@@ -36,7 +36,7 @@
   window['env']['sessionIdleTimeout'] = '$MIFOS_SESSION_IDLE_TIMEOUT';
 
   // OAuth Server Enabled
-  window['env']['oauthServerEnabled'] = '$MIFOS_OAUTH_SERVER_ENABLED';
+  window['env']['oauthServerEnabled'] = $MIFOS_OAUTH_SERVER_ENABLED;
 
   // OAuth Server URL
   window['env']['oauthServerUrl'] = '$MIFOS_OAUTH_SERVER_URL';

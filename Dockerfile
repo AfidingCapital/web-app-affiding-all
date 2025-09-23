@@ -35,7 +35,11 @@ RUN npm config set registry $NPM_REGISTRY_URL --location=global
 
 RUN npm install --location=global @angular/cli@16.0.2
 
+
 RUN npm install
+# Installer les dépendances et forcer la version compatible de d3-dispatch
+RUN npm uninstall @types/d3-dispatch || true
+RUN npm install @types/d3-dispatch@3.0.1 --save-dev || true
 
 RUN ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
 
@@ -45,6 +49,8 @@ RUN ng build --output-path=/dist $BUILD_ENVIRONMENT_OPTIONS
 FROM $NGINX_IMAGE
 
 COPY --from=builder /dist /usr/share/nginx/html
+
+RUN ls /usr/share/nginx/html
 
 EXPOSE 80
 
