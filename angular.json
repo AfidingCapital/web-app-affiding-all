@@ -27,7 +27,7 @@
             "tsConfig": "src/tsconfig.app.json",
             "polyfills": "src/polyfills.ts",
             "assets": [
-              "src/favicon.ico",
+              "src/assets/images/logo.png",
               "src/robots.txt",
               "src/manifest.json",
               "src/assets"
@@ -129,7 +129,7 @@
               }
             ],
             "assets": [
-              "src/favicon.ico",
+              "src/assets/images/logo.png",
               "src/robots.txt",
               "src/manifest.json",
               "src/assets"

@@ -8,9 +8,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
 
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="icon" type="image/png" href="assets/images/logo.png" sizes="182x184" />
-    <link rel="apple-touch-icon" type="image/png" href="apple-touch-icon.png" sizes="182x184" />
+    <link rel="icon" type="image/x-icon" href="assets/images/logo.png" />
+  <link rel="icon" type="image/png" href="assets/images/logo.png" sizes="182x184" />
+    <link rel="apple-touch-icon" type="image/png" href="assets/images/logo.png" sizes="182x184" />
     <link rel="manifest" href="manifest.json" />
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
@@ -39,11 +39,36 @@
     </script>
 
     <mifosx-web-app>
+      <style>
+        .loader-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background: transparent;
+        }
+        .loader-logo {
+          width: 160px;
+          height: 160px;
+          animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.15);
+            opacity: 0.7;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+      </style>
       <div class="loader-wrapper">
-        <div class="bottom triangle"></div>
-        <div class="top triangle"></div>
-        <div class="left triangle"></div>
-        <div class="right triangle"></div>
+        <img src="assets/images/logo.png" alt="Logo" class="loader-logo" />
       </div>
     </mifosx-web-app>
   </body>
