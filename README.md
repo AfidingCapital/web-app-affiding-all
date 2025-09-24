@@ -240,3 +240,6 @@ Want to file a bug, request a feature, contribute some code, or improve document
 
 Apache Fineract provides open APIs and affordable core banking solution for financial institutions
 and it is the backend for all UIs of the Mifos. Its GitHub Repository is (https://github.com/apache/fineract)
+
+docker compose build --no-cache
+docker compose up -d --force-recreate

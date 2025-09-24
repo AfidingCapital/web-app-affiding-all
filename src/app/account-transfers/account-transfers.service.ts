@@ -73,7 +73,10 @@ export class AccountTransfersService {
   }
 
   createMultiTransfer(data: any): Observable<any> {
-    return this.http.post(`https://cbs-server.afidingcapital.com/api/v1/external-services/fondsmouvement/multi-transfer/`, data);
+    return this.http.post(
+      `https://cbs-server.afidingcapital.com/api/v1/external-services/fondsmouvement/multi-transfer/`,
+      data
+    );
   }
 
   /**
