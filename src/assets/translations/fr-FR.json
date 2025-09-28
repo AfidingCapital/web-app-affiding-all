@@ -287,7 +287,7 @@
       }
     },
     "breadcrumbs": {
-      "Home": "Maison"
+      "Home": "Accueil"
     },
     "buttons": {
       "Accept Transfer": "Accepter le transfert",
@@ -2939,7 +2939,7 @@
       "Group Actions": "Actions de groupe",
       "GroupsCreateBusinessEvent": "GroupesCréerBusinessEvent",
       "Groups": "Groupes",
-      "Home": "Maison",
+      "Home": "Accueil",
       "host": "hôte",
       "host_name": "nom_hôte",
       "Identities": "Identités",
@@ -3240,8 +3240,8 @@
       "View, edit and/or delete your organization's employees": "Avec cette option, vous pouvez afficher, modifier et/ou supprimer les employés de votre organisation.",
       "Warning": "Avertissement",
       "Warning message": "Ce système est réservé à un usage autorisé uniquement. Tout accès non autorisé entraînera des poursuites judiciaires éventuelles. En accédant à ce système, vous reconnaissez que vous êtes autorisé à le faire et que toutes les données stockées et traitées ici sont confidentielles.",
-      "Welcome": "Accueillir",
-      "Welcome page logo from anywhere": "Ce logo ramènera l'utilisateur à la page d'accueil depuis n'importe où dans le système.",
+      "Welcome": "Bienvenue",
+      "Welcome page logo from anywhere": "Logo de la page d'accueil depuis n'importe quel emplacement",
       "Web": "la toile",
       "Working Days": "Jours de travail",
       "Working days and configure behaviour of payments": "Définir les jours ouvrables et configurer le comportement des paiements dus les jours fériés",
@@ -3267,7 +3267,7 @@
     },
     "titles": {
       "Dashboard": "Tableau de bord",
-      "Home": "Maison",
+      "Home": "Accueil",
       "Login": "Se connecter"
     }
   },
