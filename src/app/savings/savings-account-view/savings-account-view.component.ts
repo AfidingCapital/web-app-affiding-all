@@ -82,7 +82,7 @@ export class SavingsAccountViewComponent implements OnInit {
         taskPermissionName: 'CREATE_ACCOUNTTRANSFER'
       });
       this.buttonConfig.addOption({
-        name: 'Transfert multiples',
+        name: 'Transfert multiple',
         taskPermissionName: 'CREATE_ACCOUNTTRANSFER'
       });
     }
@@ -188,7 +188,7 @@ export class SavingsAccountViewComponent implements OnInit {
           queryParams: queryParams
         });
         break;
-      case 'Transfert multiples':
+      case 'Transfert multiple':
         const multipleTransferQueryParams: any = { savingsId: this.savingsAccountData.id, accountType: 'fromsavings' };
         this.router.navigate(['transfer-funds/make-multiple-account-transfer'], {
           relativeTo: this.route,
