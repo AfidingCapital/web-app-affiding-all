@@ -50,7 +50,7 @@ export class SettingsService {
   }
 
   setDefaultLanguage() {
-    const defaultLanguage = environment.defaultLanguage ? environment.defaultLanguage : 'en-US';
+    const defaultLanguage = environment.defaultLanguage ? environment.defaultLanguage : 'fr-FR';
     this.setLanguage({
       name: defaultLanguage,
       code: defaultLanguage.substring(0, 2)
