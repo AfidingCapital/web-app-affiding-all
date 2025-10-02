@@ -224,44 +224,35 @@ export class AddClientTransferDialogComponent implements OnInit, AfterViewInit {
       this.reloadAccountsWithCurrentValues();
     }, 500);
     // Client search and change event (same logic as normal component)
-    this.addClientTransferForm.controls.toClientId.valueChanges.subscribe((value: any) => {
-      console.log('Client value changed:', value);
+    //Recherche clientlimitée par bureau
+    
+   this.addClientTransferForm.controls.toClientId.valueChanges.subscribe((value: any) => {
+    const officeId = this.addClientTransferForm.controls.toOfficeId.value;
 
-      // Si la valeur est une string (recherche), faire la recherche
-      if (typeof value === 'string' && value.length >= 2) {
-        this.clientsService.getFilteredClients('displayName', 'ASC', true, value).subscribe((data: any) => {
+    if (typeof value === 'string' && value.length >= 2) {
+      if (!officeId) {
+        this.clientsData = [];
+        return;
+      }
+      this.clientsService
+        .getFilteredClients('displayName', 'ASC', true, value, officeId)
+        .subscribe((data: any) => {
           this.clientsData = data.pageItems;
-          console.log('Clients search results:', this.clientsData);
         });
-      }
-      // Si la valeur est un objet (sélection), recharger les comptes comme dans le composant normal
-      else if (typeof value === 'object' && value !== null) {
-        console.log('Client selected, reloading accounts...');
-
-        // Inclure aussi le type de compte sélectionné si disponible
-        const currentAccountType = this.addClientTransferForm.controls.toAccountType.value;
-        const formValue: any = {
-          toOfficeId: this.toOfficeId,
-          toClientId: value
-        };
-
-        // Ajouter le type de compte s'il est sélectionné
-        if (currentAccountType) {
-          formValue.toAccountType = currentAccountType;
-        }
-
-        const refinedFormValue = this.refineObject(formValue);
-
-        this.accountTransfersService
-          .newAccountTranferResource(this.id, this.accountTypeId, refinedFormValue)
-          .subscribe((response: any) => {
-            this.toAccountData = response.toAccountOptions;
-            console.log('Accounts reloaded for client:', value.displayName, this.toAccountData);
-          }, (error: any) => {
-            console.error('Error reloading accounts for client:', error);
-          });
-      }
-    });
+    } else if (typeof value === 'object' && value !== null) {
+      // Chargement des comptes avec officeId courant
+      const formValue: any = {
+        toOfficeId: officeId,
+        toClientId: value
+      };
+      const refinedFormValue = this.refineObject(formValue);
+      this.accountTransfersService
+        .newAccountTranferResource(this.id, this.accountTypeId, refinedFormValue)
+        .subscribe((response: any) => {
+          this.toAccountData = response.toAccountOptions;
+        });
+    }
+  });
 
     // Office change - reload clients and accounts
     this.addClientTransferForm.controls.toOfficeId.valueChanges.subscribe((officeId: any) => {

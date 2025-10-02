@@ -1,0 +1,65 @@
+<div class="dialog-root" style="min-width: 680px;">
+  <h2 class="mat-dialog-title" style="margin: 0 0 12px 0;">Aperçu des transferts</h2>
+
+  <!-- Simuler mat-dialog-content avec une div -->
+  <div class="dialog-content" style="padding: 0 24px 16px 24px;">
+    <!-- Détails du formulaire (lecture seule) -->
+    <section *ngIf="dialogData?.formData" class="form-summary" style="margin-bottom: 12px;">
+      <div class="row" style="display: flex; gap: 16px; align-items: center; margin-bottom: 8px;">
+        <strong>Date de transfert:</strong>
+        <span>{{ dialogData.formData.transferDate | date: 'shortDate' }}</span>
+      </div>
+      <div class="row" style="display: flex; gap: 16px; align-items: center;">
+        <strong>Description:</strong>
+        <span>{{ dialogData.formData.transferDescription }}</span>
+      </div>
+    </section>
+
+    <!-- Tableau des transferts en lecture seule -->
+    <section *ngIf="dialogData?.transferClients?.length > 0" class="table-container" style="margin-top: 8px;">
+      <table class="mat-table" style="width: 100%;">
+        <!-- Client -->
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Type de compte</th>
+            <th>Compte</th>
+            <th style="text-align: right;">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of dialogData.transferClients">
+            <td>{{ row.toClientName || row.toClientId }}</td>
+            <td>{{ row.toAccountTypeName || row.toAccountType }}</td>
+            <td>{{ row.toAccountName || row.toAccountId }}</td>
+            <td style="text-align: right;">
+              {{ row.transferAmount | currency: dialogData.currencyCode : 'symbol-narrow' : '1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <div *ngIf="(!dialogData?.transferClients || dialogData?.transferClients?.length === 0)" class="no-data" style="margin-top: 8px;">
+      <p class="text-muted" style="margin: 0; text-align: center;">
+        Aucune ligne de transfert à afficher.
+      </p>
+    </div>
+
+    <!-- Totaux -->
+    <div *ngIf="dialogData?.transferClients?.length > 0" class="totals" style="text-align: right; margin-top: 12px;">
+      <strong>Total:</strong>
+      <span style="margin-left: 8px;">
+        {{ dialogData.totalAmount | currency: dialogData.currencyCode : 'symbol-narrow' : '1.2-2' }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Simuler mat-dialog-actions avec une div -->
+  <div class="dialog-actions" style="display: flex; justify-content: flex-end; padding: 8px 24px;">
+    <button (click)="onCancel()" class="mat-button" style="margin-right: 8px;">Annuler</button>
+    <button (click)="onConfirm()" class="mat-raised-button" style="background-color: #3f51b5; color: #fff;">
+      Confirmer
+    </button>
+  </div>
+</div>

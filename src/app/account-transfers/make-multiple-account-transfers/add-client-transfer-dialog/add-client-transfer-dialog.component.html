@@ -1,20 +1,4 @@
-<h2 mat-dialog-title>{{ (data.client ? 'labels.heading.Edit Client Transfer' : 'labels.heading.Add Client Transfer') | translate }}</h2>
-
-<style>
-  mat-dialog-content {
-    min-width: 500px;
-    max-width: 600px;
-  }
-
-  mat-form-field {
-    width: 100%;
-  }
-
-  mat-dialog-actions {
-    padding: 16px 0;
-  }
-</style>
-
+<h2 mat-dialog-title>{{ 'Only savings accounts are allowed' | translate }}</h2>
 <mat-dialog-content>
   <form [formGroup]="addClientTransferForm">
     <div fxLayout="column" fxLayoutGap="2%">

@@ -2,6 +2,7 @@
 import { Component, OnInit, Input, TemplateRef, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 /** Custom Components */
 import { KeyboardShortcutsDialogComponent } from 'app/shared/keyboard-shortcuts-dialog/keyboard-shortcuts-dialog.component';
@@ -60,7 +61,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
     private authenticationService: AuthenticationService,
     private settingsService: SettingsService,
     private configurationWizardService: ConfigurationWizardService,
-    private popoverService: PopoverService
+    private popoverService: PopoverService,
+    private translateService: TranslateService 
   ) {
     this.userActivity = JSON.parse(localStorage.getItem('mifosXLocation'));
   }
@@ -223,7 +225,8 @@ export class SidenavComponent implements OnInit, AfterViewInit {
 
   get tenantIdentifier(): string {
     if (!this.settingsService.tenantIdentifier || this.settingsService.tenantIdentifier === '') {
-      return 'default';
+      //return 'default';
+      return '{{ labels.catalogs.default | translate }}';
     }
     return this.settingsService.tenantIdentifier;
   }

@@ -1,67 +1,44 @@
-/** Angular Imports */
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 
-/** Custom Services */
 import { AccountTransfersService } from '../account-transfers.service';
 import { SettingsService } from 'app/settings/settings.service';
 import { ClientsService } from 'app/clients/clients.service';
 import { Dates } from 'app/core/utils/dates';
 
-/** Custom Dialogs */
 import { AddClientTransferDialogComponent } from './add-client-transfer-dialog/add-client-transfer-dialog.component';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
+import { PreviewMultipleTransfersDialogComponent } from './preview-multiple-transfers-dialog/preview-multiple-transfers-dialog.component';
 
-/**
- * Make Multiple Account Transfers component.
- */
 @Component({
   selector: 'mifosx-make-multiple-account-transfers',
   templateUrl: './make-multiple-account-transfers.component.html',
   styleUrls: ['./make-multiple-account-transfers.component.scss']
 })
 export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewInit {
-  /** Make Multiple Account Transfers form. */
+  // Make Multiple Account Transfers form.
   makeMultipleAccountTransfersForm: UntypedFormGroup;
-  /** Account Transfers Template data. */
+  // Account Transfers Template data.
   accountTransfersTemplateData: any;
-  /** To Office Type Data */
+  // Data for selects
   toOfficeTypeData: any;
-  /** To Client Type Data */
   toClientTypeData: any;
-  /** To Account Type Data */
   toAccountTypeData: any;
-  /** To Account Data */
   toAccountData: any;
-  /** Account Type Id */
+  // Context
   accountTypeId: any;
-  /** Account Type */
   accountType: any;
-  /** Savings Id or Loans Id */
   id: any;
-  /** Clients Data */
+  // Clients
   clientsData: any;
-  /** Multiple Transfer Clients */
   transferClients: any[] = [];
 
-  /** Minimum Date allowed. */
+  // Date bounds
   minDate = new Date(2000, 0, 1);
-  /** Maximum Date allowed. */
   maxDate = new Date();
 
-  /**
-   * Retrieves the account transfers template data from `resolve`.
-   * @param {UntypedFormBuilder} formBuilder Form Builder.
-   * @param {AccountTransfersService} accountTransfersService Account Transfers Service.
-   * @param {ActivatedRoute} route Activated Route.
-   * @param {Router} router Router for navigation.
-   * @param {Dates} dateUtils Date Utils.
-   * @param {SettingsService} settingsService Settings Service.
-   * @param {ClientsService} clientsService Clients Service.
-   * @param {MatDialog} dialog Mat Dialog.
-   */
   constructor(
     private formBuilder: UntypedFormBuilder,
     private accountTransfersService: AccountTransfersService,
@@ -98,49 +75,43 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
 
   ngOnInit() {
     this.maxDate = this.settingsService.businessDate;
-    
-    // Debug: Vérifier l'initialisation de la date
+
+    // Debug
     console.log('Business date:', this.settingsService.businessDate);
     console.log('Max date:', this.maxDate);
     console.log('Business date type:', typeof this.settingsService.businessDate);
-    console.log('Business date value:', this.settingsService.businessDate);
-    
-    this.setMakeMultipleAccountTransfersForm();
-    
-    // Debug après initialisation du formulaire
+
+    this.setMakeMultiAccountTransfersForm();
+
+    // Debug after form init
     console.log('Form date value after init:', this.makeMultipleAccountTransfersForm.value.transferDate);
     console.log('Form date control valid:', this.makeMultipleAccountTransfersForm.controls.transferDate.valid);
     console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate.errors);
-    
-    // Vérifier et corriger la date si nécessaire
+
+    // Ensure date is set
     this.ensureTransferDateIsSet();
   }
 
-  /**
-   * Sets the make multiple account transfers form.
-   */
-  setMakeMultipleAccountTransfersForm() {
-    // S'assurer qu'on a une date valide
+  /** Sets the make multiple account transfers form. */
+  setMakeMultiAccountTransfersForm() {
     const defaultDate = this.settingsService.businessDate || new Date();
     console.log('Default date for form:', defaultDate);
     console.log('Default date type:', typeof defaultDate);
-    
+
     this.makeMultipleAccountTransfersForm = this.formBuilder.group({
-      toOfficeId: ['', Validators.required],
+      //toOfficeId: ['', Validators.required],
       transferDate: [defaultDate, Validators.required],
       transferDescription: ['', Validators.required]
     });
-    
+
     console.log('Form created with values:', this.makeMultipleAccountTransfersForm.value);
   }
 
-  /**
-   * Ensures that the transfer date is properly set
-   */
+  /** Ensures that the transfer date is properly set */
   ensureTransferDateIsSet() {
     const currentDate = this.makeMultipleAccountTransfersForm.value.transferDate;
     console.log('Checking transfer date:', currentDate);
-    
+
     if (!currentDate) {
       console.log('Transfer date is missing, setting default date');
       const defaultDate = this.settingsService.businessDate || new Date();
@@ -170,9 +141,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
       });
   }
 
-  /** Refine Object
-   * Removes the object param with null or '' values
-   */
+  /** Refine Object: Removes null/'' values and maps client id if present */
   refineObject(dataObj: { [x: string]: any; transferDate: any }) {
     delete dataObj.transferDate;
     if (dataObj.toClientId) {
@@ -188,11 +157,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     return dataObj;
   }
 
-  /**
-   * Subscribes to Clients search filter:
-   */
   ngAfterViewInit() {
-    // Initialize any view-specific logic here
     console.log('Multiple transfers component view initialized');
   }
 
@@ -200,13 +165,6 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
    * Opens dialog to add a new client transfer
    */
   addClientTransfer() {
-    // Vérifier que le bureau est sélectionné avant d'ouvrir le modal
-    if (!this.makeMultipleAccountTransfersForm.value.toOfficeId) {
-      alert('Veuillez d\'abord sélectionner un bureau de destination');
-      return;
-    }
-
-    // S'assurer que les données sont à jour
     const formValue = this.refineObject(this.makeMultipleAccountTransfersForm.value);
     this.accountTransfersService
       .newAccountTranferResource(this.id, this.accountTypeId, formValue)
@@ -215,14 +173,12 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
         this.toClientTypeData = response.toClientOptions;
         this.setOptions();
 
-        // Debug: Vérifier les données avant d'ouvrir le modal
         console.log('Data before opening modal:');
         console.log('toOfficeTypeData:', this.toOfficeTypeData);
         console.log('toAccountTypeData:', this.toAccountTypeData);
         console.log('toAccountData:', this.toAccountData);
         console.log('clientsData:', this.clientsData);
 
-        // Maintenant ouvrir le modal avec les données mises à jour
         const dialogRef = this.dialog.open(AddClientTransferDialogComponent, {
           data: {
             toOfficeTypeData: this.toOfficeTypeData,
@@ -232,25 +188,21 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
             toOfficeId: this.makeMultipleAccountTransfersForm.value.toOfficeId,
             accountTypeId: this.accountTypeId,
             id: this.id,
-            // Passer aussi les données initiales du resolver
             initialAccountTransfersTemplateData: this.accountTransfersTemplateData
           }
         });
 
         dialogRef.afterClosed().subscribe((result: any) => {
           if (result) {
-            this.transferClients.push({
-              id: Date.now(), // Temporary ID
-              ...result
-            });
+            const newItem = { id: Date.now(), ...result };
+            // Immutable update
+            this.transferClients = [...this.transferClients, newItem];
           }
         });
       });
   }
 
-  /**
-   * Opens dialog to edit an existing client transfer
-   */
+  /** Opens dialog to edit an existing client transfer */
   editClientTransfer(client: any) {
     const dialogRef = this.dialog.open(AddClientTransferDialogComponent, {
       data: {
@@ -269,16 +221,16 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        const index = this.transferClients.findIndex(c => c.id === client.id);
-        if (index !== -1) {
-          this.transferClients[index] = { ...client, ...result };
-        }
+        // Immutable update: remplacer l'item correspondant par une version mise à jour
+        this.transferClients = this.transferClients.map((c) =>
+          c.id === client.id ? { ...c, ...result } : c
+        );
       }
     });
   }
 
   /**
-   * Calculates the total amount of all transfers
+   * Calculs le total des transferts
    */
   getTotalAmount(): number {
     return this.transferClients.reduce((total, client) => {
@@ -287,7 +239,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
   }
 
   /**
-   * Gets the office name by ID
+   * Get office name by id
    */
   getOfficeName(officeId: any): string {
     const office = this.toOfficeTypeData?.find((o: any) => o.id === officeId);
@@ -295,7 +247,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
   }
 
   /**
-   * Removes a client transfer from the list
+   * Remove a client transfer
    */
   removeClientTransfer(client: any) {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
@@ -308,51 +260,63 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.confirm) {
-        const index = this.transferClients.findIndex(c => c.id === client.id);
-        if (index !== -1) {
-          this.transferClients.splice(index, 1);
-        }
+        // Immutable removal
+        this.transferClients = this.transferClients.filter((c) => c.id !== client.id);
       }
     });
   }
 
-  /** Flag to show preview mode */
-  showPreview = false;
+  /**
+   * Opens the preview dialog and handles confirmation.
+   * This is the new dialog-based flow.
+   */
+  openPreviewDialog(): void {
+    const dialogRef = this.dialog.open(PreviewMultipleTransfersDialogComponent, {
+      data: {
+        transferClients: this.transferClients,
+        formData: this.makeMultipleAccountTransfersForm.value,
+        totalAmount: this.getTotalAmount(),
+        currencyCode: this.accountTransfersTemplateData.currency.code
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result === 'confirm') {
+        this.confirmSubmit();
+      }
+    });
+  }
 
   /**
-   * Shows the preview of all transfers before submission.
+   * Submits the transfers - now uses the dialog for preview
    */
-  submit() {
+  submit(): void {
     if (this.transferClients.length === 0) {
       alert('Veuillez ajouter au moins un client pour le transfert');
       return;
     }
 
-    this.showPreview = true;
+    // Ouvre le dialog d’aperçu
+    this.openPreviewDialog();
   }
 
   /**
-   * Cancels the preview and returns to edit mode.
-   */
-  cancelPreview() {
-    this.showPreview = false;
-  }
-
-  /**
-   * Confirms and submits the transfers.
+   * Confirme et soumet les transferts.
    */
   confirmSubmit() {
     // Forcer la validation du formulaire
     this.makeMultipleAccountTransfersForm.markAllAsTouched();
-    
-    // Vérifier que le formulaire est valide
+
     if (!this.makeMultipleAccountTransfersForm.valid) {
       console.error('Formulaire invalide:', this.makeMultipleAccountTransfersForm.errors);
-      console.error('Erreurs par contrôle:', Object.keys(this.makeMultipleAccountTransfersForm.controls).map(key => ({
-        control: key,
-        errors: this.makeMultipleAccountTransfersForm.controls[key].errors,
-        value: this.makeMultipleAccountTransfersForm.controls[key].value
-      })));
+      console.error(
+        'Erreurs par contrôle:',
+        Object.keys(this.makeMultipleAccountTransfersForm.controls).map(key => ({
+          control: key,
+          errors: this.makeMultipleAccountTransfersForm.controls[key].errors,
+          value: this.makeMultipleAccountTransfersForm.controls[key].value
+        }))
+      );
       alert('Veuillez corriger les erreurs dans le formulaire avant de continuer.');
       return;
     }
@@ -360,7 +324,6 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     const dateFormat = this.settingsService.dateFormat;
     const locale = this.settingsService.language.code;
 
-    // Debug: Vérifier la date avant formatage
     const rawTransferDate = this.makeMultipleAccountTransfersForm.value.transferDate;
     console.log('=== DEBUG DATE TRANSFER ===');
     console.log('Raw transfer date:', rawTransferDate);
@@ -375,85 +338,29 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate.errors);
     console.log('Form date control touched:', this.makeMultipleAccountTransfersForm.controls.transferDate.touched);
     console.log('Form date control dirty:', this.makeMultipleAccountTransfersForm.controls.transferDate.dirty);
-    console.log('==========================');
+    console.log('===========================');
 
-    // Vérifier que la date est valide
-    if (!rawTransferDate) {
+    // Build formatted date
+    let formattedTransferDate: string;
+    const rawDate = this.makeMultipleAccountTransfersForm.value.transferDate;
+    if (!rawDate) {
       console.error('ERREUR: La date de transfert est manquante ou invalide');
-      console.log('Tentative de correction automatique...');
-      
-      // Essayer de corriger automatiquement
       this.ensureTransferDateIsSet();
-      
-      // Vérifier à nouveau
       const correctedDate = this.makeMultipleAccountTransfersForm.value.transferDate;
       if (!correctedDate) {
         alert('La date de transfert est requise. Veuillez sélectionner une date valide.');
         return;
       } else {
-        console.log('Date corrigée automatiquement:', correctedDate);
-        // Continuer avec la date corrigée
-        const formattedTransferDate = this.dateUtils.formatDate(correctedDate, dateFormat);
-        console.log('Formatted corrected date:', formattedTransferDate);
-        
-        if (!formattedTransferDate) {
-          alert('Erreur lors du formatage de la date de transfert corrigée.');
-          return;
-        }
-        
-        // Utiliser la date corrigée
-        const multipleTransfersData = {
-          transferDate: formattedTransferDate,
-          transferDescription: this.makeMultipleAccountTransfersForm.value.transferDescription,
-          dateFormat,
-          locale,
-          fromAccountId: this.id,
-          fromAccountType: this.accountTypeId,
-          fromClientId: this.accountTransfersTemplateData.fromClient.id,
-          fromOfficeId: this.accountTransfersTemplateData.fromClient.officeId,
-          
-          toAccounts: this.transferClients.map(client => ({
-            toClientId: client.toClientId,
-            toAccountType: client.toAccountType,
-            toAccountId: client.toAccountId,
-            transferAmount: client.transferAmount,
-            toOfficeId: client.toOfficeId, // Utiliser le toOfficeId de chaque client
-          }))
-        };
-
-        // Appel API pour le transfert multiple
-        console.log('Multiple transfers data with corrected date:', multipleTransfersData);
-
-        this.accountTransfersService.createMultiTransfer(multipleTransfersData).subscribe(
-          (response: any) => {
-            console.log('Transferts multiples enregistrés avec succès:', response);
-            alert('Tous les transferts ont été enregistrés avec succès.');
-            this.transferClients = [];
-            this.showPreview = false;
-          },
-          (error: any) => {
-            console.error('Erreur lors de l\'enregistrement des transferts multiples:', error);
-            alert('Une erreur est survenue lors de l\'enregistrement des transferts multiples.');
-          }
-        );
-
-        // Hide preview after submission
-        this.showPreview = false;
-        return;
+        formattedTransferDate = this.dateUtils.formatDate(correctedDate, dateFormat);
+      }
+    } else {
+      if (rawDate instanceof Date) {
+        formattedTransferDate = this.dateUtils.formatDate(rawDate, dateFormat);
+      } else {
+        formattedTransferDate = this.dateUtils.formatDate(rawDate, dateFormat);
       }
     }
 
-    // Vérifier que c'est bien une date valide
-    if (!(rawTransferDate instanceof Date) || isNaN(rawTransferDate.getTime())) {
-      console.error('ERREUR: La date de transfert n\'est pas une date valide');
-      alert('La date de transfert sélectionnée n\'est pas valide. Veuillez sélectionner une date valide.');
-      return;
-    }
-
-    const formattedTransferDate = this.dateUtils.formatDate(rawTransferDate, dateFormat);
-    console.log('Formatted transfer date:', formattedTransferDate);
-
-    // Vérifier que la date formatée est valide
     if (!formattedTransferDate) {
       alert('Erreur lors du formatage de la date de transfert');
       return;
@@ -468,17 +375,15 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
       fromAccountType: this.accountTypeId,
       fromClientId: this.accountTransfersTemplateData.fromClient.id,
       fromOfficeId: this.accountTransfersTemplateData.fromClient.officeId,
-
       toAccounts: this.transferClients.map(client => ({
         toClientId: client.toClientId,
         toAccountType: client.toAccountType,
         toAccountId: client.toAccountId,
         transferAmount: client.transferAmount,
-        toOfficeId: client.toOfficeId, // Utiliser le toOfficeId de chaque client
+        toOfficeId: client.toOfficeId
       }))
     };
 
-    // Appel API pour le transfert multiple
     console.log('Multiple transfers data:', multipleTransfersData);
 
     this.accountTransfersService.createMultiTransfer(multipleTransfersData).subscribe(
@@ -486,17 +391,11 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
         console.log('Transferts multiples enregistrés avec succès:', response);
         alert('Tous les transferts ont été enregistrés avec succès.');
         this.transferClients = [];
-        this.showPreview = false;
-        // Optionnel: rediriger vers la liste des transactions
-        // this.router.navigate(['../../transactions'], { relativeTo: this.route });
       },
       (error: any) => {
         console.error('Erreur lors de l\'enregistrement des transferts multiples:', error);
         alert('Une erreur est survenue lors de l\'enregistrement des transferts multiples.');
       }
     );
-
-    // Hide preview after submission
-    this.showPreview = false;
   }
 }
