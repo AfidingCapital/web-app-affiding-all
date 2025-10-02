@@ -1,5 +1,5 @@
-/** Angular Imports */
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 /** Custom Modules */
 import { AccountTransfersRoutingModule } from './account-transfers-routing.module';
@@ -17,6 +17,10 @@ import { ListTransactionsComponent } from './list-transactions/list-transactions
 import { ViewAccountTransferComponent } from './view-account-transfer/view-account-transfer.component';
 import { MakeMultipleAccountTransfersComponent } from './make-multiple-account-transfers/make-multiple-account-transfers.component';
 import { AddClientTransferDialogComponent } from './make-multiple-account-transfers/add-client-transfer-dialog/add-client-transfer-dialog.component';
+
+// Importer le module du dialog (pas le composant directement)
+import { PreviewMultipleTransfersDialogModule } from './make-multiple-account-transfers/preview-multiple-transfers-dialog/preview-multiple-transfers-dialog.module';
+
 /**
  * Account Transfers Module
  *
@@ -24,10 +28,12 @@ import { AddClientTransferDialogComponent } from './make-multiple-account-transf
  */
 @NgModule({
   imports: [
+    CommonModule,
     SharedModule,
     PipesModule,
     DirectivesModule,
-    AccountTransfersRoutingModule
+    AccountTransfersRoutingModule,
+    PreviewMultipleTransfersDialogModule // Import du module du dialog, pas le composant
   ],
   declarations: [
     ViewStandingInstructionsComponent,

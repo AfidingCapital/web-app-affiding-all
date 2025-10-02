@@ -85,8 +85,8 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
 
     // Debug after form init
     console.log('Form date value after init:', this.makeMultipleAccountTransfersForm.value.transferDate);
-    console.log('Form date control valid:', this.makeMultipleAccountTransfersForm.controls.transferDate.valid);
-    console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate.errors);
+    console.log('Form date control valid:', this.makeMultipleAccountTransfersForm.controls.transferDate?.valid);
+    console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate?.errors);
 
     // Ensure date is set
     this.ensureTransferDateIsSet();
@@ -98,9 +98,12 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     console.log('Default date for form:', defaultDate);
     console.log('Default date type:', typeof defaultDate);
 
+    // Garantir une instance Date pour le champ par défaut
+    const initialDate = defaultDate instanceof Date ? defaultDate : new Date(defaultDate);
+
     this.makeMultipleAccountTransfersForm = this.formBuilder.group({
       //toOfficeId: ['', Validators.required],
-      transferDate: [defaultDate, Validators.required],
+      transferDate: [initialDate, Validators.required],
       transferDescription: ['', Validators.required]
     });
 
@@ -172,12 +175,6 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
         this.accountTransfersTemplateData = response;
         this.toClientTypeData = response.toClientOptions;
         this.setOptions();
-
-        console.log('Data before opening modal:');
-        console.log('toOfficeTypeData:', this.toOfficeTypeData);
-        console.log('toAccountTypeData:', this.toAccountTypeData);
-        console.log('toAccountData:', this.toAccountData);
-        console.log('clientsData:', this.clientsData);
 
         const dialogRef = this.dialog.open(AddClientTransferDialogComponent, {
           data: {
@@ -268,15 +265,24 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
 
   /**
    * Opens the preview dialog and handles confirmation.
-   * This is the new dialog-based flow.
    */
   openPreviewDialog(): void {
+    // Normalisation simple des données à envoyer au dialog
+    const formValue: any = { ...this.makeMultipleAccountTransfersForm.value };
+
+    // Normaliser transferDate si nécessaire
+    if (formValue?.transferDate && !(formValue.transferDate instanceof Date)) {
+      const d = new Date(formValue.transferDate);
+      formValue.transferDate = isNaN(d.getTime()) ? formValue.transferDate : d.toISOString();
+    }
+
+    // Ouverture du dialog (une seule ouverture)
     const dialogRef = this.dialog.open(PreviewMultipleTransfersDialogComponent, {
       data: {
         transferClients: this.transferClients,
-        formData: this.makeMultipleAccountTransfersForm.value,
+        formData: formValue,
         totalAmount: this.getTotalAmount(),
-        currencyCode: this.accountTransfersTemplateData.currency.code
+        currencyCode: this.accountTransfersTemplateData?.currency?.code
       }
     });
 
@@ -325,26 +331,16 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     const locale = this.settingsService.language.code;
 
     const rawTransferDate = this.makeMultipleAccountTransfersForm.value.transferDate;
-    console.log('=== DEBUG DATE TRANSFER ===');
+    console.log('=== DEBUG DATE TRANSFER (trim extract) ===');
     console.log('Raw transfer date:', rawTransferDate);
     console.log('Raw transfer date type:', typeof rawTransferDate);
-    console.log('Raw transfer date is null:', rawTransferDate === null);
-    console.log('Raw transfer date is undefined:', rawTransferDate === undefined);
-    console.log('Raw transfer date is empty string:', rawTransferDate === '');
     console.log('Date format:', dateFormat);
     console.log('Form valid:', this.makeMultipleAccountTransfersForm.valid);
-    console.log('Form value:', this.makeMultipleAccountTransfersForm.value);
-    console.log('Form date control valid:', this.makeMultipleAccountTransfersForm.controls.transferDate.valid);
-    console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate.errors);
-    console.log('Form date control touched:', this.makeMultipleAccountTransfersForm.controls.transferDate.touched);
-    console.log('Form date control dirty:', this.makeMultipleAccountTransfersForm.controls.transferDate.dirty);
-    console.log('===========================');
 
     // Build formatted date
     let formattedTransferDate: string;
     const rawDate = this.makeMultipleAccountTransfersForm.value.transferDate;
     if (!rawDate) {
-      console.error('ERREUR: La date de transfert est manquante ou invalide');
       this.ensureTransferDateIsSet();
       const correctedDate = this.makeMultipleAccountTransfersForm.value.transferDate;
       if (!correctedDate) {
@@ -354,11 +350,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
         formattedTransferDate = this.dateUtils.formatDate(correctedDate, dateFormat);
       }
     } else {
-      if (rawDate instanceof Date) {
-        formattedTransferDate = this.dateUtils.formatDate(rawDate, dateFormat);
-      } else {
-        formattedTransferDate = this.dateUtils.formatDate(rawDate, dateFormat);
-      }
+      formattedTransferDate = this.dateUtils.formatDate(rawDate, dateFormat);
     }
 
     if (!formattedTransferDate) {
@@ -393,7 +385,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
         this.transferClients = [];
       },
       (error: any) => {
-        console.error('Erreur lors de l\'enregistrement des transferts multiples:', error);
+        console.error("Erreur lors de l'enregistrement des transferts multiples:", error);
         alert('Une erreur est survenue lors de l\'enregistrement des transferts multiples.');
       }
     );
