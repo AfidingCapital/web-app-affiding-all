@@ -2,7 +2,7 @@
   <div fxLayout="row" fxLayoutAlign="start center">
     <div class="search-box">
       <mat-form-field>
-        <input matInput placeholder="Search by Name" [formControl]="name" />
+        <input matInput placeholder="{{ 'labels.text.Search by Name' | translate }}" [formControl]="name" />
       </mat-form-field>
       <mat-checkbox #showClosedGroups labelPosition="after" (change)="changeShowClosedGroups()">{{
         'labels.inputs.Show Closed Groups' | translate

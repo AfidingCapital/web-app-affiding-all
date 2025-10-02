@@ -2,10 +2,10 @@
   <div fxLayout="row" fxLayoutAlign="start center">
     <div class="search-box">
       <mat-form-field>
-        <input matInput placeholder="Search by Name" [formControl]="name" />
+        <input matInput placeholder="{{ 'labels.text.Search by Name' | translate }}" [formControl]="name" />
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Search by ExternalID" [formControl]="externalId" />
+        <input matInput placeholder="{{ 'labels.text.Search by External ID' | translate }}" [formControl]="externalId" />
       </mat-form-field>
       <mat-checkbox #showClosedCenters labelPosition="after" (change)="changeShowClosedCenters()">
         {{ 'labels.inputs.Show Closed Centers' | translate }}
