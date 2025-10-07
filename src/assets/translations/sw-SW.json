@@ -1,5 +1,5 @@
 {
-  "APP_NAME": "Mifos X",
+  "APP_NAME": "AfidingCapital",
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
   "errors": {
@@ -1152,6 +1152,7 @@
       "Principal Amount": "Kiasi cha Mkuu"
     },
     "inputs": {
+      "Show draft" : "Onyesha rasimu",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "DHIMA",

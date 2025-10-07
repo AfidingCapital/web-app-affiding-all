@@ -1,4 +1,4 @@
-/** Angular Imports. */
+/** Angular Imports */
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -24,6 +24,53 @@ export class ClientsComponent implements OnInit {
     'status',
     'officeName'
   ];
+
+  // 1) Liste des drafts statiques
+  draftClients: DraftClient[] = [
+    {
+      id: 'draft-001',
+      displayName: 'Jean-Luc Mugowgwa',
+      accountNumber: '001234567',
+      externalId: 'EXT-DRAFT-001',
+      status: { code: 'draft', value: 'Draft' },
+      officeName: 'Kinshasa',
+      isDraft: true
+    },
+    {
+      id: 'draft-002',
+      displayName: 'Piere Kwete',
+      accountNumber: '009836542683',
+      externalId: 'EXT-DRAFT-002',
+      status: { code: 'draft', value: 'Draft' },
+      officeName: 'Kinshasa',
+      isDraft: true
+    },
+    {
+      id: 'draft-003',
+      displayName: 'Christian Kayeye',
+      accountNumber: '00983688299',
+      externalId: 'EXT-DRAFT-003',
+      status: { code: 'draft', value: 'Draft' },
+      officeName: 'Kinshasa',
+      isDraft: true
+    },
+    {
+      id: 'draft-004',
+      displayName: 'Josephine Kingombe',
+      accountNumber: '009843588299',
+      externalId: 'EXT-DRAFT-004',
+      status: { code: 'draft', value: 'Draft' },
+      officeName: 'Kinshasa',
+      isDraft: true
+    }
+    // Ajouter d'autres drafts si nécessaire
+  ];
+
+  // 2) Contrôleur d’affichage des drafts
+  showDraft: boolean = false;
+
+  // Données API et affichage
+  apiClients: any[] = []; // données API de la page courante
   dataSource: MatTableDataSource<any> = new MatTableDataSource();
 
   existsClientsToFilter = false;
@@ -45,13 +92,11 @@ export class ClientsComponent implements OnInit {
   constructor(private clientService: ClientsService) {}
 
   ngOnInit() {
-    if (environment.preloadClients) {
-      this.getClients();
-    }
+    this.getClients();
   }
 
   /**
-   * Searches server for query and resource.
+   * Recherches server pour texte et ressources.
    */
   search(value: string) {
     this.filterText = value;
@@ -59,15 +104,25 @@ export class ClientsComponent implements OnInit {
     this.getClients();
   }
 
+  // --------------- Données affichées (fusion drafts + API) ---------------
+  get displayedData(): any[] {
+    if (this.showDraft) {
+      // Drafts + API courants
+      return [...this.draftClients, ...this.apiClients];
+    }
+    return this.apiClients;
+  }
+
+  // --------------- Appels API ---------------
   private getClients() {
     this.isLoading = true;
     this.clientService
       .searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection)
       .subscribe(
         (data: any) => {
-          this.dataSource.data = data.content;
-
+          this.apiClients = data.content;
           this.totalRows = data.totalElements;
+          this.dataSource.data = this.displayedData;
 
           this.existsClientsToFilter = data.numberOfElements > 0;
           this.notExistsClientsToFilter = !this.existsClientsToFilter;
@@ -79,10 +134,25 @@ export class ClientsComponent implements OnInit {
       );
   }
 
+  // --------------- Actions UI ---------------
+  onShowDraftChange(_evt?: boolean) {
+    // La valeur this.showDraft est déjà mise à jour par ngModelChange
+    this.getClients(); // recharge les données en fonction du nouvel état
+  }
+
+  // --------------- Pagination & Tri ---------------
   pageChanged(event: PageEvent) {
     this.pageSize = event.pageSize;
     this.currentPage = event.pageIndex;
-    this.getClients();
+    // Si Show Draft est actif, on utilise quand même la pagination serveur pour apiClients;
+    // les drafts s'affichent uniquement via displayedData (Option A)
+    if (!this.showDraft) {
+      this.getClients(); // pagination serveur
+    } else {
+      // Option A: on ne recharge pas les données API ici; on met simplement à jour le dataSource
+      // afin d'inclure les drafts sur la première page uniquement via displayedData
+      this.dataSource.data = this.displayedData;
+    }
   }
 
   sortChanged(event: Sort) {
@@ -101,4 +171,17 @@ export class ClientsComponent implements OnInit {
     this.currentPage = 0;
     this.paginator.firstPage();
   }
+
+  // --------------- Types ---------------
+}
+
+/** Draft type pour le modéle DraftClient */
+interface DraftClient {
+  id: string;
+  displayName: string;
+  accountNumber: string;
+  externalId: string;
+  status: { code: string; value: string }; // doit inclure 'draft'
+  officeName: string;
+  isDraft?: boolean; // marquez explicitement comme draft
 }

@@ -1,5 +1,5 @@
 {
-  "APP_NAME": "Mifos X",
+  "APP_NAME": "AfidingCapital",
   "Logged in as": "Logged in as",
   "Remember me": "Remember me",
   "errors": {
@@ -1161,6 +1161,7 @@
       "Principal Amount": "Principal Amount"
     },
     "inputs": {
+      "Show draft" : "Show draft",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "LIABILITY",
