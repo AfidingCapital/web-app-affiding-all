@@ -56,5 +56,3 @@ testem.log
 Thumbs.db
 .vscode/
 cypress/
-
-src/assets/env.js
