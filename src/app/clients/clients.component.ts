@@ -4,6 +4,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { forkJoin } from 'rxjs';
 
 /** Custom Services */
 import { environment } from 'environments/environment';
@@ -25,46 +26,10 @@ export class ClientsComponent implements OnInit {
     'officeName'
   ];
 
-  // 1) Liste des drafts statiques
-  draftClients: DraftClient[] = [
-    {
-      id: 'draft-001',
-      displayName: 'Jean-Luc Mugowgwa',
-      accountNumber: '001234567',
-      externalId: 'EXT-DRAFT-001',
-      status: { code: 'draft', value: 'Draft' },
-      officeName: 'Kinshasa',
-      isDraft: true
-    },
-    {
-      id: 'draft-002',
-      displayName: 'Piere Kwete',
-      accountNumber: '009836542683',
-      externalId: 'EXT-DRAFT-002',
-      status: { code: 'draft', value: 'Draft' },
-      officeName: 'Kinshasa',
-      isDraft: true
-    },
-    {
-      id: 'draft-003',
-      displayName: 'Christian Kayeye',
-      accountNumber: '00983688299',
-      externalId: 'EXT-DRAFT-003',
-      status: { code: 'draft', value: 'Draft' },
-      officeName: 'Kinshasa',
-      isDraft: true
-    },
-    {
-      id: 'draft-004',
-      displayName: 'Josephine Kingombe',
-      accountNumber: '009843588299',
-      externalId: 'EXT-DRAFT-004',
-      status: { code: 'draft', value: 'Draft' },
-      officeName: 'Kinshasa',
-      isDraft: true
-    }
-    // Ajouter d'autres drafts si nécessaire
-  ];
+  // 2) Contrôleur d’affichage des drafts (récupérés via l'endpoint)
+draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
+
+
 
   // 2) Contrôleur d’affichage des drafts
   showDraft: boolean = false;
@@ -108,14 +73,43 @@ export class ClientsComponent implements OnInit {
   get displayedData(): any[] {
     if (this.showDraft) {
       // Drafts + API courants
-      return [...this.draftClients, ...this.apiClients];
+      return [...this.draftApiClients, ...this.apiClients];
     }
     return this.apiClients;
   }
 
   // --------------- Appels API ---------------
+  
   private getClients() {
-    this.isLoading = true;
+  this.isLoading = true;
+
+  if (this.showDraft) {
+    // Récupérer à la fois les clients API et les drafts via l'endpoint
+    forkJoin({
+      api: this.clientService.searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection),
+      drafts: this.clientService.getDraftClients()
+    }).subscribe(
+      ({ api, drafts }: { api: any, drafts: any[] }) => {
+        // API results
+        this.apiClients = api.content;
+        // Drafts récupérés
+        this.draftApiClients = drafts;
+
+        // Pagination: combiner les totaux
+        this.totalRows = api.totalElements + drafts.length;
+
+        this.dataSource.data = this.displayedData;
+
+        this.existsClientsToFilter = (api.numberOfElements > 0) || (drafts.length > 0);
+        this.notExistsClientsToFilter = !this.existsClientsToFilter;
+        this.isLoading = false;
+      },
+      (error: any) => {
+        this.isLoading = false;
+      }
+    );
+  } else {
+    // Cas normal: uniquement les résultats API
     this.clientService
       .searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection)
       .subscribe(
@@ -133,27 +127,22 @@ export class ClientsComponent implements OnInit {
         }
       );
   }
+}
 
+// --------------- Pagination & Tri ---------------
+pageChanged(event: PageEvent) {
+  this.pageSize = event.pageSize;
+  this.currentPage = event.pageIndex;
+  // Toujours recharger les données (API + drafts si actif)
+  this.getClients();
+}
   // --------------- Actions UI ---------------
   onShowDraftChange(_evt?: boolean) {
     // La valeur this.showDraft est déjà mise à jour par ngModelChange
     this.getClients(); // recharge les données en fonction du nouvel état
   }
 
-  // --------------- Pagination & Tri ---------------
-  pageChanged(event: PageEvent) {
-    this.pageSize = event.pageSize;
-    this.currentPage = event.pageIndex;
-    // Si Show Draft est actif, on utilise quand même la pagination serveur pour apiClients;
-    // les drafts s'affichent uniquement via displayedData (Option A)
-    if (!this.showDraft) {
-      this.getClients(); // pagination serveur
-    } else {
-      // Option A: on ne recharge pas les données API ici; on met simplement à jour le dataSource
-      // afin d'inclure les drafts sur la première page uniquement via displayedData
-      this.dataSource.data = this.displayedData;
-    }
-  }
+  
 
   sortChanged(event: Sort) {
     if (event.direction === '') {
@@ -173,15 +162,4 @@ export class ClientsComponent implements OnInit {
   }
 
   // --------------- Types ---------------
-}
-
-/** Draft type pour le modéle DraftClient */
-interface DraftClient {
-  id: string;
-  displayName: string;
-  accountNumber: string;
-  externalId: string;
-  status: { code: string; value: string }; // doit inclure 'draft'
-  officeName: string;
-  isDraft?: boolean; // marquez explicitement comme draft
 }

@@ -43,6 +43,14 @@ export class ClientsService {
     return this.http.get('/clients', { params: httpParams });
   }
 
+  //Get clients with status Draft
+   //* Endpoint example: /clients?status=Draft
+   
+  getDraftClients(): Observable<any> {
+    const httpParams = new HttpParams().set('status', 'Draft');
+    return this.http.get('/clients', { params: httpParams });
+  }
+
   getClientTemplate(): Observable<any> {
     return this.http.get('/clients/template');
   }
