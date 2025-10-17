@@ -51,6 +51,30 @@ export class ClientsService {
     return this.http.get('/clients', { params: httpParams });
   }
 
+ /**
+ * Get all active clients, with optional name filter.
+ * If filterName is present, the API is called with displayName=<filterName>.
+ */
+getActiveClients(filterName?: string): Observable<any> {
+  let httpParams = new HttpParams().set('status', 'Active');
+  // Demande des champs utiles, y compris l'ID
+  httpParams = httpParams.set(
+    'fields', 
+    'id,displayName,fullname,accountNo,emailAddress,officeName'
+  );
+  
+  //Filtrage par nom : uniquement si c'est une string
+  
+  if (typeof filterName === 'string') {
+    const trimmed = filterName.trim();
+    if (trimmed) {
+      httpParams = httpParams.set('displayName', trimmed);
+    }
+  }
+
+  return this.http.get('/clients', { params: httpParams });
+}
+
   getClientTemplate(): Observable<any> {
     return this.http.get('/clients/template');
   }

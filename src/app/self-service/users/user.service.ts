@@ -1,6 +1,6 @@
 /** Angular Routes */
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
@@ -8,6 +8,28 @@ import { map } from 'rxjs/operators';
 
 /** Custom Models */
 import { User } from './user.model';
+
+//export const SELF_REGISTRATION_URL =
+ // 'https://cbs-server.afidingcapital.com/fineract-provider/api/v1/self/registration';
+
+
+  export interface SelfRegistrationPayload {
+  username: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  officeId: string | number;
+  roles: number [];          // un ou plusieurs rôles
+  sendPasswordToEmail: boolean;
+
+  // Champs optionnels
+  staffId?: string | number;
+  isSelfServiceUser?: boolean;
+  passwordNeverExpires?: boolean;
+  clients?: (string | number)[];
+
+  [key: string]: any;
+}
 
 /**
  * Self service users service.
@@ -54,4 +76,16 @@ export class UserService {
   changePassword(userId: string, passwordObj: any) {
     return this.http.put(`/users/${userId}`, passwordObj);
   }
+
+  registerSelfServiceUser(payload: SelfRegistrationPayload): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-Mifos-Platform-TenantId': 'default'
+    });
+    
+    return this.http.post(`/users`, payload, { headers });
+  }
+
+  
+
 }

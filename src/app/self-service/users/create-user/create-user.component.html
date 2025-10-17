@@ -9,7 +9,7 @@
     </mat-card-header>
 
     <div *ngIf="userType.value === 'Existing User'">
-      <form [formGroup]="createUserForm">
+      <form [formGroup]="createUserForm" (ngSubmit)="registerSelfServiceUser()" >
         <mat-card-content>
           <div fxLayout="column">
             <mat-form-field>
@@ -32,24 +32,36 @@
                   {{ staff.displayName }}
                 </mat-option>
               </mat-select>
-            </mat-form-field>
-
-            <mat-form-field>
+            </mat-form-field >
+<!-- Autocomplete Client (Existing User) -->
+            <mat-form-field >
               <mat-label>{{ 'labels.inputs.Client' | translate }}</mat-label>
-              <mat-select>
-                <mat-option *ngFor="let client of clientData" [value]="client">
-                  {{ client }}
-                </mat-option>
-              </mat-select>
+              <input
+    type="text"
+    matInput
+    [formControl]="clients"
+    [matAutocomplete]="auto"
+    placeholder="Entrez le nom du client actif"
+  />
+  <mat-autocomplete
+    #auto="matAutocomplete"
+    [displayWith]="displayClientName"
+    (optionSelected)="onClientSelected($event)">
+    <mat-option
+      *ngFor="let option of filteredActiveClients"
+      [value]="option">
+      {{ option.displayName || option.name || (option.firstname + ' ' + option.lastname) || option }}
+    </mat-option>
+  </mat-autocomplete>
             </mat-form-field>
           </div>
         </mat-card-content>
 
         <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
-          <button type="button" mat-raised-button [routerLink]="['../']">
+          <button type="button" mat-raised-button [routerLink]="['../']" (click)="logAction('Cancel Existing User')">
             {{ 'labels.buttons.Cancel' | translate }}
           </button>
-          <button mat-raised-button color="accent">
+          <button mat-raised-button color="accent" type="submit" (click)="logAction('Activate Self Service User')">
             <fa-icon icon="lock-open" class="m-r-10"></fa-icon>
             {{ 'labels.buttons.Activate Self Service User' | translate }}
           </button>
@@ -58,7 +70,7 @@
     </div>
 
     <div *ngIf="userType.value === 'New User'">
-      <form [formGroup]="createUserForm">
+      <form [formGroup]="createUserForm" (ngSubmit)="registerSelfServiceUser()">
         <mat-card-content>
           <div fxLayout="row wrap" fxLayoutGap="2%" fxLayout.lt-md="column">
             <mat-form-field>
@@ -85,19 +97,19 @@
 
             <mat-form-field fxFlex="48%">
               <mat-label>{{ 'labels.inputs.User Name' | translate }}</mat-label>
-              <input type="text" matInput />
+              <input type="text" matInput required formControlName="username" />
             </mat-form-field>
 
             <span fxFlex="48%" fxHide.lt-md></span>
 
             <mat-form-field fxFlex="48%">
               <mat-label>{{ 'labels.inputs.First Name' | translate }}</mat-label>
-              <input type="text" matInput />
+              <input type="text" matInput required formControlName="firstname" />
             </mat-form-field>
 
             <mat-form-field fxFlex="48%">
               <mat-label>{{ 'labels.inputs.Last Name' | translate }}</mat-label>
-              <input type="text" matInput />
+              <input type="text" matInput required formControlName="lastname" />
             </mat-form-field>
 
             <mat-form-field fxFlex="48%">
@@ -118,7 +130,7 @@
 
             <mat-form-field fxFlex="48%">
               <mat-label>{{ 'labels.inputs.Email' | translate }}</mat-label>
-              <input type="email" matInput />
+              <input type="email" matInput required formControlName="email" />
             </mat-form-field>
 
             <mat-form-field fxFlex="48%">
@@ -129,10 +141,10 @@
         </mat-card-content>
 
         <mat-card-actions fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" fxLayoutGap="5px">
-          <button type="button" mat-raised-button [routerLink]="['../']">
+          <button type="button" mat-raised-button [routerLink]="['../']" (click)="logAction('Cancel New User')">
             {{ 'labels.buttons.Cancel' | translate }}
           </button>
-          <button mat-raised-button color="primary">{{ 'labels.buttons.Submit' | translate }}</button>
+          <button type="submit" mat-raised-button color="primary" (click)="logAction('Submit New User')">{{ 'labels.buttons.Submit' | translate }}</button>
         </mat-card-actions>
       </form>
     </div>
