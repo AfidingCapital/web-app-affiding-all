@@ -32,6 +32,9 @@ export class CreateUserComponent implements OnInit {
   /** Create Client Form */
   createUserForm: UntypedFormGroup;
 
+  /** Message de notification UI */
+  creationMessage: string | null = null;
+
   /** Denotes type of user. */
   userTypes = [
     'Existing User',
@@ -153,28 +156,28 @@ export class CreateUserComponent implements OnInit {
   };
 
   // Lorsqu'une option est sélectionnée dans l'autocomplete
-onClientSelected(event: MatAutocompleteSelectedEvent) {
-  const selected = event.option.value;
-  this.selectedClient = typeof selected === 'object' ? selected : null;
+  onClientSelected(event: MatAutocompleteSelectedEvent) {
+    const selected = event.option.value;
+    this.selectedClient = typeof selected === 'object' ? selected : null;
 
-  const id = this.selectedClient?.id ?? (typeof selected === 'object' ? selected.id : undefined);
-  const emailFromClient = this.displayClientMail(selected);
-  const firstnameFromClient = this.displayClientName(selected);
-  const lastnameFromClient = this.displayClientName(selected);
-  const usernameCandidate = this.displayClientName(selected);
+    const id = this.selectedClient?.id ?? (typeof selected === 'object' ? selected.id : undefined);
+    const emailFromClient = this.displayClientMail(selected);
+    const firstnameFromClient = this.displayClientName(selected);
+    const lastnameFromClient = this.displayClientName(selected);
+    const usernameCandidate = this.displayClientName(selected);
 
-  this.createUserForm.patchValue({
-    clients: id != null ? [id] : [],
-    firstname: firstnameFromClient ?? '',
-    lastname: lastnameFromClient ?? '',
-    username: usernameCandidate ?? '',
-    email: emailFromClient ?? ''
-  });
+    this.createUserForm.patchValue({
+      clients: id != null ? [id] : [],
+      firstname: firstnameFromClient ?? '',
+      lastname: lastnameFromClient ?? '',
+      username: usernameCandidate ?? '',
+      email: emailFromClient ?? ''
+    });
 
-  this.clientNameControl.setValue(usernameCandidate, { emitEvent: false });
+    this.clientNameControl.setValue(usernameCandidate, { emitEvent: false });
 
-  this.log('Client sélectionné – id:', id, 'firstnameFromClient:', firstnameFromClient, 'lastnameFromClient:', lastnameFromClient, 'username:', usernameCandidate, 'emailClient:', emailFromClient);
-}
+    this.log('Client sélectionné – id:', id, 'firstnameFromClient:', firstnameFromClient, 'lastnameFromClient:', lastnameFromClient, 'username:', usernameCandidate, 'emailClient:', emailFromClient);
+  }
 
 
   /**
@@ -252,13 +255,21 @@ onClientSelected(event: MatAutocompleteSelectedEvent) {
     };
 
     this.log('Payload prepared (sanitized):', sanitizedPayload);
+    // Reset le message avant nouvelle création
+    this.creationMessage = null;
 
     this.userService.registerSelfServiceUser(payload).subscribe(
       resp => {
         this.log('Utilisateur créé avec succès', resp);
+        // Afficher le message à l'UI
+        this.creationMessage = 'Utilisateur créé avec succès';
+        // Optionnel: réinitialiser le formulaire après succès
+        // this.createUserForm.reset({ isSelfServiceUser: true, clients: [1], roles: [2], sendPasswordToEmail: false });
       },
       err => {
         this.log('Erreur lors de la création', err);
+        // Afficher un message d'erreur générique ou plus précis si dispo
+        this.creationMessage = 'Erreur lors de la création de l’utilisateur';
       }
     );
   }

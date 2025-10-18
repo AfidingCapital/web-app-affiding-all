@@ -28,12 +28,12 @@ export class UsersComponent implements OnInit {
   /** Columns to be displayed in users table. */
   displayedColumns: string[] = [
     'select',
-    'name',
+    'username',
     'id',
     'email',
     'status',
     'officeName',
-    'staff'
+    'staffDisplayName'
   ];
   /** Data source for users table. */
   dataSource: MatTableDataSource<User>;
