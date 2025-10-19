@@ -2,6 +2,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 /** Custom Services */
 import { UsersService } from '../users.service';
@@ -28,12 +29,14 @@ export class ViewUserComponent {
    * @param {ActivatedRoute} route Activated Route.
    * @param {Router} router Router for navigation.
    * @param {MatDialog} dialog Dialog reference.
+   * @param {MatSnackBar} snackbar Snackbar for messages.
    */
   constructor(
     private usersService: UsersService,
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackbar: MatSnackBar
   ) {
     this.route.data.subscribe((data: { user: any }) => {
       this.userData = data.user;
@@ -64,15 +67,37 @@ export class ViewUserComponent {
       width: '400px',
       height: '300px'
     });
+
     changeUserPasswordDialogRef.afterClosed().subscribe((response: any) => {
-      if (response.password && response.repeatPassword) {
+      try {
+        if (!response || !response.password || !response.repeatPassword) {
+          return; // rien à faire si les champs manquent
+        }
+
         const password = response.password;
         const repeatPassword = response.repeatPassword;
-        const firstname = this.userData.firstname;
-        const data = { password: password, repeatPassword: repeatPassword, firstname: firstname };
-        this.usersService.changePassword(this.userData.id, data).subscribe(() => {
-          this.router.navigate(['/appusers']);
+
+        // Validation simple côté client
+        if (password !== repeatPassword) {
+          this.snackbar.open('Les mots de passe ne correspondent pas.', 'Fermer', { duration: 3000 });
+          return;
+        }
+
+        // Payload: adaptez selon votre API si nécessaire
+        const data = { password: password, repeatPassword: repeatPassword };
+        this.usersService.changePassword(this.userData.id, data).subscribe({
+          next: () => {
+            this.snackbar.open('Mot de passe mis à jour avec succès.', 'Fermer', { duration: 2000 });
+            this.router.navigate(['/appusers']);
+          },
+          error: (err) => {
+            const msg = err?.error?.message || 'Échec de la mise à jour du mot de passe';
+            this.snackbar.open(msg, 'Fermer', { duration: 5000 });
+          }
         });
+
+      } catch (e) {
+        this.snackbar.open('Une erreur est survenue lors de la mise à jour du mot de passe.', 'Fermer', { duration: 5000 });
       }
     });
   }
