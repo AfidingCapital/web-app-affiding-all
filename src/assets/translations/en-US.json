@@ -1161,7 +1161,7 @@
       "Principal Amount": "Principal Amount"
     },
     "inputs": {
-      "Show draft" : "Show draft",
+      "Show prospect" : "Show prospect",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "LIABILITY",

@@ -38,7 +38,7 @@ export class CreateUserComponent implements OnInit {
   /** Denotes type of user. */
   userTypes = [
     'Existing User',
-    'New User'
+    //'New User'
   ];
   /** Radio button group form control for type of user. */
   userType = new UntypedFormControl(this.userTypes[0]);

@@ -1,25 +1,25 @@
-/** Angular Routes */
+/** Angular Imports */
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 /** Custom Models */
 import { User } from './user.model';
 
-//export const SELF_REGISTRATION_URL =
- // 'https://cbs-server.afidingcapital.com/fineract-provider/api/v1/self/registration';
-
-
-  export interface SelfRegistrationPayload {
+/** 
+ * Self service users service.
+ *
+ * Harmonisé avec les 4 fichiers pour compatibilité avec le view-user.
+ */
+export interface SelfRegistrationPayload {
   username: string;
   firstname: string;
   lastname: string;
   email: string;
   officeId: string | number;
-  roles: number [];          // un ou plusieurs rôles
+  roles: number[];          // un ou plusieurs rôles
   sendPasswordToEmail: boolean;
 
   // Champs optionnels
@@ -31,15 +31,12 @@ import { User } from './user.model';
   [key: string]: any;
 }
 
-/**
- * Self service users service.
- *
- * TODO: Complete functionality once API is available.
- */
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+
+  private base = 'https://cbs-server.afidingcapital.com/fineract-provider/api/v1/users';
   /**
    * @param {HttpClient} http Http Client to send requests.
    */
@@ -47,22 +44,21 @@ export class UserService {
 
   /**
    * Gets all the self service users.
-   *
-   * TODO: To be replaced once API is available.
    */
   getUsers(): Observable<User[]> {
-    const httpParams = new HttpParams().set('fields', 'id,firstname,lastname,email,officeName,staff');
-    return this.http.get('/users', { params: httpParams }).pipe(
-      map((users: any) => {
-        users.forEach((user: any) => {
-          user.name = `${user.firstname} ${user.lastname}`;
-          user.staff = user.staff ? `${user.staff.firstname} ${user.staff.lastname}` : '';
-          delete user.firstname;
-          delete user.lastname;
-        });
-        return users as User[];
-      })
-    );
+    return this.http.get<User[]>(this.base);
+  }
+
+  getUserById(id: number): Observable<User> {
+    return this.http.get<User>(`${this.base}/${id}`);
+  }
+
+  activateUser(id: number): Observable<any> {
+    return this.http.post(`${this.base}/${id}/activate`, {});
+  }
+
+  deactivateUser(id: number): Observable<any> {
+    return this.http.post(`${this.base}/${id}/deactivate`, {});
   }
 
   /**
@@ -74,7 +70,9 @@ export class UserService {
    * TODO: update endpoint once API available
    */
   changePassword(userId: string, passwordObj: any) {
-    return this.http.put(`/users/${userId}`, passwordObj);
+    // Utilise un endpoint supposé
+    // Adapté pour être cohérent avec la base
+    return this.http.put(`${this.base}/${userId}/password`, passwordObj);
   }
 
   registerSelfServiceUser(payload: SelfRegistrationPayload): Observable<any> {
@@ -83,9 +81,6 @@ export class UserService {
       'X-Mifos-Platform-TenantId': 'default'
     });
     
-    return this.http.post(`/users`, payload, { headers });
+    return this.http.post(`${this.base}`, payload, { headers });
   }
-
-  
-
 }

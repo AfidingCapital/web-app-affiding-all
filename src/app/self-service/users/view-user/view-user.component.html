@@ -1,31 +1,41 @@
-<div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%">
+<!-- Boutons global (édition, mot de passe, activation/désactivation) -->
+<div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%" *ngIf="selectedUser">
   <!-- TODO: Update to show only Activate/Inactivate button at a time according to status of user. -->
   <button mat-raised-button color="primary" [routerLink]="['edit']">
     <fa-icon icon="edit" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Edit' | translate }}
   </button>
-  <button mat-raised-button color="primary" (click)="changeUserPassword()">
+  <button mat-raised-button color="primary" (click)="changeUserPassword()" *ngIf="selectedUser">
     <fa-icon icon="cog" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Change Password' | translate }}
   </button>
-  <button mat-raised-button color="accent">
+  <button mat-raised-button color="accent"
+          (click)="activateUser(selectedUser?.id)"
+          *ngIf="selectedUser && !isActive(selectedUser)">
     <fa-icon icon="lock-open" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Activate' | translate }}
   </button>
-  <button mat-raised-button color="warn">
+  <button mat-raised-button color="warn"
+          (click)="deactivateUser(selectedUser?.id)" 
+          *ngIf="selectedUser && isActive(selectedUser)">
     <fa-icon icon="lock" class="m-r-10"></fa-icon>
     {{ 'labels.buttons.Deactivate' | translate }}
   </button>
 </div>
 
-<div class="container">
+<div class="container" *ngIf="selectedUser">
   <mat-card>
     <mat-card-content>
       <div fxLayout="row wrap" class="content">
         <div fxFlex="100%" class="header">
-          <fa-icon icon="circle" size="lg" matTooltip="{{ user.status }}" matTooltipPosition="above"></fa-icon>
+          <fa-icon
+            name="circle"
+            size="lg"
+            matTooltip="{{ isActive(selectedUser) ? 'Active' : 'Inactive' }}"
+            matTooltipPosition="above">
+          </fa-icon>
           &nbsp;&nbsp;
-          {{ 'labels.inputs.ID' | translate }}: {{ user.id }}
+          {{ 'labels.inputs.ID' | translate }}: {{ selectedUser.id }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -33,7 +43,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.username }}
+          {{ selectedUser.username }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -41,7 +51,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.firstName }}
+          {{ selectedUser.firstname }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -49,7 +59,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.lastName }}
+          {{ selectedUser.lastName }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -57,7 +67,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.gender }}
+          {{ selectedUser.gender }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -65,7 +75,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.dateOfBirth }}
+          {{ selectedUser.dateOfBirth }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -73,7 +83,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.email }}
+          {{ selectedUser.email }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -81,7 +91,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.mobile }}
+          {{ selectedUser.mobile }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -89,7 +99,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.office }}
+          {{ selectedUser.office }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -97,7 +107,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.staff }}
+          {{ selectedUser.staff?.displayName ?? '-' }}
         </div>
 
         <div fxFlex="50%" class="header">
@@ -105,7 +115,7 @@
         </div>
 
         <div fxFlex="50%">
-          {{ user.activationDate }}
+          {{ formatJoiningDate(selectedUser.staff?.joiningDate) }}
         </div>
       </div>
     </mat-card-content>

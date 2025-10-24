@@ -1160,7 +1160,7 @@
       "Principal Amount": "Montant principal"
     },
     "inputs": {
-      "Show draft" : "Afficher le brouillon",
+      "Show prospect" : "Afficher le prospect",
       "accounting": {
         "ASSET": "ACTIF",
         "LIABILITY": "RESPONSABILITÉ",
