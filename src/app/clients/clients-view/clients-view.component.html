@@ -230,6 +230,11 @@
         <button mat-menu-item (click)="doAction('Transfer Client')">
           {{ 'labels.buttons.Transfer Client' | translate }}
         </button>
+        <span *ngIf="clientViewData.status.value === 'Draft'"
+          ><button mat-menu-item (click)="doAction('Activate')">
+            {{ 'labels.buttons.Accept Prospect' | translate }}
+          </button></span
+        >
         <span *ngIf="clientViewData.status.value === 'Pending'"
           ><button mat-menu-item (click)="doAction('Activate')">
             {{ 'labels.buttons.Activate' | translate }}

@@ -14,6 +14,7 @@ export class ClientActionsComponent {
   /** Flag object to store possible actions and render appropriate UI to the user */
   actions: {
     'Assign Staff': boolean;
+    Accept: boolean;
     Close: boolean;
     Reject: boolean;
     Survey: boolean;
@@ -32,6 +33,7 @@ export class ClientActionsComponent {
     'Create Collateral': boolean;
   } = {
     'Assign Staff': false,
+    Accept: false,
     Close: false,
     Reject: false,
     Survey: false,

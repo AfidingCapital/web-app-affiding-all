@@ -40,6 +40,8 @@ export class ClientActionsResolver implements Resolve<Object> {
         return this.clientsService.getClientCommandTemplate('close');
       case 'Reject':
         return this.clientsService.getClientCommandTemplate('reject');
+      case 'Accept':
+        return this.clientsService.getClientCommandTemplate('accept');
       case 'Withdraw':
         return this.clientsService.getClientCommandTemplate('withdraw');
       case 'Transfer Client':

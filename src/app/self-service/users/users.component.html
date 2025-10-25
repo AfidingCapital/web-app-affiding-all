@@ -81,7 +81,7 @@
 
       <ng-container matColumnDef="staffDisplayName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Staff' | translate }}</th>
-        <td mat-cell *matCellDef="let user">{{ user.staffDisplayName }}</td>
+        <td mat-cell *matCellDef="let user">{{ user.staff?.displayName ?? ''}}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

@@ -7,6 +7,19 @@ import { Observable } from 'rxjs';
 /**
  * Clients service.
  */
+
+export interface ClientActivationPayload {
+  locale?: string;
+  dateFormat?: string;
+  activationDate?: string;
+
+  officeId?: number;
+  clientId?: number;
+  resourceId?: number;
+
+  [key: string]: any;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -14,7 +27,17 @@ export class ClientsService {
   /**
    * @param {HttpClient} http Http Client to send requests.
    */
+ 
+ private base = '/api/v1/clients'
+
   constructor(private http: HttpClient) {}
+
+  activateClient(clientId: number, payload: ClientActivationPayload): Observable<any> {
+    const url = `${this.base}/${clientId}`; // ex: /api/v1/clients/1
+    const params = new HttpParams().set('command', 'activate');
+    return this.http.post<any>(url, payload, { params });
+  }
+
 
   getFilteredClients(
     orderBy: string,
@@ -42,6 +65,7 @@ export class ClientsService {
       .set('orderBy', orderBy);
     return this.http.get('/clients', { params: httpParams });
   }
+  
 
   //Get clients with status Draft
    //* Endpoint example: /clients?status=Draft
@@ -55,7 +79,15 @@ export class ClientsService {
  * Get all active clients, with optional name filter.
  * If filterName is present, the API is called with displayName=<filterName>.
  */
-getActiveClients(filterName?: string): Observable<any> {
+/* getActiveClients(filterName?: string): Observable<any> {
+  let httpParams = new HttpParams();
+  // Demande des champs utiles, y compris l'ID
+  httpParams = httpParams.set(
+    'fields', 
+    'id,displayName,fullname,accountNo,emailAddress,officeName'
+  ); */
+
+  getActiveClients(filterName?: string): Observable<any> {
   let httpParams = new HttpParams().set('status', 'Active');
   // Demande des champs utiles, y compris l'ID
   httpParams = httpParams.set(
@@ -448,3 +480,4 @@ getActiveClients(filterName?: string): Observable<any> {
     return this.http.post(`/v2/clients/search`, request);
   }
 }
+

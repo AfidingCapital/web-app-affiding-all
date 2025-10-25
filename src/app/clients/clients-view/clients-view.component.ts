@@ -64,6 +64,7 @@ export class ClientsViewComponent implements OnInit {
       case 'Close':
       case 'Survey':
       case 'Reject':
+      case 'Accept':
       case 'Activate':
       case 'Withdraw':
       case 'Update Default Savings':

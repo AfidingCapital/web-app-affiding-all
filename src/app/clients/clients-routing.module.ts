@@ -46,6 +46,7 @@ import { ClientChargeViewResolver } from './common-resolvers/client-charge-view.
 import { ClientTransactionPayResolver } from './common-resolvers/client-transaction-pay.resolver';
 import { ClientDataAndTemplateResolver } from './common-resolvers/client-and-template.resolver';
 import { ClientCollateralResolver } from './common-resolvers/client-collateral.resolver';
+//import { AcceptClientDraftComponent } from './clients-view/client-actions/accept-client-draft/accept-client-draft.component';
 
 const routes: Routes = [
   Route.withShell([
@@ -189,6 +190,14 @@ const routes: Routes = [
             clientViewData: ClientViewResolver
           },
           children: [
+            /* {
+              path: 'accept-draft',
+              data: { title: 'Accept Client Draft', breadcrumb: 'Accept Client Draft', routeParamBreadcrumb: false },
+              component: AcceptClientDraftComponent,
+              resolve: {
+                clientTemplate: ClientTemplateResolver
+              }
+            }, */
             {
               path: 'edit',
               data: { title: 'Edit Client', breadcrumb: 'Edit', routeParamBreadcrumb: false },
