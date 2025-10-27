@@ -6,6 +6,7 @@
   window["env"]["fineractApiUrl"]  = '';
 
   window["env"]["apiProvider"] = '';
+  window["env"]["apiProviderCustomer"] = '';
   window["env"]["apiVersion"]  = '';
 
   window["env"]["fineractPlatformTenantId"]  = '';

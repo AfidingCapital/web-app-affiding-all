@@ -129,7 +129,9 @@ export class SidenavComponent implements OnInit, AfterViewInit {
   setMappedAcitivites() {
     const activities: string[] = this.getFrequentActivities();
     activities.forEach((activity: string) => {
-      if (activity.includes('/clients')) {
+      if (activity.includes('/prospects')) {
+        this.pushActivity('/prospects');
+      } else if (activity.includes('/clients')) {
         this.pushActivity('/clients');
       } else if (activity.includes('/groups')) {
         this.pushActivity('/groups');

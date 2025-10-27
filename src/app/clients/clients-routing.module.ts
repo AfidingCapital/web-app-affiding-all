@@ -6,6 +6,7 @@ import { Route } from '../core/route/route.service';
 
 /** Custom Components */
 import { ClientsComponent } from './clients.component';
+import { ProspectsComponent } from './prospects.component';
 import { ClientsViewComponent } from './clients-view/clients-view.component';
 import { GeneralTabComponent } from './clients-view/general-tab/general-tab.component';
 import { FamilyMembersTabComponent } from './clients-view/family-members-tab/family-members-tab.component';
@@ -51,6 +52,18 @@ import { ClientCollateralResolver } from './common-resolvers/client-collateral.r
 const routes: Routes = [
   Route.withShell([
     {
+      path: 'prospects',
+      data: { title: 'Prospects', breadcrumb: 'Prospects', routeParamBreadcrumb: false },
+      children: [
+        {
+          path: '',
+          component: ProspectsComponent
+        },
+        ],
+        
+    },
+
+    {
       path: 'clients',
       data: { title: 'Clients', breadcrumb: 'Clients', routeParamBreadcrumb: false },
       children: [
@@ -58,6 +71,7 @@ const routes: Routes = [
           path: '',
           component: ClientsComponent
         },
+        
         {
           path: 'create',
           data: { title: 'Create Client', breadcrumb: 'Create Client', routeParamBreadcrumb: false },

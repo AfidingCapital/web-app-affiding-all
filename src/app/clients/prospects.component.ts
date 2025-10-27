@@ -8,14 +8,14 @@ import { forkJoin } from 'rxjs';
 
 /** Custom Services */
 import { environment } from 'environments/environment';
-import { ClientsService } from './clients.service';
+import { ProspectsService } from './prospects.service';
 
 @Component({
   selector: 'mifosx-clients',
-  templateUrl: './clients.component.html',
-  styleUrls: ['./clients.component.scss']
+  templateUrl: './prospects.component.html',
+  styleUrls: ['./prospects.component.scss']
 })
-export class ClientsComponent implements OnInit {
+export class ProspectsComponent implements OnInit {
   @ViewChild('showClosedAccounts') showClosedAccounts: MatCheckbox;
 
   displayedColumns = [
@@ -54,7 +54,7 @@ draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private clientService: ClientsService) {}
+  constructor(private clientService: ProspectsService) {}
 
   ngOnInit() {
     this.getClients();

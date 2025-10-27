@@ -1,5 +1,10 @@
 export const frequentActivities: any[] = [
   {
+    path: '/prospects',
+    icon: 'user',
+    toolTip: 'Prospects'
+  },
+  {
     path: '/clients',
     icon: 'user',
     toolTip: 'Clients'
