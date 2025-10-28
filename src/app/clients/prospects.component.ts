@@ -35,11 +35,11 @@ draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
   showDraft: boolean = false;
 
   // Données API et affichage
-  apiClients: any[] = []; // données API de la page courante
+  apiProspects: any[] = []; // données API de la page courante
   dataSource: MatTableDataSource<any> = new MatTableDataSource();
 
-  existsClientsToFilter = false;
-  notExistsClientsToFilter = false;
+  existsProspectsToFilter = false;
+  notExistsProspectsToFilter = false;
 
   totalRows: number;
   isLoading = false;
@@ -54,10 +54,10 @@ draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private clientService: ProspectsService) {}
+  constructor(private prospectService: ProspectsService) {}
 
   ngOnInit() {
-    this.getClients();
+    this.getProspects();
   }
 
   /**
@@ -66,32 +66,32 @@ draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
   search(value: string) {
     this.filterText = value;
     this.resetPaginator();
-    this.getClients();
+    this.getProspects();
   }
 
   // --------------- Données affichées (fusion drafts + API) ---------------
   get displayedData(): any[] {
     if (this.showDraft) {
       // Drafts + API courants
-      return [...this.draftApiClients, ...this.apiClients];
+      return [...this.draftApiClients, ...this.apiProspects];
     }
-    return this.apiClients;
+    return this.apiProspects;
   }
 
   // --------------- Appels API ---------------
-  
-  private getClients() {
+
+  private getProspects() {
   this.isLoading = true;
 
   if (this.showDraft) {
-    // Récupérer à la fois les clients API et les drafts via l'endpoint
+    // Récupérer à la fois les prospects API et les drafts via l'endpoint
     forkJoin({
-      api: this.clientService.searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection),
-      drafts: this.clientService.getDraftClients()
+      api: this.prospectService.searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection),
+      drafts: this.prospectService.getDraftClients()
     }).subscribe(
       ({ api, drafts }: { api: any, drafts: any[] }) => {
         // API results
-        this.apiClients = api.content;
+        this.apiProspects = api.content;
         // Drafts récupérés
         this.draftApiClients = drafts;
 
@@ -100,8 +100,8 @@ draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
 
         this.dataSource.data = this.displayedData;
 
-        this.existsClientsToFilter = (api.numberOfElements > 0) || (drafts.length > 0);
-        this.notExistsClientsToFilter = !this.existsClientsToFilter;
+        this.existsProspectsToFilter = (api.numberOfElements > 0) || (drafts.length > 0);
+        this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
         this.isLoading = false;
       },
       (error: any) => {
@@ -110,16 +110,16 @@ draftApiClients: any[] = []; // drafts récupérés depuis l'endpoint
     );
   } else {
     // Cas normal: uniquement les résultats API
-    this.clientService
+    this.prospectService
       .searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection)
       .subscribe(
         (data: any) => {
-          this.apiClients = data.content;
+          this.apiProspects = data.content;
           this.totalRows = data.totalElements;
           this.dataSource.data = this.displayedData;
 
-          this.existsClientsToFilter = data.numberOfElements > 0;
-          this.notExistsClientsToFilter = !this.existsClientsToFilter;
+          this.existsProspectsToFilter = data.numberOfElements > 0;
+          this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
           this.isLoading = false;
         },
         (error: any) => {
@@ -134,12 +134,12 @@ pageChanged(event: PageEvent) {
   this.pageSize = event.pageSize;
   this.currentPage = event.pageIndex;
   // Toujours recharger les données (API + drafts si actif)
-  this.getClients();
+  this.getProspects();
 }
   // --------------- Actions UI ---------------
   onShowDraftChange(_evt?: boolean) {
     // La valeur this.showDraft est déjà mise à jour par ngModelChange
-    this.getClients(); // recharge les données en fonction du nouvel état
+    this.getProspects(); // recharge les données en fonction du nouvel état
   }
 
   
@@ -153,7 +153,7 @@ pageChanged(event: PageEvent) {
       this.sortDirection = event.direction;
     }
     this.resetPaginator();
-    this.getClients();
+    this.getProspects();
   }
 
   private resetPaginator() {

@@ -20,8 +20,10 @@ export const environment = {
   //baseApiUrl:'http://192.168.100.29',
   oauthServerUrl: loadedEnv['oauthServerUrl'] || loadedEnv['fineractApiUrl'] + loadedEnv['apiProvider'],
   allowServerSwitch: env.allow_switching_backend_instance,
+  apiProviderCustomer: loadedEnv['apiProviderCustomer'] || '/custom-provider/api/v1',
   apiProvider: loadedEnv['apiProvider'] || '/fineract-provider/api',
   apiVersion: loadedEnv['apiVersion'] || '/v1',
+  serverUrlCustomer: '',
   serverUrl: '',
   oauth: {
     enabled: loadedEnv['oauthServerEnabled'] || false, // For connecting to Mifos X using OAuth2 Authentication change the value to true
@@ -55,4 +57,5 @@ export const environment = {
 };
 
 // Server URL
+environment.serverUrlCustomer = `${environment.baseApiUrl}${environment.apiProviderCustomer}${environment.apiVersion}`;
 environment.serverUrl = `${environment.baseApiUrl}${environment.apiProvider}${environment.apiVersion}`;

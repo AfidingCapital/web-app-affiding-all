@@ -1,4 +1,5 @@
 const activities: any[] = [
+  { activity: 'prospect', path: '/prospect' },
   { activity: 'client', path: '/clients' },
   { activity: 'groups', path: '/groups' },
   { activity: 'centers', path: '/centers' },
