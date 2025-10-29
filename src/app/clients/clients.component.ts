@@ -7,7 +7,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { forkJoin } from 'rxjs';
 
 /** Custom Services */
-import { environment } from 'environments/environment';
 import { ClientsService } from './clients.service';
 
 @Component({

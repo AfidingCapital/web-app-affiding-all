@@ -13,6 +13,7 @@ import { WebAppComponent } from './web-app.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 
 /** Custom Modules */
+import { ProspectsModule } from './prospects/prospects.module';
 import { CoreModule } from './core/core.module';
 import { HomeModule } from './home/home.module';
 import { LoginModule } from './login/login.module';
@@ -68,6 +69,7 @@ export function HttpLoaderFactory(http: HttpClient) {
         ]
       }
     }),
+	ProspectsModule,
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
