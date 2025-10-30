@@ -13,6 +13,7 @@ import { SettingsService } from 'app/settings/settings.service';
  */
 @Injectable()
 export class ApiPrefixInterceptor implements HttpInterceptor {
+  
   /**
    * @param {SettingsService} settingsService Settings Service
    */
