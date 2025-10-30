@@ -26,9 +26,9 @@ export const environment = {
       ':' +
       window.location.port,
   // For connecting to server running elsewhere set the base API URL
-  baseApiUrl:
-  loadedEnv['baseApiUrl'] || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,
-  customApiApiUrl:'http://192.168.100.29:8080/custom-provider/api/v1',
+  baseApiUrl:'http://localhost',
+  //loadedEnv['baseApiUrl'] || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,
+  customApiApiUrl:'http://localhost:8080/custom-provider/api/v1',
   allowServerSwitch: env.allow_switching_backend_instance,
   apiProvider: loadedEnv['apiProvider'] || '/fineract-provider/api',
   apiVersion: loadedEnv['apiVersion'] || '/v1',

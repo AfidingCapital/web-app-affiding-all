@@ -19,40 +19,6 @@
         />
       </mat-form-field>
     </div>
-
-     <!-- Colonne 2 & 3 fusionnées: Show Closed Accounts + Show draft (même ligne, colonnes adjacentes) -->
-
-    <div class="col filter-col" *ngIf="existsProspectsToFilter" fxLayout="row" fxLayoutAlign="right" fxLayoutGap="8px">
-      <!-- Sub-colonne: Show Closed Accounts -->
-      <div class="col filter-col" fxLayout="row" fxLayoutAlign="right" fxLayoutGap="8px">
-        <mat-checkbox #showClosedAccounts labelPosition="after">
-          {{ 'labels.inputs.Show Closed Accounts' | translate }}
-        </mat-checkbox>
-      </div>
-      <!-- Sub-colonne: Show draft -->
-      <div class="col filter-col" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
-        <!-- Utiliser ngModelChange pour éviter les double appels -->
-        <!-- <mat-checkbox [(ngModel)]="showDraft" (ngModelChange)="onShowDraftChange($event)" labelPosition="after">
-          {{ 'labels.inputs.Show prospect' | translate }}
-        </mat-checkbox> -->
-      </div>
-      
-    </div>
-
-     <!-- Colonne 4: Boutons Import / Create -->
-    <div class="col action-col" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="25px">
-      <button
-        mat-raised-button
-        color="primary"
-        [routerLink]="['../', 'organization', 'bulk-import', 'Clients']"
-        *mifosxHasPermission="'CREATE_CLIENT'"
-      >
-        <fa-icon icon="download" class="m-r-10"></fa-icon>{{ 'labels.buttons.Import Client' | translate }}
-      </button>
-      <button mat-raised-button color="primary" [routerLink]="['create']" *mifosxHasPermission="'CREATE_CLIENT'">
-        <fa-icon icon="plus" class="m-r-10"></fa-icon>{{ 'labels.buttons.Create Client' | translate }}
-      </button>
-    </div>
   </div>
 
   <div [hidden]="!existsProspectsToFilter">
@@ -65,7 +31,7 @@
       <!-- Name Column -->
       <ng-container matColumnDef="displayName">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.name' | translate }}</th>
-        <td mat-cell *matCellDef="let row" [routerLink]="[row.id, 'general']">{{ row.displayName }}</td>
+        <td mat-cell *matCellDef="let row" [routerLink]="[row.id]">{{ row.displayName }}</td>
       </ng-container>
 
       <!-- Mobile No Column -->
@@ -118,7 +84,7 @@
   <div class="alert" [hidden]="!notExistsProspectsToFilter">
     <div class="message">
       <i class="fa fa-exclamation-circle alert-check"></i>
-      {{ 'labels.text.No client was found' | translate }}
+      {{ 'labels.text.No prospect was found' | translate }}
     </div>
   </div>
 </mat-card>

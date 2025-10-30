@@ -1,0 +1,69 @@
+<div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%">
+
+  <button mat-raised-button color="primary" (click)="accept()">
+    <fa-icon icon="cog" class="m-r-10"></fa-icon>
+    {{ 'labels.buttons.Accept Prospect' | translate }}
+  </button>
+
+  <button mat-raised-button color="warn" (click)="reject()">
+    <fa-icon icon="trash" class="m-r-10"></fa-icon>
+    {{ 'labels.buttons.Reject' | translate }}
+  </button>
+
+</div>
+
+<div class="container">
+  <mat-card>
+    <mat-card-content>
+      <div fxLayout="row wrap" class="content">
+        
+        <div fxFlex="50%" class="mat-body-strong">
+          {{ 'labels.inputs.First Name' | translate }}
+        </div>
+
+        <div fxFlex="50%">
+          {{ userData.firstname }}
+        </div>
+        
+        <div fxFlex="50%" class="mat-body-strong">
+          {{ 'labels.inputs.Middle Name' | translate }}
+        </div>
+
+        <div fxFlex="50%">
+          {{ userData.middlename }}
+        </div>
+
+        <div fxFlex="50%" class="mat-body-strong">
+          {{ 'labels.inputs.Last Name' | translate }}
+        </div>
+
+        <div fxFlex="50%">
+          {{ userData.lastname }}
+        </div>
+
+        <div fxFlex="50%" class="mat-body-strong" *ngIf="userData.emailAddress">
+          {{ 'labels.inputs.Email' | translate }}
+        </div>
+
+        <div fxFlex="50%" *ngIf="userData.emailAddress">
+          {{ userData.emailAddress }}
+        </div>
+
+        <div fxFlex="50%" class="mat-body-strong" *ngIf="userData.mobileNo">
+          {{ 'labels.inputs.Mobile No' | translate }}
+        </div>
+
+        <div fxFlex="50%" *ngIf="userData.mobileNo">
+          {{ userData.mobileNo }}
+        </div>
+
+      </div>
+
+      <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="2%" fxLayout.lt-md="column">
+        <button type="button" mat-raised-button color="primary" [routerLink]="['../']">
+          {{ 'labels.buttons.Back' | translate }}
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -9,10 +9,10 @@ export class ProspectsService {
   private base = '/prospects';
 
   constructor(private http: HttpClient) {}
-
-  getDraftClients(): Observable<any> {
-    const httpParams = new HttpParams().set('status', 'Draft');
-    return this.http.get('/clients', { params: httpParams });
+  
+  getProspect(prospectId: string){
+	const url = `${this.base}/${prospectId}`; // ex: /api/v1/prospects/1
+	return this.http.get(url);
   }
 
   // GET uniquement: récupère les prospects avec pagination et tri
@@ -32,7 +32,7 @@ export class ProspectsService {
       httpParams: httpParams.toString()
     });
 
-    return this.http.get(`${this.base}`, { params: httpParams, headers });
+    return this.http.get(`${this.base}`, { params: httpParams, headers: headers});
   }
 
   searchByText(text: string, page: number, pageSize: number, sortAttribute: string = '', sortDirection: string = '') {
@@ -55,6 +55,16 @@ export class ProspectsService {
       };
     }
     const httpParams = new HttpParams()
-    return this.http.get(`${this.base}`, { params: httpParams });
+    return this.http.get(this.base, { params: httpParams });
+  }
+  
+  acceptProspect(prospectId: string){
+  	const url = `${this.base}/accept/${prospectId}`;
+  	return this.http.post(url,{});
+  }
+  
+  rejectProspect(prospectId: string){
+  	const url = `${this.base}/reject/${prospectId}`;
+  	return this.http.post(url,{});
   }
 }

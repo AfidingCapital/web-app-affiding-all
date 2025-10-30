@@ -8,7 +8,6 @@ import { PipesModule } from '../pipes/pipes.module';
 import { DirectivesModule } from '../directives/directives.module';
 
 /** Custom Components */
-import { ProspectsComponent } from './prospects.component';
 import { ClientsComponent } from './clients.component';
 import { ClientsViewComponent } from './clients-view/clients-view.component';
 import { GeneralTabComponent } from './clients-view/general-tab/general-tab.component';
@@ -72,7 +71,6 @@ import { ClientDatatableStepComponent } from './client-stepper/client-datatable-
     DirectivesModule
   ],
   declarations: [
-    ProspectsComponent,
     ClientsComponent,
     ClientsViewComponent,
     GeneralTabComponent,
