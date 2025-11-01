@@ -80,15 +80,23 @@ export class ProspectsComponent implements OnInit {
   private mapStatus(status: string | number | undefined): string {
     if (status == null) return '—';
     const map: Record<string, string> = {
-      '0': 'Nouveau',
-      '1': 'Active',
-      '2': 'Pending', 
-      '3': 'Refusé'
+      '0': 'Error',
+      '1': 'New',
+      '2': 'Accepted', 
+      '3': 'Rejected',
+      '4': 'Expired'
     };
     const key = String(status);
     return map[key] ?? key;
   }
 
+  private isAcceptedStatus(statusRaw: any): boolean {
+  const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
+  // 2 est le code par défaut pour Accepted, mais c'est ici dynamiquement lisible via mapStatus
+  // On déduit que c'est “Accepted” si mapStatus(code) renvoie 'Accepted' ET que code est exactement 2
+  // Ici on garde une détection simple basée sur le code numérique
+  return Number(code) === 2;
+}
   private getProspects() {
     this.isLoading = true;
 
@@ -105,28 +113,19 @@ export class ProspectsComponent implements OnInit {
           this.apiProspects = content.map((p: any) => {
             // Si status peut être un objet { code, value }, gère les deux cas
             const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
+            const isAccepted= this.isAcceptedStatus(statusRaw);
+            // Le label est calculé via mapStatus pour refléter le mapping dynamique
+  const statusLabel = this.mapStatus(statusRaw);
+  const statusCode = isAccepted ? 'clientStatusType.pending' : undefined;
 
-            // Calcul du label: si code === 2 (Pending) sinon mapping général
-            const statusLabel = (typeof statusRaw === 'number' && statusRaw === 2)
-              ? 'Pending'
-              : this.mapStatus(statusRaw);
+    return {
+    ...p,
+    statusValue: statusRaw,
+    statusLabel: statusLabel,
+    statusCode: statusCode,
+    createdAtLabel: this.formatDate(p.createdAt)
+  };
 
-              const statusCode = (typeof statusRaw === 'number' && statusRaw === 2)
-              ? 'clientStatusType.pending'
-              : undefined;
-
-            const transformed: any = {
-              ...p,
-              statusValue: statusRaw,
-              statusLabel: statusLabel,
-              statusCode: statusCode,
-              createdAtLabel: this.formatDate(p.createdAt)
-            };
-
-            // Debug rapide
-            console.log('statusLabel pour ce prospect:', statusLabel, 'statusRaw:', statusRaw, 'objet:', transformed);
-
-            return transformed;
           });
 
           this.totalRows = this.apiProspects.length;
@@ -161,12 +160,12 @@ export class ProspectsComponent implements OnInit {
         // Appliquer le même mapping ici pour ne pas écraser statusLabel
         const mapped = content.map((p: any) => {
           const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
-          const statusLabel = (typeof statusRaw === 'number' && statusRaw === 2)
-            ? 'Pending'
-            : this.mapStatus(statusRaw);
-          const statusCode = (typeof statusRaw === 'number' && statusRaw === 2)
-            ? 'clientStatusType.pending'
-            : undefined;
+            const isAccepted= this.isAcceptedStatus(statusRaw);
+            // Le label est calculé via mapStatus pour refléter le mapping dynamique
+  const statusLabel = this.mapStatus(statusRaw);
+  const statusCode = isAccepted ? 'clientStatusType.pending' : undefined;
+
+    
 
           return {
             ...p,

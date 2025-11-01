@@ -2160,7 +2160,7 @@
       "Report Run Frequency": "Ripoti Run Frequency",
       "Report Sub Type": "Ripoti Aina Ndogo",
       "Report Type": "Aina ya Ripoti",
-      "Request Date": "Tarehe ya Ombi",
+      "Request date": "Tarehe ya Ombi",
       "Requested Shares": "Ulizoomba Hisa",
       "Reschedule Date": "Tarehe ya Kupanga upya",
       "Reschedule Form": "Panga upya Fomu",
@@ -3093,7 +3093,7 @@
       "Search by user": "Tafuta na mtumiaji",
       "Search by Name" : "Tafuta na Jina",
       "Search by External ID": "Tafuta na Kitambulisho cha Nje",
-      "Search by client name, external Id, mobile " : "Tafuta na jina la mteja, Id ya Nje, simu",
+      "Search by prospect name, mobile, email" : "Tafuta kwa jina la matarajio, simu, barua pepe",
       "Section Buttons": "Sehemu hii ina jina la mtumiaji, picha ya mtumiaji, mipangilio ya mtumiaji na kitufe cha kuondoka.",
       "select": "chagua",
       "Selection you can create new drop-downs and edit": "Kutoka kwa uteuzi huu unaweza kuunda menyu kunjuzi mpya na kuhariri thamani zake na pia kuhariri thamani za misimbo na menyu kunjuzi zinazozalishwa na mfumo.",
@@ -3473,6 +3473,6 @@
   },
 "is designed by": "imetengenezwa na",
   "A global community": "Shirika la Dunia",
-  "Only savings accounts are allowed" : "Ni lazima kuwa na akaunti za akiba pekee"
-
+  "Only savings accounts are allowed" : "Ni lazima kuwa na akaunti za akiba pekee",
+  "Accepted": "Kubalika"
 }

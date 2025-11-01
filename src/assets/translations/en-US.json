@@ -2172,7 +2172,7 @@
       "Report Run Frequency": "Report Run Frequency",
       "Report Sub Type": "Report Sub Type",
       "Report Type": "Report Type",
-      "Request Date": "Request Date",
+      "Request date": "Request date",
       "Requested Shares": "Requested Shares",
       "Reschedule Date": "Reschedule Date",
       "Reschedule Form": "Reschedule Form",
@@ -3109,7 +3109,7 @@
       "Search by Text": "Search by Text",
       "Search by Name" : "Search by name",
       "Search by External ID": "Search by External ID",
-      "Search by client name, external Id, mobile " : "Search by client name, external Id, mobile",
+      "Search by prospect name, mobile, email" : "Search by prospect name, mobile, email",
       "Search Journal Entry": "Search Journal Entry",
       "Search bar to filter fixed deposit products.": "Search bar to filter fixed deposit products.",
       "Search by user": "Search by user",
@@ -3494,5 +3494,6 @@
 
   "is designed by": "is designed by the",
   "A global community": "A global community",
-  "Only savings accounts are allowed" : "Only savings accounts are allowed"
+  "Only savings accounts are allowed" : "Only savings accounts are allowed",
+  "Accepted": "Accepted"
 }

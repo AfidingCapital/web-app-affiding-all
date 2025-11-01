@@ -14,7 +14,7 @@
       <mat-form-field class="search-field no-border-search" appearance="outline" style="width: 85%;">
         <input
           matInput
-          placeholder="{{ 'labels.text.Search by client name, external Id, mobile ' | translate }}"
+          placeholder="{{ 'labels.text.Search by prospect name, mobile, email' | translate }}"
           (keydown.enter)="search($event.target.value)"
         />
       </mat-form-field>
@@ -64,7 +64,7 @@
       </ng-container>
 
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Created At' | translate }}</th>
+        <th mat-header-cell *matHeaderCellDef>{{ 'labels.inputs.Request date' | translate }}</th>
         <td mat-cell *matCellDef="let row">{{ row.createdAtLabel }}</td>
       </ng-container>
 

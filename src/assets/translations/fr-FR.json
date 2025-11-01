@@ -1915,7 +1915,7 @@
       "Minimum gap between Installments": "Écart minimum entre les versements",
       "Mobile": "Mobile",
       "Mobile Banking App": "Application bancaire mobile",
-      "Mobile No": "Non de portable",
+      "Mobile No": "Numéro de téléphone",
       "Mobile Number": "Numéro de portable",
       "Mobile Number for SMS": "Numéro de portable pour SMS",
       "Monday": "Lundi",
@@ -2168,7 +2168,7 @@
       "Report Run Frequency": "Fréquence d'exécution du rapport",
       "Report Sub Type": "Sous-type de rapport",
       "Report Type": "Type de rapport",
-      "Request Date": "Date de la demande",
+      "Request date": "Date de la demande",
       "Requested Shares": "Actions demandées",
       "Reschedule Date": "Date de report",
       "Reschedule Form": "Formulaire de reprogrammation",
@@ -3107,7 +3107,7 @@
       "Search by Text": "Recherche par texte",
       "Search by Name" : "Recherche par nom",
       "Search by External ID": "Recherche par Id Externe",
-      "Search by client name, external Id, mobile " : "Recherche par nom du client, Id Externe, téléphone",
+      "Search by prospect name, mobile, email" : "Recherche par nom du prospect, téléphone, email",
       "Search by user": "Recherche par l'utilisateur",
       "Section Buttons": "Cette section contient le nom d'utilisateur, la photo de l'utilisateur, les paramètres utilisateur et le bouton de déconnexion.",
       "select": "sélectionner",
@@ -3490,5 +3490,6 @@
 
   "is designed by": "est developpé par",
   "A global community": "Une organisation mondiale",
-  "Only savings accounts are allowed" : "Seuls les comptes d'épargnes sont autorisés"
+  "Only savings accounts are allowed" : "Seuls les comptes d'épargnes sont autorisés",
+    "Accepted": "Accepté"
 }
