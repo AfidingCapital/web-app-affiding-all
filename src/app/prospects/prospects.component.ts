@@ -69,23 +69,36 @@ export class ProspectsComponent implements OnInit {
   private getProspects() {
   this.isLoading = true;
 
-  this.prospectService.searchByText(this.filterText, this.currentPage, this.pageSize, this.sortAttribute, this.sortDirection)
-  	.subscribe(
-        (data: any) => {
-          this.apiProspects = data;
-          this.totalRows = data.length;
-          this.dataSource.data = this.displayedData;
+  this.prospectService.searchByText(
+    this.filterText,
+    this.currentPage,
+    this.pageSize,
+    this.sortAttribute,
+    this.sortDirection
+  )
+  .subscribe(
+    (data: any) => {
+      const content = data?.content ?? data ?? [];
+      const totalElements = data?.totalElements ?? (Array.isArray(content) ? content.length : 0);
+      const numberOfElements = data?.numberOfElements ?? (Array.isArray(content) ? content.length : 0);
 
-          this.existsProspectsToFilter = data.length > 0;
-          this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
-          this.isLoading = false;
-		  
-		  console.log(data);console.log(this.apiProspects);console.log(this.displayedData);
-        },
-        (error: any) => {
-          this.isLoading = false;
-        }
-      );
+      this.apiProspects = content;
+      this.totalRows = totalElements;
+      this.dataSource.data = this.displayedData;
+
+      this.existsProspectsToFilter = numberOfElements > 0;
+      this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
+      this.isLoading = false;
+
+      console.log('Prospects raw:', data);
+      console.log('apiProspects:', this.apiProspects);
+      console.log('displayedData:', this.displayedData);
+    },
+    (error: any) => {
+      this.isLoading = false;
+      console.error('Erreur lors du chargement des prospects', error);
+    }
+  );
 }
 
 // --------------- Pagination & Tri ---------------

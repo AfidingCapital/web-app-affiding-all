@@ -36,27 +36,18 @@ export class ProspectsService {
   }
 
   searchByText(text: string, page: number, pageSize: number, sortAttribute: string = '', sortDirection: string = '') {
-    let request: any = {
-      request: {
-        text
-      },
-      page,
-      size: pageSize
-    };
-    if (sortAttribute !== '' && sortDirection !== '') {
-      request = {
-        ...request,
-        sorts: [
-          {
-            direction: sortDirection,
-            property: sortAttribute
-          }
-        ]
-      };
-    }
-    const httpParams = new HttpParams()
-    return this.http.get(this.base, { params: httpParams });
+  let params = new HttpParams()
+    .set('text', text)
+    .set('page', String(page))
+    .set('size', String(pageSize));
+
+  if (sortAttribute && sortDirection) {
+    // Si l’API attend un format différent, ajuste
+    params = params.set('sort', `${sortAttribute},${sortDirection}`);
   }
+
+  return this.http.get(this.base, { params });
+}
   
   acceptProspect(prospectId: string){
   	const url = `${this.base}/accept/${prospectId}`;
