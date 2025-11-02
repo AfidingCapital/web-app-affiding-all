@@ -61,11 +61,11 @@ export class ApiPrefixInterceptor implements HttpInterceptor {
     
     if (!request.url.includes('http:') && !request.url.includes('https:')) {
       if (request.url.includes('prospects')) {
-        console.log('Je viens d\'ajouter le custom URL Customer :' + customUrl+' à '+request.url);
+       // console.log('Je viens d\'ajouter le custom URL Customer :' + customUrl+' à '+request.url);
         request = request.clone({ url: customUrl + request.url });
       }
       else {
-        console.log('Je viens d\'ajouter le base URL :' + baseUrl+' à '+request.url);
+       // console.log('Je viens d\'ajouter le base URL :' + baseUrl+' à '+request.url);
         request = request.clone({ url: baseUrl + request.url });
       }
     }

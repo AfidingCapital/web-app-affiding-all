@@ -136,8 +136,8 @@ export class ProspectsComponent implements OnInit {
           this.notExistsProspectsToFilter = !hasResults;
           this.isLoading = false;
 
-          console.log('Prospects raw:', data);
-          console.log('apiProspects:', this.apiProspects);
+          // console.log('Prospects raw:', data);
+          // console.log('apiProspects:', this.apiProspects);
         },
         (error: any) => {
           this.isLoading = false;
@@ -184,9 +184,9 @@ export class ProspectsComponent implements OnInit {
         this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
         this.isLoading = false;
 
-        console.log('Prospects raw (searchByText):', data);
-        console.log('apiProspects (appliqué mapping):', this.apiProspects);
-        console.log('displayedData:', this.displayedData);
+        // console.log('Prospects raw (searchByText):', data);
+        // console.log('apiProspects (appliqué mapping):', this.apiProspects);
+        // console.log('displayedData:', this.displayedData);
       },
       (error: any) => {
         this.isLoading = false;

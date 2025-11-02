@@ -3,9 +3,13 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { Observable } from 'rxjs';
+import { OnInit } from '@angular/core';
 
 /** Custom Services */
 import { ProspectsService } from '../prospects.service';
+import { ClientsService } from '../../clients/clients.service';
 
 /** Custom Components */
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
@@ -20,10 +24,15 @@ import { ChangePasswordDialogComponent } from 'app/shared/change-password-dialog
   templateUrl: './view-prospect.component.html',
   styleUrls: ['./view-prospect.component.scss']
 })
-export class ViewProspectComponent {
+export class ViewProspectComponent implements OnInit  {
   /** User Data. */
   userData: any;
+  prospectImage: any;
+  private readonly prospectId = '14';
 
+  ngOnInit(): void {
+    this.loadProspectProfil();
+  }
   /**
    * Retrieves the user data from `resolve`.
    * @param {ProspectsService} prospectsService Users Service.
@@ -33,6 +42,8 @@ export class ViewProspectComponent {
    * @param {MatSnackBar} snackbar Snackbar for messages.
    */
   constructor(
+    private clientsService: ClientsService,
+    private _sanitizer: DomSanitizer,
     private prospectsService: ProspectsService,
     private route: ActivatedRoute,
     private router: Router,
@@ -41,12 +52,24 @@ export class ViewProspectComponent {
   ) {
     this.route.data.subscribe((data: { user: any }) => {
       this.userData = data.user;
+      // console.log('ViewProspectComponent: userData chargé via resolve', this.userData);
     });
   }
 
   /**
    * Reject the prospect and redirects to prospects.
    */
+
+  loadProspectProfil() {
+    //console.log(`ViewProspectComponent: appel getClientProfileImage pour le client ${this.prospectId}`);
+    this.prospectsService.getProspectProfileImage(this.prospectId).subscribe(
+       (base64Image: any) => {
+        this.prospectImage = this._sanitizer.bypassSecurityTrustResourceUrl(base64Image);
+      },
+      (error: any) => {}
+    );
+  }
+
   reject() {
     const rejectProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
 	  data: {

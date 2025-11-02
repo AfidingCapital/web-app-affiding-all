@@ -24,13 +24,13 @@ export class ProspectsService {
       .set('sortOrder', sortOrder)
       .set('orderBy', orderBy);
 
-    console.log('ProspectsService.getProspects called with', {
-      orderBy,
-      sortOrder,
-      offset,
-      limit,
-      httpParams: httpParams.toString()
-    });
+    // //console.log('ProspectsService.getProspects called with', {
+    //   orderBy,
+    //   sortOrder,
+    //   offset,
+    //   limit,
+    //   httpParams: httpParams.toString()
+    // });
 
     return this.http.get(`${this.base}`, { params: httpParams, headers: headers});
   }
@@ -57,5 +57,12 @@ export class ProspectsService {
   rejectProspect(prospectId: string){
   	const url = `${this.base}/reject/${prospectId}`;
   	return this.http.post(url,{});
+  }
+
+  getProspectProfileImage(prospectId: string) {
+    //const httpParams = new HttpParams().set('maxHeight', '150');
+    return this.http
+      .skipErrorHandler()
+      .get(`/prospects/${prospectId}/images`, { responseType: 'text' });
   }
 }

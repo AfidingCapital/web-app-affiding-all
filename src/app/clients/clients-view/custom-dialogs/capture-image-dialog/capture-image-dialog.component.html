@@ -9,13 +9,19 @@
   <!-- Using a class will break renderer changes -->
   <p #fallback [ngStyle]="{ display: 'none' }" align="center"></p>
 
-  <div fxFlex="20%" align="center">
+  <div>
+   <mat-dialog-actions align="end">
     <button #captureButton *ngIf="!isCaptured" mat-stroked-button color="primary" (click)="capture()">
       {{ 'labels.buttons.Capture' | translate }}
     </button>
+     <button mat-raised-button mat-dialog-close>{{ 'labels.buttons.Cancel' | translate }}</button>
     <button *ngIf="isCaptured" mat-stroked-button color="primary" (click)="recapture()">
       <fa-icon icon="undo" size="sm" class="m-r-10"></fa-icon>{{ 'labels.buttons.Recapture' | translate }}
     </button>
+    <button *ngIf="isCaptured" mat-stroked-button color="primary" (click)="save()" [mat-dialog-close]="image">
+      {{ 'labels.buttons.Confirm' | translate }}
+    </button>
+    </mat-dialog-actions>
   </div>
 
   <mat-dialog-actions align="end">

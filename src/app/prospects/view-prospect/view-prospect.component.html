@@ -13,38 +13,41 @@
 </div>
 
 <div class="container">
+  
   <mat-card>
+
     <mat-card-content>
+  <div class="profile-layout">
+    <div class="profile-image-container">
+      <img
+        mat-card-md-image
+        class="profile-image"
+        [src]="prospectImage ? prospectImage : 'assets/images/user_placeholder.png'"
+        alt="Profile image"
+      />
+    </div>
+
+    <div class="profile-details" fxLayout="column" fxFlex>
+      <!-- contenu existant (First/Last name, etc.) -->
       <div fxLayout="row wrap" class="content">
-        
         <div fxFlex="50%" class="mat-body-strong">
           {{ 'labels.inputs.First Name' | translate }}
         </div>
+        <div fxFlex="50%">{{ userData.firstname }}</div>
 
-        <div fxFlex="50%">
-          {{ userData.firstname }}
-        </div>
-        
         <div fxFlex="50%" class="mat-body-strong">
           {{ 'labels.inputs.Middle Name' | translate }}
         </div>
-
-        <div fxFlex="50%">
-          {{ userData.middlename }}
-        </div>
+        <div fxFlex="50%">{{ userData.middlename }}</div>
 
         <div fxFlex="50%" class="mat-body-strong">
           {{ 'labels.inputs.Last Name' | translate }}
         </div>
-
-        <div fxFlex="50%">
-          {{ userData.lastname }}
-        </div>
+        <div fxFlex="50%">{{ userData.lastname }}</div>
 
         <div fxFlex="50%" class="mat-body-strong" *ngIf="userData.emailAddress">
           {{ 'labels.inputs.Email' | translate }}
         </div>
-
         <div fxFlex="50%" *ngIf="userData.emailAddress">
           {{ userData.emailAddress }}
         </div>
@@ -52,11 +55,9 @@
         <div fxFlex="50%" class="mat-body-strong" *ngIf="userData.mobileNo">
           {{ 'labels.inputs.Mobile No' | translate }}
         </div>
-
         <div fxFlex="50%" *ngIf="userData.mobileNo">
           {{ userData.mobileNo }}
         </div>
-
       </div>
 
       <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="2%" fxLayout.lt-md="column">
@@ -64,6 +65,9 @@
           {{ 'labels.buttons.Back' | translate }}
         </button>
       </div>
-    </mat-card-content>
+    </div>
+  </div>
+</mat-card-content>
+
   </mat-card>
 </div>

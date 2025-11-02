@@ -41,10 +41,10 @@ export class ViewUserComponent implements OnInit {
       if (data.user) {
         this.selectedUser = this.normalizeUser(data.user);
         if (this.debugMode) {
-          console.log('ViewUser: initialisé depuis resolver ->', {
-            user: this.user,
-            selectedUser: this.selectedUser
-          });
+          // console.log('ViewUser: initialisé depuis resolver ->', {
+          //   user: this.user,
+          //   selectedUser: this.selectedUser
+          // });
         }
       }
     });
@@ -94,7 +94,7 @@ export class ViewUserComponent implements OnInit {
         this.selectedUser = this.normalizeUser(u);
         this.loadingSelectedUser = false;
         if (this.debugMode) {
-          console.log('ViewUser: chargé via selectUser ->', this.selectedUser);
+         // console.log('ViewUser: chargé via selectUser ->', this.selectedUser);
         }
       },
       (err: any) => {
@@ -133,7 +133,7 @@ export class ViewUserComponent implements OnInit {
         this.selectedUser = s;
       }
       if (this.debugMode) {
-        console.log('ViewUser: activation complète pour id', id);
+        //console.log('ViewUser: activation complète pour id', id);
       }
     });
   }
@@ -147,7 +147,7 @@ export class ViewUserComponent implements OnInit {
         this.selectedUser = s;
       }
       if (this.debugMode) {
-        console.log('ViewUser: désactivation complète pour id', id);
+        //console.log('ViewUser: désactivation complète pour id', id);
       }
     });
   }

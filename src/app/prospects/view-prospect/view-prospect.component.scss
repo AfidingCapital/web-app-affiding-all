@@ -12,3 +12,27 @@
     }
   }
 }
+
+.profile-image {
+      object-fit: cover;
+      border-radius: 20px;
+    }
+
+.profile-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.profile-image-container {
+  flex: 0 0 auto;          /* ne pas étendre l’image */
+  width: 120px;              /* ajuste selon ta déco */
+  height: auto;
+}
+
+.profile-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;        /* facultatif */
+}

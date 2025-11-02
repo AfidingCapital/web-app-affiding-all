@@ -77,16 +77,16 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     this.maxDate = this.settingsService.businessDate;
 
     // Debug
-    console.log('Business date:', this.settingsService.businessDate);
-    console.log('Max date:', this.maxDate);
-    console.log('Business date type:', typeof this.settingsService.businessDate);
+    // console.log('Business date:', this.settingsService.businessDate);
+    // console.log('Max date:', this.maxDate);
+    // console.log('Business date type:', typeof this.settingsService.businessDate);
 
     this.setMakeMultiAccountTransfersForm();
 
     // Debug after form init
-    console.log('Form date value after init:', this.makeMultipleAccountTransfersForm.value.transferDate);
-    console.log('Form date control valid:', this.makeMultipleAccountTransfersForm.controls.transferDate?.valid);
-    console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate?.errors);
+    // console.log('Form date value after init:', this.makeMultipleAccountTransfersForm.value.transferDate);
+    // console.log('Form date control valid:', this.makeMultipleAccountTransfersForm.controls.transferDate?.valid);
+    // console.log('Form date control errors:', this.makeMultipleAccountTransfersForm.controls.transferDate?.errors);
 
     // Ensure date is set
     this.ensureTransferDateIsSet();
@@ -95,8 +95,8 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
   /** Sets the make multiple account transfers form. */
   setMakeMultiAccountTransfersForm() {
     const defaultDate = this.settingsService.businessDate || new Date();
-    console.log('Default date for form:', defaultDate);
-    console.log('Default date type:', typeof defaultDate);
+    // console.log('Default date for form:', defaultDate);
+    // console.log('Default date type:', typeof defaultDate);
 
     // Garantir une instance Date pour le champ par défaut
     const initialDate = defaultDate instanceof Date ? defaultDate : new Date(defaultDate);
@@ -107,21 +107,21 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
       transferDescription: ['', Validators.required]
     });
 
-    console.log('Form created with values:', this.makeMultipleAccountTransfersForm.value);
+    //console.log('Form created with values:', this.makeMultipleAccountTransfersForm.value);
   }
 
   /** Ensures that the transfer date is properly set */
   ensureTransferDateIsSet() {
     const currentDate = this.makeMultipleAccountTransfersForm.value.transferDate;
-    console.log('Checking transfer date:', currentDate);
+    //console.log('Checking transfer date:', currentDate);
 
     if (!currentDate) {
-      console.log('Transfer date is missing, setting default date');
+     // console.log('Transfer date is missing, setting default date');
       const defaultDate = this.settingsService.businessDate || new Date();
       this.makeMultipleAccountTransfersForm.patchValue({
         transferDate: defaultDate
       });
-      console.log('Transfer date set to:', defaultDate);
+      //console.log('Transfer date set to:', defaultDate);
     }
   }
 
@@ -161,7 +161,7 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
   }
 
   ngAfterViewInit() {
-    console.log('Multiple transfers component view initialized');
+   // console.log('Multiple transfers component view initialized');
   }
 
   /**
@@ -331,11 +331,11 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
     const locale = this.settingsService.language.code;
 
     const rawTransferDate = this.makeMultipleAccountTransfersForm.value.transferDate;
-    console.log('=== DEBUG DATE TRANSFER (trim extract) ===');
-    console.log('Raw transfer date:', rawTransferDate);
-    console.log('Raw transfer date type:', typeof rawTransferDate);
-    console.log('Date format:', dateFormat);
-    console.log('Form valid:', this.makeMultipleAccountTransfersForm.valid);
+    // console.log('=== DEBUG DATE TRANSFER (trim extract) ===');
+    // console.log('Raw transfer date:', rawTransferDate);
+    // console.log('Raw transfer date type:', typeof rawTransferDate);
+    // console.log('Date format:', dateFormat);
+    // console.log('Form valid:', this.makeMultipleAccountTransfersForm.valid);
 
     // Build formatted date
     let formattedTransferDate: string;
@@ -376,11 +376,11 @@ export class MakeMultipleAccountTransfersComponent implements OnInit, AfterViewI
       }))
     };
 
-    console.log('Multiple transfers data:', multipleTransfersData);
+    //console.log('Multiple transfers data:', multipleTransfersData);
 
     this.accountTransfersService.createMultiTransfer(multipleTransfersData).subscribe(
       (response: any) => {
-        console.log('Transferts multiples enregistrés avec succès:', response);
+        //console.log('Transferts multiples enregistrés avec succès:', response);
         alert('Tous les transferts ont été enregistrés avec succès.');
         this.transferClients = [];
       },

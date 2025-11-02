@@ -159,7 +159,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
       delete payload.user.staffId;
     }
 
-    console.log('Submitting payload au serveur:', payload);
+    //console.log('Submitting payload au serveur:', payload);
 
     this.usersService.createUser(payload).subscribe((response: any) => {
       if (this.configurationWizardService.showUsersForm === true) {
@@ -232,7 +232,7 @@ export class CreateUserComponent implements OnInit, AfterViewInit {
   }
 
   registerSelfServiceUser(): void {
-    console.log('registerSelfServiceUser: chemin atteint, délégation vers submit()');
+    //console.log('registerSelfServiceUser: chemin atteint, délégation vers submit()');
     this.submit();
   }
 }

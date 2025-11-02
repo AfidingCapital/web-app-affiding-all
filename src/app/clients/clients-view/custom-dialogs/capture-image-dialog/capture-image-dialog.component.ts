@@ -10,6 +10,8 @@ import { MatDialogRef } from '@angular/material/dialog';
   templateUrl: './capture-image-dialog.component.html',
   styleUrls: ['./capture-image-dialog.component.scss']
 })
+
+
 export class CaptureImageDialogComponent implements AfterViewInit, OnDestroy {
   /** Video element reference */
   @ViewChild('video', { static: true }) video: ElementRef;
@@ -41,6 +43,8 @@ export class CaptureImageDialogComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.stopCamera();
   }
+
+  
 
   /**
    * Initializes camera video stream once user grants permission.
@@ -106,4 +110,24 @@ export class CaptureImageDialogComponent implements AfterViewInit, OnDestroy {
     this.isCaptured = false;
     this.video.nativeElement.play();
   }
+
+  private dataURLToFile(dataURL: string, filename: string): File {
+  const arr = dataURL.split(',');
+  const mimeMatch = dataURL.match(/^data:(.*?);base64,/);
+  const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
+  save() {
+  if (!this.clientImageDataURL) return;
+
+  const capturedFile = this.dataURLToFile(this.clientImageDataURL, 'capture.png');
+  this.dialogRef.close({ file: capturedFile, name: capturedFile.name });
+}
 }
