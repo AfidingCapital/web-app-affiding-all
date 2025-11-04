@@ -26,9 +26,9 @@ export const environment = {
       ':' +
       window.location.port,
   // For connecting to server running elsewhere set the base API URL
-  baseApiUrl:'http://localhost',
+  baseApiUrl: 'http://localhost',
   //loadedEnv['baseApiUrl'] || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,
-  customApiApiUrl:'http://192.168.1.67:8080/custom-provider/api/v1',
+  customApiApiUrl: 'https://cbs-server.afidingcapital.com/custom-provider/api/v1',
   allowServerSwitch: env.allow_switching_backend_instance,
   apiProvider: loadedEnv['apiProvider'] || '/fineract-provider/api',
   apiVersion: loadedEnv['apiVersion'] || '/v1',
@@ -45,8 +45,7 @@ export const environment = {
     buttonText: 'Close'
   },
   defaultLanguage: loadedEnv['defaultLanguage'] || 'fr-FR',
-  supportedLanguages:
-    loadedEnv['supportedLanguages'] || 'fr-FR,en-US,sw-SW',
+  supportedLanguages: loadedEnv['supportedLanguages'] || 'fr-FR,en-US,sw-SW',
   preloadClients: loadedEnv['preloadClients'] || true,
 
   defaultCharDelimiter: loadedEnv['defaultCharDelimiter'] || ',',
