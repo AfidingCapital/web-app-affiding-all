@@ -19,13 +19,22 @@
     <mat-card-content>
   <div class="profile-layout">
     <div class="profile-image-container">
-      <img
-        mat-card-md-image
-        class="profile-image"
-        [src]="prospectImage ? prospectImage : 'assets/images/user_placeholder.png'"
-        alt="Profile image"
-      />
+  <ng-container *ngIf="isImageLoading; else imageLoaded">
+    <!-- Loader (utilise ton style ou un spinner Material) -->
+    <div class="image-loader" aria-label="Chargement de l'image">
+      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
     </div>
+  </ng-container>
+
+  <ng-template #imageLoaded>
+    <img
+      mat-card-md-image
+      class="profile-image"
+      [src]="prospectImage ? prospectImage : defaultPlaceholder"
+      alt="Profile image"
+    />
+  </ng-template>
+</div>
 
     <div class="profile-details" fxLayout="column" fxFlex>
       <!-- contenu existant (First/Last name, etc.) -->

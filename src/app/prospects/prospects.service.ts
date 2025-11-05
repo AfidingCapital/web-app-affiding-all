@@ -24,14 +24,6 @@ export class ProspectsService {
       .set('sortOrder', sortOrder)
       .set('orderBy', orderBy);
 
-    // //console.log('ProspectsService.getProspects called with', {
-    //   orderBy,
-    //   sortOrder,
-    //   offset,
-    //   limit,
-    //   httpParams: httpParams.toString()
-    // });
-
     return this.http.get(`${this.base}`, { params: httpParams, headers: headers});
   }
 

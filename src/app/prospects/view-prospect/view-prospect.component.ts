@@ -27,11 +27,23 @@ import { ChangePasswordDialogComponent } from 'app/shared/change-password-dialog
 export class ViewProspectComponent implements OnInit  {
   /** User Data. */
   userData: any;
-  prospectImage: any;
-  private readonly prospectId = '14';
+  prospectImage: SafeUrl | null = null;
+  isImageLoading: boolean = false;
+  private defaultPlaceholder = '/assets/user_placeholder.png';
+  id : number;
+  picturePath:string;
+  cintentType:string;
+  private prospectId: string = '';
 
   ngOnInit(): void {
-    this.loadProspectProfil();
+   // Récupération de l'ID depuis la route et appel du chargement d'image
+    this.route.paramMap.subscribe(params => {
+      this.prospectId = params.get('id') || '';
+      // Assure-toi que loadProspectProfil est appelé uniquement après que l'ID soit défini
+      if (this.prospectId) {
+        this.loadProspectProfil();
+      }
+    });
   }
   /**
    * Retrieves the user data from `resolve`.
@@ -61,14 +73,51 @@ export class ViewProspectComponent implements OnInit  {
    */
 
   loadProspectProfil() {
-    //console.log(`ViewProspectComponent: appel getClientProfileImage pour le client ${this.prospectId}`);
-    this.prospectsService.getProspectProfileImage(this.prospectId).subscribe(
-       (base64Image: any) => {
-        this.prospectImage = this._sanitizer.bypassSecurityTrustResourceUrl(base64Image);
-      },
-      (error: any) => {}
-    );
+  this.isImageLoading = true;
+  this.prospectsService.getProspectProfileImage(this.prospectId).subscribe(
+    (response: any) => {
+      let imageSrc: string | null = null;
+
+      if (typeof response === 'string') {
+        imageSrc = response;
+      } else {
+        const candidate =
+          response?.picturePath ?? response?.image ?? response?.data ?? '';
+        imageSrc = candidate;
+      }
+
+      if (!imageSrc) {
+        // pas d'image fournie => placeholder utilisateur
+        this.prospectImage = this._sanitizer.bypassSecurityTrustResourceUrl(this.defaultPlaceholder);
+      } else {
+        this.prospectImage = this.mapImageResponse(imageSrc);
+      }
+
+      this.isImageLoading = false;
+    },
+    (error: any) => {
+      console.error('Erreur chargement image prospect', error);
+      this.prospectImage = this._sanitizer.bypassSecurityTrustResourceUrl(this.defaultPlaceholder);
+      this.isImageLoading = false;
+    }
+  );
+}
+
+  private mapImageResponse(src: string): SafeUrl {
+  if (!src) {
+    return this._sanitizer.bypassSecurityTrustResourceUrl(this.defaultPlaceholder);
   }
+
+  let url = src;
+
+  if (src.startsWith('http') || src.startsWith('data:')) {
+    url = src;
+  } else {
+    url = `${window.location.origin}${src}`;
+  }
+
+  return this._sanitizer.bypassSecurityTrustResourceUrl(url);
+}
 
   reject() {
     const rejectProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
