@@ -1,10 +1,8 @@
 /** Angular Imports */
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatCheckbox } from '@angular/material/checkbox';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { forkJoin } from 'rxjs';
 
 /** Custom Services */
 import { ProspectsService } from './prospects.service';
@@ -59,7 +57,7 @@ export class ProspectsComponent implements OnInit {
     this.getProspects();
   }
 
-  // --------------- Données affichées (fusion drafts + API) ---------------
+  // --------------- Données affichées ---------------
   get displayedData(): any[] {
     return this.apiProspects;
   }
@@ -67,22 +65,22 @@ export class ProspectsComponent implements OnInit {
   // --------------- Appels API ---------------
 
   private formatDate(iso: string | undefined): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  // 29 October 2025
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  }).format(d);
-}
+    if (!iso) return '';
+    const d = new Date(iso);
+    // 29 October 2025
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(d);
+  }
 
   private mapStatus(status: string | number | undefined): string {
     if (status == null) return '—';
     const map: Record<string, string> = {
       '0': 'Error',
       '1': 'New',
-      '2': 'Accepted', 
+      '2': 'Accepted',
       '3': 'Rejected',
       '4': 'Expired'
     };
@@ -91,102 +89,48 @@ export class ProspectsComponent implements OnInit {
   }
 
   private isAcceptedStatus(statusRaw: any): boolean {
-  const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
-  // 2 est le code par défaut pour Accepted, mais c'est ici dynamiquement lisible via mapStatus
-  // On déduit que c'est “Accepted” si mapStatus(code) renvoie 'Accepted' ET que code est exactement 2
-  // Ici on garde une détection simple basée sur le code numérique
-  return Number(code) === 2;
-}
+    const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
+    return Number(code) === 2;
+  }
+
   private getProspects() {
     this.isLoading = true;
 
     this.prospectService.getProspects(
-      this.sortAttribute, 
-      this.sortDirection, 
+      this.sortAttribute,
+      this.sortDirection,
       this.currentPage,
       this.pageSize
     )
-      .subscribe(
-        (data: any) => {
-          const content: any[] = data?.content ?? data ?? [];
-
-          this.apiProspects = content.map((p: any) => {
-            // Si status peut être un objet { code, value }, gère les deux cas
-            const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
-            const isAccepted= this.isAcceptedStatus(statusRaw);
-            // Le label est calculé via mapStatus pour refléter le mapping dynamique
-  const statusLabel = this.mapStatus(statusRaw);
-  const statusCode = isAccepted ? 'clientStatusType.pending' : undefined;
-
-    return {
-    ...p,
-    statusValue: statusRaw,
-    statusLabel: statusLabel,
-    statusCode: statusCode,
-    createdAtLabel: this.formatDate(p.createdAt)
-  };
-
-          });
-
-          this.totalRows = this.apiProspects.length;
-          this.dataSource.data = this.apiProspects;
-
-          const hasResults = this.apiProspects.length > 0;
-          this.existsProspectsToFilter = hasResults;
-          this.notExistsProspectsToFilter = !hasResults;
-          this.isLoading = false;
-
-          // console.log('Prospects raw:', data);
-          // console.log('apiProspects:', this.apiProspects);
-        },
-        (error: any) => {
-          this.isLoading = false;
-          console.error('Erreur lors du chargement des prospects', error);
-        }
-      );
-
-    // Flux searchByText: applique le même mapping pour éviter d’écraser statusLabel
-    this.prospectService.searchByText(
-      this.filterText,
-      this.currentPage,
-      this.pageSize,
-      this.sortAttribute,
-      this.sortDirection
-    )
     .subscribe(
       (data: any) => {
-        const content = data?.content ?? data ?? [];
+        const content: any[] = data?.content ?? data ?? [];
 
-        // Appliquer le même mapping ici pour ne pas écraser statusLabel
-        const mapped = content.map((p: any) => {
+        this.apiProspects = content.map((p: any) => {
+          // Si status peut être un objet { code, value }, gère les deux cas
           const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
-            const isAccepted= this.isAcceptedStatus(statusRaw);
-            // Le label est calculé via mapStatus pour refléter le mapping dynamique
-  const statusLabel = this.mapStatus(statusRaw);
-  const statusCode = isAccepted ? 'clientStatusType.pending' : undefined;
-
-    
+          const isAccepted = this.isAcceptedStatus(statusRaw);
+          // Le label est calculé via mapStatus pour refléter le mapping dynamique
+          const statusLabel = this.mapStatus(statusRaw);
+          const statusCode = isAccepted ? 'clientStatusType.pending' : undefined;
 
           return {
             ...p,
             statusValue: statusRaw,
             statusLabel: statusLabel,
             statusCode: statusCode,
-             createdAtLabel: this.formatDate(p.createdAt)
+            createdAtLabel: this.formatDate(p.createdAt)
           };
         });
 
-        this.apiProspects = mapped;
-        this.totalRows = data?.totalElements ?? mapped.length;
+        // totalElements attendu côté backend pour pagination
+        this.totalRows = data?.totalElements ?? this.apiProspects.length;
         this.dataSource.data = this.displayedData;
 
-        this.existsProspectsToFilter = (mapped.length > 0);
-        this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
+        const hasResults = this.apiProspects.length > 0;
+        this.existsProspectsToFilter = hasResults;
+        this.notExistsProspectsToFilter = !hasResults;
         this.isLoading = false;
-
-        // console.log('Prospects raw (searchByText):', data);
-        // console.log('apiProspects (appliqué mapping):', this.apiProspects);
-        // console.log('displayedData:', this.displayedData);
       },
       (error: any) => {
         this.isLoading = false;
@@ -199,16 +143,8 @@ export class ProspectsComponent implements OnInit {
   pageChanged(event: PageEvent) {
     this.pageSize = event.pageSize;
     this.currentPage = event.pageIndex;
-    // Toujours recharger les données (API + drafts si actif)
     this.getProspects();
   }
-  // --------------- Actions UI ---------------
-  onShowDraftChange(_evt?: boolean) {
-    // La valeur this.showDraft est déjà mise à jour par ngModelChange
-    this.getProspects(); // recharge les données en fonction du nouvel état
-  }
-
-  
 
   sortChanged(event: Sort) {
     if (event.direction === '') {
@@ -224,7 +160,15 @@ export class ProspectsComponent implements OnInit {
 
   private resetPaginator() {
     this.currentPage = 0;
-    this.paginator.firstPage();
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+  }
+
+  // --------------- Actions UI ---------------
+  onShowDraftChange(_evt?: boolean) {
+    // La valeur this.showDraft n’est pas utilisée ici, garder si besoin d’avenir
+    this.getProspects(); // recharge les données en fonction du nouvel état (si implémenté)
   }
 
   // --------------- Types ---------------
