@@ -42,12 +42,12 @@ export class ProspectsService {
 }
   
   acceptProspect(prospectId: string){
-  	const url = `${this.base}/accept/${prospectId}`;
+  	const url = `${this.base}/${prospectId}/accept`;
   	return this.http.post(url,{});
   }
   
   rejectProspect(prospectId: string){
-  	const url = `${this.base}/reject/${prospectId}`;
+  	const url = `${this.base}/${prospectId}/reject`;
   	return this.http.post(url,{});
   }
 
