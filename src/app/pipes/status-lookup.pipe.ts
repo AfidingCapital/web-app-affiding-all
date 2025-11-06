@@ -41,6 +41,7 @@ export class StatusLookupPipe implements PipeTransform {
       'prospectStatusType.accepted': 'status-accepted',
       'prospectStatusType.rejected': 'status-rejected',
       'prospectStatusType.expired': 'status-expired',
+      'prospectStatusType.error': 'status-error',
       'groupingStatusType.active': 'status-active',
       'groupingStatusType.pending': 'status-pending',
       'groupingStatusType.submitted.and.pending.approval': 'status-pending',

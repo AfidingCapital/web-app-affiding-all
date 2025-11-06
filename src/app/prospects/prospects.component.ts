@@ -133,6 +133,7 @@ export class ProspectsComponent implements OnInit {
           const isNew = this.isNewStatus(statusRaw);
           const isRejected = this.isRejectedStatus(statusRaw);
           const isExpired = this.isExpiredStatus(statusRaw);
+          const isError = this.isErrorStatus(statusRaw);
 
           // Le label est calculé via mapStatus pour refléter le mapping dynamique
           const statusLabel = this.mapStatus(statusRaw);
@@ -141,6 +142,7 @@ export class ProspectsComponent implements OnInit {
   { cond: isRejected, value: 'loanStatusType.overpaid' },
   { cond: isExpired, value: 'loanProduct.inActive' },
   { cond: isNew, value: 'prospectStatusType.new' },
+  { cond: isError, value: 'prospectStatusType.error' },
 ];
 
 const statusCode = STATUS_ORDER.find(s => s.cond)?.value;

@@ -290,6 +290,7 @@
       "Home": "Accueil"
     },
     "buttons": {
+      "Accept":"Accepter",
       "Accept Prospect": "Accepter le prospect",
       "Accept Transfer": "Accepter le transfert",
       "Actions": "Actions",

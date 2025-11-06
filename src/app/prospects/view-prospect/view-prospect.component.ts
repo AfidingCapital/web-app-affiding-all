@@ -136,14 +136,14 @@ export class ViewProspectComponent implements OnInit  {
     // Obtenir la traduction pour le heading
     const translatedHeading = this.translate.instant('labels.buttons.Reject') || 'Reject';
 
-    const dialogData: ConfirmationDialogData = {
+    const rejectDialogData: ConfirmationDialogData = {
       heading: translatedHeading,
       dialogContext: `Êtes-vous sûr de vouloir rejeter le prospect "${this.prospectData?.displayName ?? ''}"`,
       type: 'delete'
     };
 
     const rejectProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: dialogData
+      data: rejectDialogData
     });
 
     rejectProspectDialogRef.afterClosed().subscribe((result: any) => {
@@ -159,8 +159,9 @@ export class ViewProspectComponent implements OnInit  {
    * Accept the prospect and redirects to clients.
    */
   accept() {
+    const translatedHeading = this.translate.instant('labels.buttons.Accept') || 'Accept';
     const acceptDialogData: ConfirmationDialogData = {
-      heading: this.translate.instant('labels.buttons.Reject') || 'Reject',
+      heading: translatedHeading,
       dialogContext: `Êtes-vous sûr de vouloir accepter le prospect "${this.prospectData.displayName ?? ''}"`,
       type: 'confirm'
     };

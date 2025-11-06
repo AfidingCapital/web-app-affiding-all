@@ -1,6 +1,6 @@
 <div class="card-wrapper" fxLayout="column" fxLayoutAlign="start stretch">
   <!-- Barre d’actions en haut -->
-  <div class="toolbar" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="12px">
+  <div class="toolbar" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="12px" *ngIf="prospectData.status === 1">
     <button mat-raised-button color="primary" (click)="accept()">
       <fa-icon icon="cog" class="icon"></fa-icon>
       {{ 'labels.buttons.Accept Prospect' | translate }}
@@ -71,7 +71,7 @@
           </div>
         </div>
 
-        <div class="back-btn">
+        <div class="back-btn" >
           <button mat-stroked-button color="primary" [routerLink]="['../']">
             {{ 'labels.buttons.Back' | translate }}
           </button>
