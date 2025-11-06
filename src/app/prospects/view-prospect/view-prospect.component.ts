@@ -34,7 +34,7 @@ export interface ConfirmationDialogData {
 
 export class ViewProspectComponent implements OnInit  {
   /** User Data. */
-  userData: any;
+  prospectData: any;
   prospectImage: SafeUrl | null = null;
   isImageLoading: boolean = false;
   private defaultPlaceholder = '/assets/user_placeholder.png';
@@ -58,7 +58,7 @@ export class ViewProspectComponent implements OnInit  {
     this.translate = this.translateService;
 
     this.route.data.subscribe((data: { user: any }) => {
-      this.userData = data.user;
+      this.prospectData = data.user;
     });
   }
 
@@ -138,7 +138,7 @@ export class ViewProspectComponent implements OnInit  {
 
     const dialogData: ConfirmationDialogData = {
       heading: translatedHeading,
-      dialogContext: `Êtes-vous sûr de vouloir rejeter le prospect "${this.userData?.displayName ?? ''}"`,
+      dialogContext: `Êtes-vous sûr de vouloir rejeter le prospect "${this.prospectData?.displayName ?? ''}"`,
       type: 'delete'
     };
 
@@ -148,7 +148,7 @@ export class ViewProspectComponent implements OnInit  {
 
     rejectProspectDialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.confirm) {
-        this.prospectsService.rejectProspect(this.userData?.id).subscribe(() => {
+        this.prospectsService.rejectProspect(this.prospectData?.id).subscribe(() => {
           this.router.navigate(['/prospects']);
         });
       }
@@ -161,7 +161,7 @@ export class ViewProspectComponent implements OnInit  {
   accept() {
     const acceptDialogData: ConfirmationDialogData = {
       heading: this.translate.instant('labels.buttons.Reject') || 'Reject',
-      dialogContext: `Êtes-vous sûr de vouloir accepter le prospect "${this.userData?.displayName ?? ''}"`,
+      dialogContext: `Êtes-vous sûr de vouloir accepter le prospect "${this.prospectData.displayName ?? ''}"`,
       type: 'confirm'
     };
 
@@ -171,7 +171,7 @@ export class ViewProspectComponent implements OnInit  {
 
     acceptProspectDialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.confirm) {
-        this.prospectsService.acceptProspect(this.userData?.id).subscribe(() => {
+        this.prospectsService.acceptProspect(this.prospectData?.id).subscribe(() => {
           this.router.navigate(['/clients']);
         });
       }
@@ -204,8 +204,7 @@ export class ViewProspectComponent implements OnInit  {
 
         // Payload: adaptez selon votre API si nécessaire
         const data = { password: password, repeatPassword: repeatPassword };
-        // Exemple: appeler l’API appropriée (ici, on laisse tel quel ou ajuste selon ta API)
-        // this.prospectsService.changePassword(this.userData.id, data).subscribe(...);
+        
 
       } catch (e) {
         this.snackbar.open('Une erreur est survenue lors de la mise à jour du mot de passe.', 'Fermer', { duration: 5000 });

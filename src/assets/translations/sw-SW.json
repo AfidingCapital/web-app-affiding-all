@@ -1154,6 +1154,7 @@
     },
     "inputs": {
       "Show prospect" : "Onyesha mtazamo",
+      "Date of birth": "Tarehe ya kuzaliwa",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "DHIMA",

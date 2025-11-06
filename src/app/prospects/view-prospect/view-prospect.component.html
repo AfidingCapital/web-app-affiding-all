@@ -1,82 +1,82 @@
-<div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%">
+<div class="card-wrapper" fxLayout="column" fxLayoutAlign="start stretch">
+  <!-- Barre d’actions en haut -->
+  <div class="toolbar" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="12px">
+    <button mat-raised-button color="primary" (click)="accept()">
+      <fa-icon icon="cog" class="icon"></fa-icon>
+      {{ 'labels.buttons.Accept Prospect' | translate }}
+    </button>
 
-  <button mat-raised-button color="primary" (click)="accept()">
-    <fa-icon icon="cog" class="m-r-10"></fa-icon>
-    {{ 'labels.buttons.Accept Prospect' | translate }}
-  </button>
-
-  <button mat-raised-button color="warn" (click)="reject()">
-    <fa-icon icon="trash" class="m-r-10"></fa-icon>
-    {{ 'labels.buttons.Reject' | translate }}
-  </button>
-
-</div>
-
-<div class="container">
-  
-  <mat-card>
-
-    <mat-card-content>
-  <div class="profile-layout">
-    <div class="profile-image-container">
-  <ng-container *ngIf="isImageLoading; else imageLoaded">
-    <!-- Loader (utilise ton style ou un spinner Material) -->
-    <div class="image-loader" aria-label="Chargement de l'image">
-      <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
-    </div>
-  </ng-container>
-
-  <ng-template #imageLoaded>
-    <img
-      mat-card-md-image
-      class="profile-image"
-      [src]="prospectImage ? prospectImage : defaultPlaceholder"
-      alt="Profile image"
-    />
-  </ng-template>
-</div>
-
-    <div class="profile-details" fxLayout="column" fxFlex>
-      <!-- contenu existant (First/Last name, etc.) -->
-      <div fxLayout="row wrap" class="content">
-        <div fxFlex="50%" class="mat-body-strong">
-          {{ 'labels.inputs.First Name' | translate }}
-        </div>
-        <div fxFlex="50%">{{ userData.firstname }}</div>
-
-        <div fxFlex="50%" class="mat-body-strong">
-          {{ 'labels.inputs.Middle Name' | translate }}
-        </div>
-        <div fxFlex="50%">{{ userData.middlename }}</div>
-
-        <div fxFlex="50%" class="mat-body-strong">
-          {{ 'labels.inputs.Last Name' | translate }}
-        </div>
-        <div fxFlex="50%">{{ userData.lastname }}</div>
-
-        <div fxFlex="50%" class="mat-body-strong" *ngIf="userData.emailAddress">
-          {{ 'labels.inputs.Email' | translate }}
-        </div>
-        <div fxFlex="50%" *ngIf="userData.emailAddress">
-          {{ userData.emailAddress }}
-        </div>
-
-        <div fxFlex="50%" class="mat-body-strong" *ngIf="userData.mobileNo">
-          {{ 'labels.inputs.Mobile No' | translate }}
-        </div>
-        <div fxFlex="50%" *ngIf="userData.mobileNo">
-          {{ userData.mobileNo }}
-        </div>
-      </div>
-
-      <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="2%" fxLayout.lt-md="column">
-        <button type="button" mat-raised-button color="primary" [routerLink]="['../']">
-          {{ 'labels.buttons.Back' | translate }}
-        </button>
-      </div>
-    </div>
+    <button mat-raised-button color="warn" (click)="reject()">
+      <fa-icon icon="trash" class="icon"></fa-icon>
+      {{ 'labels.buttons.Reject' | translate }}
+    </button>
   </div>
-</mat-card-content>
 
+  <!-- Carte Profil -->
+  <mat-card class="profile-card">
+    <mat-card-content class="profile-content" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="24px">
+      <!-- Image -->
+      <div class="image-area" aria-label="Profile image">
+        <ng-container *ngIf="isImageLoading; else imageLoaded">
+          <div class="image-spinner">
+            <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+          </div>
+        </ng-container>
+        <ng-template #imageLoaded>
+          <img [src]="prospectImage ? prospectImage : defaultPlaceholder" alt="Profile image" />
+        </ng-template>
+      </div>
+
+      <!-- Détails -->
+      <div class="details-area" fxLayout="column" fxFlex>
+        <div class="row-grid" fxLayout="row" fxLayoutWrap="wrap" fxLayoutGap="32px 48px">
+          <div class="detail">
+            <div class="label">{{ 'labels.inputs.First Name' | translate }}</div>
+            <div class="value">{{ prospectData.firstname }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.middlename">
+            <div class="label">{{ 'labels.inputs.Middle Name' | translate }}</div>
+            <div class="value">{{ prospectData.middlename }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.lastname">
+            <div class="label">{{ 'labels.inputs.Last Name' | translate }}</div>
+            <div class="value">{{ prospectData.lastname }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.emailAddress">
+            <div class="label">{{ 'labels.inputs.Email' | translate }}</div>
+            <div class="value">{{ prospectData.emailAddress }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.mobileNo">
+            <div class="label">{{ 'labels.inputs.Mobile No' | translate }}</div>
+            <div class="value">{{ prospectData.mobileNo }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.emailAddress">
+            <div class="label">{{ 'labels.inputs.Address' | translate }}</div>
+            <div class="value">{{ prospectData.address }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.emailAddress">
+            <div class="label">{{ 'labels.inputs.Date of birth' | translate }}</div>
+            <div class="value">{{ prospectData.dateOfBirth }}</div>
+          </div>
+
+          <div class="detail" *ngIf="prospectData.emailAddress">
+            <div class="label">{{ 'labels.inputs.Gender' | translate }}</div>
+            <div class="value">{{ prospectData.gender }}</div>
+          </div>
+        </div>
+
+        <div class="back-btn">
+          <button mat-stroked-button color="primary" [routerLink]="['../']">
+            {{ 'labels.buttons.Back' | translate }}
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
   </mat-card>
 </div>

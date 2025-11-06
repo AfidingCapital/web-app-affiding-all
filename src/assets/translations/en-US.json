@@ -1163,6 +1163,7 @@
     },
     "inputs": {
       "Show prospect" : "Show prospect",
+      "Date of birth" : "Date of birth",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "LIABILITY",
