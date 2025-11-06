@@ -36,7 +36,11 @@ export class StatusLookupPipe implements PipeTransform {
       'clientStatusType.submitted.and.pending.approval': 'status-pending',
       'clientStatusTYpe.approved': 'status-approved',
       'clientStatusType.transfer.in.progress': 'status-transfer-progress', // write
-      'clientStatusType.transfer.on.hold': 'status-transfer-hold', // write
+      'clientStatusType.transfer.on.hold': 'status-transfer-hold',
+      'prospectStatusType.new': 'status-new',
+      'prospectStatusType.accepted': 'status-accepted',
+      'prospectStatusType.rejected': 'status-rejected',
+      'prospectStatusType.expired': 'status-expired',
       'groupingStatusType.active': 'status-active',
       'groupingStatusType.pending': 'status-pending',
       'groupingStatusType.submitted.and.pending.approval': 'status-pending',

@@ -93,6 +93,26 @@ export class ProspectsComponent implements OnInit {
     return Number(code) === 2;
   }
 
+  private isErrorStatus(statusRaw: any): boolean {
+    const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
+    return Number(code) === 0;
+  }
+
+  private isNewStatus(statusRaw: any): boolean {
+    const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
+    return Number(code) === 1;
+  }
+
+  private isRejectedStatus(statusRaw: any): boolean {
+    const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
+    return Number(code) === 3;
+  }
+
+  private isExpiredStatus(statusRaw: any): boolean {
+    const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
+    return Number(code) === 4;
+  }
+
   private getProspects() {
     this.isLoading = true;
 
@@ -110,10 +130,20 @@ export class ProspectsComponent implements OnInit {
           // Si status peut être un objet { code, value }, gère les deux cas
           const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
           const isAccepted = this.isAcceptedStatus(statusRaw);
+          const isNew = this.isNewStatus(statusRaw);
+          const isRejected = this.isRejectedStatus(statusRaw);
+          const isExpired = this.isExpiredStatus(statusRaw);
+
           // Le label est calculé via mapStatus pour refléter le mapping dynamique
           const statusLabel = this.mapStatus(statusRaw);
-          const statusCode = isAccepted ? 'clientStatusType.pending' : undefined;
+         const STATUS_ORDER = [
+  { cond: isAccepted, value: 'prospectStatusType.accepted' },
+  { cond: isRejected, value: 'loanStatusType.overpaid' },
+  { cond: isExpired, value: 'loanProduct.inActive' },
+  { cond: isNew, value: 'prospectStatusType.new' },
+];
 
+const statusCode = STATUS_ORDER.find(s => s.cond)?.value;
           return {
             ...p,
             statusValue: statusRaw,
