@@ -102,8 +102,8 @@ export class ViewProspectComponent implements OnInit  {
 
   acceptProspectDialogRef.afterClosed().subscribe((result: any) => {
     if (result && result.confirm) {
-  	this.prospectsService.acceptProspect(this.userData.id).subscribe(() => {
-  		this.router.navigate(['/clients']);
+  	this.prospectsService.acceptProspect(this.userData.id).subscribe((response: any) => {
+  		this.router.navigate(['/clients/' + response.clientId]);
   	});
     }
   });
