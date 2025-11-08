@@ -7,12 +7,17 @@ import { Observable } from 'rxjs';
 })
 export class ProspectsService {
   private base = '/prospects';
+  // genderDescription endpoint construit dynamiquement: `${base}/tpt`
+  private get genderDescriptionBase(): string {
+    return `${this.base}/tpt`;
+  }
 
   constructor(private http: HttpClient) {}
-  
+
+  // GET /prospects/{prospectId}
   getProspect(prospectId: string){
-	const url = `${this.base}/${prospectId}`; // ex: /api/v1/prospects/1
-	return this.http.get(url);
+    const url = `${this.base}/${prospectId}`; // ex: /api/v1/prospects/1
+    return this.http.get(url);
   }
 
   // GET uniquement: récupère les prospects avec pagination et tri
@@ -27,28 +32,35 @@ export class ProspectsService {
     return this.http.get(`${this.base}`, { params: httpParams, headers: headers});
   }
 
-  searchByText(text: string, page: number, pageSize: number, sortAttribute: string = '', sortDirection: string = '') {
-  let params = new HttpParams()
-    .set('text', text)
-    .set('page', String(page))
-    .set('size', String(pageSize));
+  // Recherche par texte avec pagination et tri optionnel
+  searchByText(text: string, page: number, pageSize: number, sortAttribute: string = '', sortDirection: string = ''): Observable<any> {
+    let params = new HttpParams()
+      .set('text', text)
+      .set('page', String(page))
+      .set('size', String(pageSize));
 
-  if (sortAttribute && sortDirection) {
-    // Si l’API attend un format différent, ajuste
-    params = params.set('sort', `${sortAttribute},${sortDirection}`);
+    if (sortAttribute && sortDirection) {
+      // Si l’API attend un format différent, ajuste
+      params = params.set('sort', `${sortAttribute},${sortDirection}`);
+    }
+
+    return this.http.get(this.base, { params });
   }
 
-  return this.http.get(this.base, { params });
-}
-  
+  // Nouvelle: gender description via /prospects/tpt
+  getGenderDescription(): Observable<any> {
+    const url = this.genderDescriptionBase; // /prospects/tpt
+    return this.http.get(url);
+  }
+
   acceptProspect(prospectId: string){
-  	const url = `${this.base}/${prospectId}/accept`;
-  	return this.http.post(url,{});
+    const url = `${this.base}/${prospectId}/accept`;
+    return this.http.post(url, {});
   }
-  
+
   rejectProspect(prospectId: string){
-  	const url = `${this.base}/${prospectId}/reject`;
-  	return this.http.post(url,{});
+    const url = `${this.base}/${prospectId}/reject`;
+    return this.http.post(url, {});
   }
 
   getProspectProfileImage(prospectId: string) {

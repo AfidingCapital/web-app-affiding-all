@@ -29,7 +29,7 @@ export class ProspectsComponent implements OnInit {
   existsProspectsToFilter = false;
   notExistsProspectsToFilter = false;
 
-  totalRows: number;
+  totalRows: number = 0;
   isLoading = false;
 
   pageSize = 50;

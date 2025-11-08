@@ -30,19 +30,21 @@ export interface ConfirmationDialogData {
   templateUrl: './view-prospect.component.html',
   styleUrls: ['./view-prospect.component.scss']
 })
-
-
 export class ViewProspectComponent implements OnInit  {
   /** User Data. */
   prospectData: any;
+  clientData: any;
   prospectImage: SafeUrl | null = null;
   isImageLoading: boolean = false;
   private defaultPlaceholder = '/assets/user_placeholder.png';
-  id : number;
-  picturePath:string;
-  cintentType:string;
+  id: number;
+  picturePath: string;
+  cintentType: string;
   private prospectId: string = '';
   translate: any;
+
+  // Nouvelle propriété pour afficher la description du genre
+  genderDescriptionLabel: string | null = null;
 
   constructor(
     private clientsService: ClientsService,
@@ -59,6 +61,7 @@ export class ViewProspectComponent implements OnInit  {
 
     this.route.data.subscribe((data: { user: any }) => {
       this.prospectData = data.user;
+      this.clientData = data.user;
     });
   }
 
@@ -66,21 +69,13 @@ export class ViewProspectComponent implements OnInit  {
    // Récupération de l'ID depuis la route et appel du chargement d'image
     this.route.paramMap.subscribe(params => {
       this.prospectId = params.get('id') || '';
-      // Assure-toi que loadProspectProfil est appelé uniquement après que l'ID soit défini
+      // Assure-toi que loadProspectProfil est appelé uniquement après que l’ID soit défini
       if (this.prospectId) {
         this.loadProspectProfil();
       }
     });
   }
 
-  /**
-   * Retrieves the user data from `resolve`.
-   * @param {ProspectsService} prospectsService Users Service.
-   * @param {ActivatedRoute} route Activated Route.
-   * @param {Router} router Router for navigation.
-   * @param {MatDialog} dialog Dialog reference.
-   * @param {MatSnackBar} snackbar Snackbar for messages.
-   */
   // (Les injections et le constructeur sont déjà listés ci-dessus.)
 
   loadProspectProfil() {
@@ -105,12 +100,41 @@ export class ViewProspectComponent implements OnInit  {
         }
 
         this.isImageLoading = false;
+
+        // Après chargement de l'image (ou indépendamment), charger la description du genre si nécessaire
+        this.loadGenderDescriptionIfNeeded();
       },
       (error: any) => {
         console.error('Erreur chargement image prospect', error);
         this.prospectImage = this._sanitizer.bypassSecurityTrustResourceUrl(this.defaultPlaceholder);
         this.isImageLoading = false;
+
+        // Même en cas d'erreur image, tenter de charger la description du genre
+        this.loadGenderDescriptionIfNeeded();
       }
+    );
+  }
+
+  private loadGenderDescriptionIfNeeded() {
+    // Vérifie la valeur du genre et charge la description correspondante si nécessaire
+    const genderValue = this.prospectData?.genderValue;
+    if (!genderValue) {
+      this.genderDescriptionLabel = null;
+      return;
+    }
+
+    // Appel API pour récupérer la liste des genders
+    this.prospectsService.getGenderDescription().subscribe(
+      (resp: any) => {
+        const list = resp?.genderList || [];
+        const match = list.find((g: any) => g?.value === genderValue);
+        this.genderDescriptionLabel = match?.description ?? null;
+      },
+      (err) => {
+        console.error('Erreur lors de getGenderDescription', err);
+        this.genderDescriptionLabel = null;
+      }
+      // Note: vous pouvez optimiser en appelant une seule fois et réutiliser le résultat
     );
   }
 
@@ -173,7 +197,7 @@ export class ViewProspectComponent implements OnInit  {
     acceptProspectDialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.confirm) {
         this.prospectsService.acceptProspect(this.prospectData?.id).subscribe(() => {
-          this.router.navigate(['/clients']);
+          this.router.navigate(['/clients', this.prospectData?.id]);
         });
       }
     });
@@ -205,7 +229,7 @@ export class ViewProspectComponent implements OnInit  {
 
         // Payload: adaptez selon votre API si nécessaire
         const data = { password: password, repeatPassword: repeatPassword };
-        
+        // Implémentation backend à ajouter si nécessaire
 
       } catch (e) {
         this.snackbar.open('Une erreur est survenue lors de la mise à jour du mot de passe.', 'Fermer', { duration: 5000 });
