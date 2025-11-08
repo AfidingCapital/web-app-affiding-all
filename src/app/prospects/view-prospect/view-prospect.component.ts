@@ -29,7 +29,7 @@ export class ViewProspectComponent implements OnInit  {
   clientData: any;
   prospectImage: SafeUrl | null = null;
   isImageLoading: boolean = false;
-  private defaultPlaceholder = '/assets/user_placeholder.png';
+  public defaultPlaceholder = '/assets/user_placeholder.png';
   id: number;
   picturePath: string;
   cintentType: string;

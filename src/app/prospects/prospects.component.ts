@@ -1,4 +1,3 @@
-/** Angular Imports */
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
@@ -29,7 +28,7 @@ export class ProspectsComponent implements OnInit {
   existsProspectsToFilter = false;
   notExistsProspectsToFilter = false;
 
-  totalRows: number = 0;
+  totalRows: number ;
   isLoading = false;
 
   pageSize = 50;
@@ -50,10 +49,12 @@ export class ProspectsComponent implements OnInit {
 
   /**
    * Recherches server pour texte et ressources.
+   * Cette méthode est déclenchée par le champ de recherche (ou via bouton).
    */
   search(value: string) {
     this.filterText = value;
     this.resetPaginator();
+    // Utilise searchByText pour aligner avec l'API attendue
     this.getProspects();
   }
 
@@ -63,8 +64,6 @@ export class ProspectsComponent implements OnInit {
   }
 
   // --------------- Appels API ---------------
-
-
   private mapStatus(status: string | number | undefined): string {
     if (status == null) return '—';
     const map: Record<string, string> = {
@@ -106,18 +105,19 @@ export class ProspectsComponent implements OnInit {
   private getProspects() {
     this.isLoading = true;
 
-    this.prospectService.getProspects(
+    // Appel API adaptée: utilisation de searchByText pour produire l’URL cible
+    this.prospectService.searchByText(
+      this.filterText,
+      this.currentPage,    // page
+      this.pageSize,       // pageSize
       this.sortAttribute,
-      this.sortDirection,
-      this.currentPage,
-      this.pageSize
+      this.sortDirection
     )
     .subscribe(
       (data: any) => {
-        const content: any[] = data?.content ?? data ?? [];
+        const content: any[] = data?.content ?? data?.items ?? data ?? [];
 
         this.apiProspects = content.map((p: any) => {
-          // Si status peut être un objet { code, value }, gère les deux cas
           const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
           const isAccepted = this.isAcceptedStatus(statusRaw);
           const isNew = this.isNewStatus(statusRaw);
@@ -125,17 +125,16 @@ export class ProspectsComponent implements OnInit {
           const isExpired = this.isExpiredStatus(statusRaw);
           const isError = this.isErrorStatus(statusRaw);
 
-          // Le label est calculé via mapStatus pour refléter le mapping dynamique
           const statusLabel = this.mapStatus(statusRaw);
-         const STATUS_ORDER = [
-  { cond: isAccepted, value: 'prospectStatusType.accepted' },
-  { cond: isRejected, value: 'loanStatusType.overpaid' },
-  { cond: isExpired, value: 'loanProduct.inActive' },
-  { cond: isNew, value: 'prospectStatusType.new' },
-  { cond: isError, value: 'prospectStatusType.error' },
-];
+          const STATUS_ORDER = [
+            { cond: isAccepted, value: 'prospectStatusType.accepted' },
+            { cond: isRejected, value: 'loanStatusType.overpaid' },
+            { cond: isExpired, value: 'loanProduct.inActive' },
+            { cond: isNew, value: 'prospectStatusType.new' },
+            { cond: isError, value: 'prospectStatusType.error' },
+          ];
 
-const statusCode = STATUS_ORDER.find(s => s.cond)?.value;
+          const statusCode = STATUS_ORDER.find(s => s.cond)?.value;
           return {
             ...p,
             statusValue: statusRaw,
@@ -145,13 +144,12 @@ const statusCode = STATUS_ORDER.find(s => s.cond)?.value;
           };
         });
 
-        // totalElements attendu côté backend pour pagination
-        this.totalRows = data?.totalElements ?? this.apiProspects.length;
-        this.dataSource.data = this.displayedData;
+        // Total et données affichées
+        this.totalRows = data?.totalElements ?? data?.total ?? content.length;
+        this.dataSource.data = this.apiProspects;
 
-        const hasResults = this.apiProspects.length > 0;
-        this.existsProspectsToFilter = hasResults;
-        this.notExistsProspectsToFilter = !hasResults;
+        this.existsProspectsToFilter = this.apiProspects.length > 0;
+        this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
         this.isLoading = false;
       },
       (error: any) => {

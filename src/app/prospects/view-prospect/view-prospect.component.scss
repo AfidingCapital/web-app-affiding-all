@@ -1,28 +1,40 @@
+/* Conteneur global et largeur maximale équivalente à la vue User */
 .card-wrapper {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
+  max-width: 37rem; /* même valeur que la vue User */
+  margin: 0 auto;
 }
 
+/* Barre d’actions en haut */
 .toolbar {
-  padding: 0.25rem 1rem 0.5rem;
+  padding: 0.25rem 0.5rem 0.75rem;
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
 }
 
+/* Carte profil principale (identique au style User) */
 .profile-card {
   border-radius: 14px;
   box-shadow: 0 6px 18px rgba(0,0,0,.08);
   overflow: hidden;
   background: #fff;
   border: 1px solid #e5e5e5;
+  width: 100%;
 }
 
+/* Contenu de la carte */
 .profile-content {
   padding: 20px;
   display: flex;
+  flex-direction: row; /* garde le layout ligne sur grand écran, comme User */
   align-items: stretch;
   gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Zone image (taille cohérente avec User) */
 .image-area {
   width: 140px;
   height: 140px;
@@ -33,14 +45,12 @@
   justify-content: center;
   background: #f5f5f5;
 }
-
 .image-area img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 10px;
 }
-
 .image-spinner {
   display: flex;
   align-items: center;
@@ -49,75 +59,62 @@
   height: 100%;
 }
 
-.details-area {
-  min-width: 0;
-  flex: 1 1 auto;
+/* Zone détails: lignes (label + valeur sur une même ligne) */
+.lines-area {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  flex: 1;
 }
-
-.row-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 22px; /* spacing équilibré entre items */
-  align-items: start;
+.line {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
 }
-
-.detail {
-  min-width: 0;
-}
-
-.label {
+.line .label {
+  min-width: 180px;
   font-weight: 600;
-  font-size: 0.88rem;
   color: #555;
-  margin-bottom: 4px;
 }
-
-/* Surtout: espacement uniforme entre les lignes de détail */
-.value {
+.line .value {
+  flex: 1;
   font-size: 0.95rem;
   color: #111;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  line-height: 1.2; /* évite les sauts de ligne inutiles */
 }
 
-.details-area {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
+/* Bouton Back (aligné à droite) */
 .back-btn {
   margin: 0;
   padding: 0;
-  margin-top: auto;       /* pousse le bouton tout en bas du conteneur */
-  align-self: flex-end;   /* left aligné dans le conteneur */
-  width: 100%;              /* ou 100% si tu veux qu’il occupe toute la largeur mais aligné à gauche */
+  margin-top: auto;
+  align-self: flex-end;
+  width: 100%;
   display: flex;
   justify-content: flex-end;
 }
 
-/* Ajustements responsive */
+/* Responsive: petit écran - image au-dessus et détails sur lignes */
 @media (max-width: 900px) {
-  .row-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px 22px;
+  .profile-content {
+    flex-direction: column;
+  }
+  .lines-area {
+    width: 100%;
   }
 }
 @media (max-width: 600px) {
-  .profile-content {
-    padding: 14px;
-    flex-direction: column;
+  .card-wrapper {
+    padding: 0.25rem 0.5rem;
   }
   .image-area {
     width: 120px;
     height: 120px;
+    margin: 0 auto 8px;
   }
-  .row-grid {
-    grid-template-columns: 1fr;
+  .line .label {
+    min-width: 140px;
   }
 }

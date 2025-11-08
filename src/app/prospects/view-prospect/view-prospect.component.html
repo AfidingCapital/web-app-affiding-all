@@ -1,76 +1,83 @@
 <div class="card-wrapper" fxLayout="column" fxLayoutAlign="start stretch">
   <!-- Barre d’actions en haut -->
-  <div class="toolbar" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="12px" *ngIf="prospectData.status === 1">
-    <button mat-raised-button color="primary" (click)="accept()">
-      <fa-icon icon="cog" class="icon"></fa-icon>
+  <div class="toolbar" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="12px" *ngIf="prospectData?.status === 1" aria-label="Actions Prospect">
+    <button mat-raised-button color="primary" (click)="accept()" aria-label="Accepter le prospect">
+      <fa-icon icon="cog" class="icon" aria-hidden="true"></fa-icon>
       {{ 'labels.buttons.Accept Prospect' | translate }}
     </button>
 
-    <button mat-raised-button color="warn" (click)="reject()">
-      <fa-icon icon="trash" class="icon"></fa-icon>
+    <button mat-raised-button color="warn" (click)="reject()" aria-label="Rejeter le prospect">
+      <fa-icon icon="trash" class="icon" aria-hidden="true"></fa-icon>
       {{ 'labels.buttons.Reject' | translate }}
     </button>
   </div>
 
   <!-- Carte Profil -->
-  <mat-card class="profile-card">
-    <mat-card-content class="profile-content" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="24px">
+  <mat-card class="profile-card" aria-labelledby="prospectTitle">
+    <mat-card-content class="profile-content" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="24px" id="prospectCard">
       <!-- Image -->
-      <div class="image-area" aria-label="Profile image">
+      <div class="image-area" aria-label="Profile image" *ngIf="prospectImage || defaultPlaceholder">
         <ng-container *ngIf="isImageLoading; else imageLoaded">
           <div class="image-spinner">
             <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
           </div>
         </ng-container>
         <ng-template #imageLoaded>
-          <img [src]="prospectImage ? prospectImage : defaultPlaceholder" alt="Profile image" />
+          <img [src]="prospectImage || defaultPlaceholder" alt="Profil image" />
         </ng-template>
       </div>
 
       <!-- Détails -->
-      <div class="details-area" fxLayout="column" fxFlex>
-        <div class="row-grid" fxLayout="row" fxLayoutWrap="wrap" fxLayoutGap="32px 48px">
-          <div class="detail">
-            <div class="label">{{ 'labels.inputs.First Name' | translate }}</div>
-            <div class="value">{{ prospectData.firstname }}</div>
-          </div>
-
-          <div class="detail" *ngIf="prospectData.middlename">
-            <div class="label">{{ 'labels.inputs.Middle Name' | translate }}</div>
-            <div class="value">{{ prospectData.middlename }}</div>
-          </div>
-
-          <div class="detail" *ngIf="prospectData.lastname">
-            <div class="label">{{ 'labels.inputs.Last Name' | translate }}</div>
-            <div class="value">{{ prospectData.lastname }}</div>
-          </div>
-
-          <div class="detail" *ngIf="prospectData.emailAddress">
-            <div class="label">{{ 'labels.inputs.Email' | translate }}</div>
-            <div class="value">{{ prospectData.emailAddress }}</div>
-          </div>
-
-          <div class="detail" *ngIf="prospectData.mobileNo">
-            <div class="label">{{ 'labels.inputs.Mobile No' | translate }}</div>
-            <div class="value">{{ prospectData.mobileNo }}</div>
-          </div>
-
-          <div class="detail" *ngIf="prospectData.emailAddress">
-            <div class="label">{{ 'labels.inputs.Address' | translate }}</div>
-            <div class="value">{{ prospectData.address }}</div>
-          </div>
-
-          <div class="detail" >
-            <div class="label">{{ 'labels.inputs.Date of birth' | translate }}</div>
-            <div class="value">{{ dateOfBirthLabel }}</div>
-          </div>
-
-          <div class="detail" >
-            <div class="label">{{ 'labels.inputs.Gender' | translate }}</div>
-            <div class="value">{{ genderDescriptionLabel }}</div>
-          </div>
+      <div class="lines-area" fxLayout="column" fxFlex>
+        <!-- Première ligne: Prénom -->
+        <div class="line" *ngIf="prospectData?.firstname">
+          <span class="label">{{ 'labels.inputs.First Name' | translate }}</span>
+          <span class="value">{{ prospectData.firstname }}</span>
         </div>
 
+        <!-- 2e ligne: Middle Name (si présent) -->
+        <div class="line" *ngIf="prospectData?.middlename">
+          <span class="label">{{ 'labels.inputs.Middle Name' | translate }}</span>
+          <span class="value">{{ prospectData.middlename }}</span>
+        </div>
+
+        <!-- 3e ligne: Last Name -->
+        <div class="line" *ngIf="prospectData?.lastname">
+          <span class="label">{{ 'labels.inputs.Last Name' | translate }}</span>
+          <span class="value">{{ prospectData.lastname }}</span>
+        </div>
+
+        <!-- Email -->
+        <div class="line" *ngIf="prospectData?.emailAddress">
+          <span class="label">{{ 'labels.inputs.Email' | translate }}</span>
+          <span class="value">{{ prospectData.emailAddress }}</span>
+        </div>
+
+        <!-- Mobile -->
+        <div class="line" *ngIf="prospectData?.mobileNo">
+          <span class="label">{{ 'labels.inputs.Mobile No' | translate }}</span>
+          <span class="value">{{ prospectData.mobileNo }}</span>
+        </div>
+
+        <!-- Address -->
+        <div class="line" *ngIf="prospectData?.address">
+          <span class="label">{{ 'labels.inputs.Address' | translate }}</span>
+          <span class="value">{{ prospectData.address }}</span>
+        </div>
+
+        <!-- Date of birth -->
+        <div class="line" >
+          <span class="label">{{ 'labels.inputs.Date of birth' | translate }}</span>
+          <span class="value">{{ dateOfBirthLabel }}</span>
+        </div>
+
+        <!-- Gender -->
+        <div class="line" >
+          <span class="label">{{ 'labels.inputs.Gender' | translate }}</span>
+          <span class="value">{{ genderDescriptionLabel }}</span>
+        </div>
+
+        <!-- Bouton Back -->
         <div class="back-btn" >
           <button mat-stroked-button color="primary" [routerLink]="['../']">
             {{ 'labels.buttons.Back' | translate }}
