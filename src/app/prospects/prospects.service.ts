@@ -32,6 +32,18 @@ export class ProspectsService {
     return this.http.get(`${this.base}`, { params: httpParams, headers: headers});
   }
 
+  // Dans ProspectsService
+formatDateNeeded(iso?: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric'
+  }).format(d);
+}
+
   // Recherche par texte avec pagination et tri optionnel
   searchByText(text: string, page: number, pageSize: number, sortAttribute: string = '', sortDirection: string = ''): Observable<any> {
     let params = new HttpParams()

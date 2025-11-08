@@ -64,16 +64,6 @@ export class ProspectsComponent implements OnInit {
 
   // --------------- Appels API ---------------
 
-  private formatDate(iso: string | undefined): string {
-    if (!iso) return '';
-    const d = new Date(iso);
-    // 29 October 2025
-    return new Intl.DateTimeFormat('en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    }).format(d);
-  }
 
   private mapStatus(status: string | number | undefined): string {
     if (status == null) return '—';
@@ -151,7 +141,7 @@ const statusCode = STATUS_ORDER.find(s => s.cond)?.value;
             statusValue: statusRaw,
             statusLabel: statusLabel,
             statusCode: statusCode,
-            createdAtLabel: this.formatDate(p.createdAt)
+            createdAtLabel: this.prospectService.formatDateNeeded(p.createdAt)
           };
         });
 
