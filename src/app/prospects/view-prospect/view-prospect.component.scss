@@ -80,7 +80,8 @@ flex: 1;
 align-self: stretch;
 }
 .line {
-display: flex;
+display: grid;
+grid-template-columns: 180px 1fr;
 gap: 12px;
 align-items: baseline;
 }
@@ -93,8 +94,8 @@ color: #555;
 flex: 1;
 font-size: 0.95rem;
 color: #111;
-white-space: nowrap;
-overflow: hidden;
+white-space: normal;
+word-break: break-word;
 text-overflow: ellipsis;
 }
 
