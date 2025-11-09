@@ -1,6 +1,6 @@
-<div class="card-wrapper" fxLayout="column" fxLayoutAlign="start stretch">
+
   <!-- Barre d’actions en haut -->
-  <div class="toolbar" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="12px" *ngIf="prospectData?.status === 1" aria-label="Actions Prospect">
+  <div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%" *ngIf="prospectData?.status === 1" aria-label="Actions Prospect">
     <button mat-raised-button color="primary" (click)="accept()" aria-label="Accepter le prospect">
       <fa-icon icon="cog" class="icon" aria-hidden="true"></fa-icon>
       {{ 'labels.buttons.Accept Prospect' | translate }}
@@ -12,9 +12,10 @@
     </button>
   </div>
 
+  <div class="container">
   <!-- Carte Profil -->
-  <mat-card class="profile-card" aria-labelledby="prospectTitle">
-    <mat-card-content class="profile-content" fxLayout="row" fxLayout.lt-md="column" fxLayoutGap="24px" id="prospectCard">
+  <mat-card>
+    <mat-card-content class="profile-content ">
       <!-- Image -->
       <div class="image-area" aria-label="Profile image" *ngIf="prospectImage || defaultPlaceholder">
         <ng-container *ngIf="isImageLoading; else imageLoaded">
