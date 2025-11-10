@@ -290,6 +290,7 @@
       "Home": "Home"
     },
     "buttons": {
+      "Accept":"Accept",
       "Accept Prospect": "Accept Prospect",
       "Accept Transfer": "Accept Transfer",
       "Actions": "Actions",
@@ -1163,6 +1164,7 @@
     },
     "inputs": {
       "Show prospect" : "Show prospect",
+      "Date of birth" : "Date of birth",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "LIABILITY",

@@ -290,6 +290,7 @@
       "Home": "Accueil"
     },
     "buttons": {
+      "Accept":"Accepter",
       "Accept Prospect": "Accepter le prospect",
       "Accept Transfer": "Accepter le transfert",
       "Actions": "Actions",
@@ -326,7 +327,7 @@
       "Assign Member": "Attribuer un membre",
       "Attach Meeting": "Joindre une réunion",
       "Attendance": "Présence",
-      "Back": "Dos",
+      "Back": "Précédent",
       "Bar Chart": "Diagramme à bandes",
       "Browse": "Parcourir",
       "Bulk JLG Loan Application": "Demande de prêt JLG en masse",
@@ -1162,6 +1163,7 @@
     },
     "inputs": {
       "Show prospect" : "Afficher le prospect",
+      "Date of birth" : "Date de naissance",
       "accounting": {
         "ASSET": "ACTIF",
         "LIABILITY": "RESPONSABILITÉ",

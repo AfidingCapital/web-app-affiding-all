@@ -1,68 +1,100 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProspectsService {
+  // Base relatif, conformément à votre fichier d'origine
   private base = '/prospects';
 
+  // genderDescription endpoint construit dynamiquement: `${base}/tpt`
+  private get genderDescriptionBase(): string {
+    return `${this.base}/tpt`;
+  }
+
+  // Placeholder public pour usage dans les composants si besoin
+  public defaultPlaceholder: string = '/assets/user_placeholder.png';
+
   constructor(private http: HttpClient) {}
-  
-  getProspect(prospectId: string){
-	const url = `${this.base}/${prospectId}`; // ex: /api/v1/prospects/1
-	return this.http.get(url);
+
+  // GET /prospects/{prospectId}
+  getProspect(prospectId: string): Observable<any> {
+    const url = `${this.base}/${prospectId}`; // ex: /prospects/1
+    return this.http.get(url);
   }
 
   // GET uniquement: récupère les prospects avec pagination et tri
-  getProspects(orderBy: string, sortOrder: string, offset: number, limit: number): Observable<any> {
-    const headers = new HttpHeaders().set('Sec-Fetch-Mode', 'no-cors');
+  // Version harmonisée: utilise page/limit et optionnel sorting via direction/property
+  getProspects(orderBy: string, sortOrder: string, page: number, limit: number): Observable<any> {
     const httpParams = new HttpParams()
-      .set('offset', offset.toString())
+      .set('page', page.toString())
       .set('limit', limit.toString())
-      .set('sortOrder', sortOrder)
-      .set('orderBy', orderBy);
+      .set('orderBy', orderBy)
+      .set('sortOrder', sortOrder);
 
-    // //console.log('ProspectsService.getProspects called with', {
-    //   orderBy,
-    //   sortOrder,
-    //   offset,
-    //   limit,
-    //   httpParams: httpParams.toString()
-    // });
-
-    return this.http.get(`${this.base}`, { params: httpParams, headers: headers});
+    return this.http.get(this.base, { params: httpParams });
   }
 
-  searchByText(text: string, page: number, pageSize: number, sortAttribute: string = '', sortDirection: string = '') {
-  let params = new HttpParams()
-    .set('text', text)
-    .set('page', String(page))
-    .set('size', String(pageSize));
-
-  if (sortAttribute && sortDirection) {
-    // Si l’API attend un format différent, ajuste
-    params = params.set('sort', `${sortAttribute},${sortDirection}`);
+  // Dans ProspectsService
+  formatDateNeeded(iso?: string): string {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '';
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }).format(d);
   }
 
-  return this.http.get(this.base, { params });
-}
-  
-  acceptProspect(prospectId: string){
-  	const url = `${this.base}/${prospectId}/accept`;
-  	return this.http.post(url,{});
-  }
-  
-  rejectProspect(prospectId: string){
-  	const url = `${this.base}/${prospectId}/reject`;
-  	return this.http.post(url,{});
+  // Recherche par texte avec pagination et tri optionnel
+  // Version harmonisée: retourne la même structure quelle que soit l’API
+  searchByText(
+    text: string,
+    page: number,
+    pageSize: number,
+    sortAttribute: string = '',
+    sortDirection: string = ''
+  ): Observable<any> {
+    // Construction des paramètres GET plats
+    // Version sans texte dans l’URL (à adapter si votre API attend texte)
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', pageSize.toString());
+
+    // Tri optionnel
+    if (sortAttribute && sortDirection) {
+      const dir = sortDirection.toUpperCase();
+      params = params.set('direction', dir).set('property', sortAttribute);
+    }
+
+    // Si votre API attend le texte sous un paramètre précis, décommentez et adaptez:
+    // params = params.set('text', text); // ou .set('query', text)
+
+    return this.http.get(this.base, { params });
   }
 
-  getProspectProfileImage(prospectId: string) {
+  // Nouvelle: gender description via /prospects/tpt
+  getGenderDescription(): Observable<any> {
+    const url = this.genderDescriptionBase; // /prospects/tpt
+    return this.http.get(url);
+  }
+
+  acceptProspect(prospectId: string): Observable<any> {
+    const url = `${this.base}/${prospectId}/accept`;
+    return this.http.post(url, {});
+  }
+
+  rejectProspect(prospectId: string): Observable<any> {
+    const url = `${this.base}/${prospectId}/reject`;
+    return this.http.post(url, {});
+  }
+
+  getProspectProfileImage(prospectId: string): Observable<any> {
+    // Option: ajouter des params si nécessaire
     //const httpParams = new HttpParams().set('maxHeight', '150');
-    return this.http
-      .skipErrorHandler()
-      .get(`/prospects/${prospectId}/images`, { responseType: 'text' });
+    return this.http.get(`/prospects/${prospectId}/images`, { responseType: 'text' });
   }
 }

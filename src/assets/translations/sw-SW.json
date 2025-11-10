@@ -290,6 +290,7 @@
       "Home": "Nyumbani"
     },
     "buttons": {
+      "Accept":"Kubali",
       "Accept Prospect": "Kubali Mtu wa Kuangaliwa",
       "Accept Transfer": "Kubali Uhamisho",
       "Actions": "Vitendo",
@@ -1154,6 +1155,7 @@
     },
     "inputs": {
       "Show prospect" : "Onyesha mtazamo",
+      "Date of birth": "Tarehe ya kuzaliwa",
       "accounting": {
         "ASSET": "ASSET",
         "LIABILITY": "DHIMA",

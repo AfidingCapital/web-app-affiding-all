@@ -4,6 +4,20 @@
   color: $status-active;
 }
 
+.status-new {
+  color: $status-new;
+}
+
+.status-accepted {
+  color: $status-accepted;
+}
+
+.status-rejected {
+  color: $status-rejected;
+}
+.status-expired {
+  color: $status-expired;
+}
 .status-inactive {
   color: $status-inactive;
 }
@@ -18,6 +32,10 @@
 
 .status-approved {
   color: $status-approved;
+}
+
+.status-error {
+  color: $status-error;
 }
 
 .status-overpaid {
