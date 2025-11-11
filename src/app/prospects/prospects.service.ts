@@ -64,6 +64,11 @@ export class ProspectsService {
       .set('page', page.toString())
       .set('limit', pageSize.toString());
 
+      // Texte de recherche (assurez-vous que le nom correspond à l’API)
+  if (text != null && text.trim() !== '') {
+    params = params.set('text', text.trim()); // ou 'query' / 'q' selon l’API
+  }
+
     // Tri optionnel
     if (sortAttribute && sortDirection) {
       const dir = sortDirection.toUpperCase();
