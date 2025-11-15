@@ -112,3 +112,12 @@ $color: #e2e4ec;
   padding: 2px 6px;
   border-radius: 4px;
 }
+.top-bar .filter-item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Si nécessaire, ajuste le padding/margins globaux autour des filtres */
+  @media (max-width: 600px) {
+    .search-field { width: 100%; }
+  }

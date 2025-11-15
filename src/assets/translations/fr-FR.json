@@ -1162,6 +1162,8 @@
       "Principal Amount": "Montant principal"
     },
     "inputs": {
+      "Show prospects Accepted": "Afficher les prospects acceptés",
+      "Show prospects Refused" : "Afficher les prospects refusés",
       "Client Path":"Chemin vers le client",
       "Show prospect" : "Afficher le prospect",
       "Date of birth" : "Date de naissance",

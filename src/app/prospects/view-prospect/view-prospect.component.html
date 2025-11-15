@@ -30,6 +30,13 @@
 
       <!-- Détails -->
       <div class="lines-area" fxLayout="column" fxFlex>
+
+        <!-- status -->
+        <div class="line" >
+          <span class="label" >{{ 'labels.inputs.Status' | translate }}</span>
+          <span class="value">{{ statusLabel | translate }}</span>
+        </div>
+        
         <!-- Première ligne: Prénom -->
         <div class="line" *ngIf="prospectData?.firstname">
           <span class="label">{{ 'labels.inputs.First Name' | translate }}</span>
@@ -98,11 +105,7 @@
 </span>
 </div>
 
-        <!-- status -->
-        <div class="line" >
-          <span class="label" >{{ 'labels.inputs.Status' | translate }}</span>
-          <span class="value">{{ statusLabel | translate }}</span>
-        </div>
+        
 
         <!-- Bouton Back -->
         <div class="back-btn" >

@@ -1154,6 +1154,8 @@
       "Principal Amount": "Kiasi cha Mkuu"
     },
     "inputs": {
+      "Show prospects Accepted" : "Onyesha mtazamo kubali",
+      "Show prospects Refused" : "Onyesha mtazamo kataliya",
       "Client Path": "Ndjiya kwa client",
       "Show prospect" : "Onyesha mtazamo",
       "Date of birth": "Tarehe ya kuzaliwa",

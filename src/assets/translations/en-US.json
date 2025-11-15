@@ -1163,6 +1163,8 @@
       "Principal Amount": "Principal Amount"
     },
     "inputs": {
+      "Show prospects Accepted": "Show prospects Accepted",
+      "Show prospects Refused" : "Show prospects Refused",
       "Client Path": "Client Path",
       "Show prospect" : "Show prospect",
       "Date of birth" : "Date of birth",

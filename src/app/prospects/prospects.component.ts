@@ -28,7 +28,7 @@ export class ProspectsComponent implements OnInit {
   existsProspectsToFilter = false;
   notExistsProspectsToFilter = false;
 
-  totalRows: number ;
+  totalRows: number = 0;
   isLoading = false;
 
   pageSize = 50;
@@ -37,6 +37,13 @@ export class ProspectsComponent implements OnInit {
 
   sortAttribute = '';
   sortDirection = '';
+
+  // Filtres (nouveaux) - pilotage via ngModel
+  filterShowAccepted: boolean = false;
+  filterShowRefused: boolean = false;
+
+  // Message informatif lorsqu'aucun "new" au chargement
+  newStatusEmptyMessage: string | null = null;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -132,13 +139,32 @@ export class ProspectsComponent implements OnInit {
           };
         });
 
-        // Total et données affichées
+        // Total et données affichées initialement
         this.totalRows = data?.totalElements ?? data?.total ?? content.length;
-        this.dataSource.data = this.apiProspects;
 
-        this.existsProspectsToFilter = this.apiProspects.length > 0;
+        // Filtrage initial: afficher uniquement les "new"
+        const initialNew = this.apiProspects.filter(p => {
+          const s = ((p.statusLabel ?? '')).toString().toLowerCase();
+          return s === 'new';
+        });
+
+        // Mettre à jour dataSource et les compteurs
+        this.dataSource.data = initialNew;
+        this.totalRows = initialNew.length;
+        this.existsProspectsToFilter = initialNew.length > 0;
         this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
         this.isLoading = false;
+
+        // Message informatif si aucun "new" au chargement
+        if (initialNew.length === 0) {
+          this.newStatusEmptyMessage = 'Aucun  nouveau prospect trouvé';
+        } else {
+          this.newStatusEmptyMessage = null;
+        }
+
+        // Si tu souhaites activer les filtres immédiatement après chargement même sans interaction utilisateur,
+        // tu peux appeler ceci:
+        // this.applyFilters(true);
       },
       (error: any) => {
         this.isLoading = false;
@@ -179,5 +205,46 @@ export class ProspectsComponent implements OnInit {
     this.getProspects(); // recharge les données en fonction du nouvel état (si implémenté)
   }
 
-  // --------------- Types ---------------
+  // --------------- Filtrage Show Accepted/Refused ---------------
+  onFilterChange(): void {
+    this.applyFilters();
+  }
+
+  private applyFilters(resetToNewOnLoad: boolean = false): void {
+    // Filtrage simple sur les données existantes (après chargement)
+    const accepted = this.filterShowAccepted;
+    const refused = this.filterShowRefused;
+
+    // Si aucun filtre actif, afficher tout
+    let filtered = this.apiProspects;
+
+    const anyFilterActive = accepted || refused;
+    if (anyFilterActive) {
+      filtered = this.apiProspects.filter(p => {
+        const s = (p.statusLabel ?? '').toString().toLowerCase();
+        if (resetToNewOnLoad) {
+          // lors du chargement initial, n'afficher que "new"
+          return s === 'new';
+        }
+        if (accepted && !refused) {
+          return s === 'accepted';
+        }
+        if (refused && !accepted) {
+          return s === 'refused';
+        }
+        if (accepted && refused) {
+          return s === 'accepted' || s === 'refused';
+        }
+        return true;
+      });
+    }
+
+    this.dataSource.data = filtered;
+    this.totalRows = filtered.length;
+    this.notExistsProspectsToFilter = filtered.length === 0;
+    this.existsProspectsToFilter = filtered.length > 0;
+  }
+
+  // --------------- Recherche (inchangé) ---------------
+  // La méthode search est ci-dessus
 }
