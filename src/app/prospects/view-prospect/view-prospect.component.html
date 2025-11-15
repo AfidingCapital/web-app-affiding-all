@@ -75,7 +75,33 @@
         <!-- Gender -->
         <div class="line" >
           <span class="label">{{ 'labels.inputs.Gender' | translate }}</span>
-          <span class="value">{{ genderDescriptionLabel }}</span>
+          <span class="value">{{ genderDescriptionLabel | translate }}</span>
+        </div>
+
+        <!-- createdAt -->
+        <div class="line" >
+          <span class="label">{{ 'labels.inputs.Created At' | translate }}</span>
+          <span class="value">{{ createdAtLabel }}</span>
+        </div>
+
+        <!-- acceptedAt -->
+        <div class="line" *ngIf="prospectData?.acceptedAt" >
+          <span class="label">{{ 'labels.inputs.Accepted At' | translate }}</span>
+          <span class="value">{{ acceptedAtLabel }}</span>
+        </div>
+
+        <!-- clientPath -->
+         <div class="line" *ngIf="prospectData?.clientId">
+  <span class="label" style="cursor: pointer;" [routerLink]="clientPath">{{ 'labels.inputs.Client Path' | translate }}</span>
+  <span class="value" style="cursor: pointer;" [routerLink]="clientPath">
+  /clients/{{ prospectData?.clientId }}/
+</span>
+</div>
+
+        <!-- status -->
+        <div class="line" >
+          <span class="label" >{{ 'labels.inputs.Status' | translate }}</span>
+          <span class="value">{{ statusLabel | translate }}</span>
         </div>
 
         <!-- Bouton Back -->

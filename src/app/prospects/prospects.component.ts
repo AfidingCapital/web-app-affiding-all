@@ -64,19 +64,6 @@ export class ProspectsComponent implements OnInit {
   }
 
   // --------------- Appels API ---------------
-  private mapStatus(status: string | number | undefined): string {
-    if (status == null) return '—';
-    const map: Record<string, string> = {
-      '0': 'Error',
-      '1': 'New',
-      '2': 'Accepted',
-      '3': 'Rejected',
-      '4': 'Expired'
-    };
-    const key = String(status);
-    return map[key] ?? key;
-  }
-
   private isAcceptedStatus(statusRaw: any): boolean {
     const code = typeof statusRaw === 'object' && statusRaw != null ? statusRaw.code : statusRaw;
     return Number(code) === 2;
@@ -125,7 +112,8 @@ export class ProspectsComponent implements OnInit {
           const isExpired = this.isExpiredStatus(statusRaw);
           const isError = this.isErrorStatus(statusRaw);
 
-          const statusLabel = this.mapStatus(statusRaw);
+          // Utiliser le mapping centralisé via le service
+          const statusLabel = this.prospectService.mapStatus(statusRaw);
           const STATUS_ORDER = [
             { cond: isAccepted, value: 'prospectStatusType.accepted' },
             { cond: isRejected, value: 'loanStatusType.overpaid' },

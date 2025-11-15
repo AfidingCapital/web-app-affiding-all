@@ -1163,6 +1163,7 @@
       "Principal Amount": "Principal Amount"
     },
     "inputs": {
+      "Client Path": "Client Path",
       "Show prospect" : "Show prospect",
       "Date of birth" : "Date of birth",
       "accounting": {
@@ -1426,6 +1427,7 @@
       "Create Fixed Deposit Product": "Create Fixed Deposit Product",
       "Create Journal Entries": "Create Journal Entries",
       "Created At": "Created At",
+      "Accepted At": "Accepted At",
       "Created By": "Created By",
       "Created On": "Created On",
       "Credit": "Credit",
@@ -3493,6 +3495,8 @@
     "Refund transactions where interest refund will automatically be calculated": "Refund transactions where interest refund will automatically be calculated"
   },
 
+"Homme":"Man",
+"Femme":"Woman",
   "Search by client name, Account No, mobile": "Search by client name, Account No, mobile", 
   "is designed by": "is designed by the",
   "A global community": "A global community",

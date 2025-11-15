@@ -1162,6 +1162,7 @@
       "Principal Amount": "Montant principal"
     },
     "inputs": {
+      "Client Path":"Chemin vers le client",
       "Show prospect" : "Afficher le prospect",
       "Date of birth" : "Date de naissance",
       "accounting": {
@@ -1424,7 +1425,8 @@
       "Cover Image": "Image de couverture",
       "Create Fixed Deposit Product": "Créer un produit de dépôt fixe",
       "Create Journal Entries": "Créer des entrées de journal",
-      "Created At": "Créé à",
+      "Created At": "Créé le",
+      "Accepted At": "Accepté le",
       "Created By": "Créé par",
       "Created On": "Créé sur",
       "Credit": "Crédit",
@@ -3489,6 +3491,8 @@
     "Refund transactions where interest refund will automatically be calculated": "Opérations de remboursement pour lesquelles le remboursement des intérêts sera automatiquement calculé"
   },
 
+  "Homme":"Homme",
+  "Femme":"Femme",
   "Search by client name, Account No, mobile":"Rechercher par nom du client, numéro de compte, mobile",
   "is designed by": "est developpé par",
   "A global community": "Une organisation mondiale",

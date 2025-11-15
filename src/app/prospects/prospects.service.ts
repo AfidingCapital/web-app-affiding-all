@@ -64,10 +64,10 @@ export class ProspectsService {
       .set('page', page.toString())
       .set('limit', pageSize.toString());
 
-      // Texte de recherche (assurez-vous que le nom correspond à l’API)
-  if (text != null && text.trim() !== '') {
-    params = params.set('text', text.trim()); // ou 'query' / 'q' selon l’API
-  }
+    // Texte de recherche (assurez-vous que le nom correspond à l’API)
+    if (text != null && text.trim() !== '') {
+      params = params.set('text', text.trim()); // ou 'query' / 'q' selon l’API
+    }
 
     // Tri optionnel
     if (sortAttribute && sortDirection) {
@@ -85,6 +85,21 @@ export class ProspectsService {
   getGenderDescription(): Observable<any> {
     const url = this.genderDescriptionBase; // /prospects/tpt
     return this.http.get(url);
+  }
+
+  // Mapping centralisé du statut
+  // Public pour être réutilisé par tous les composants
+  public mapStatus(status: string | number | undefined): string {
+    if (status == null) return '—';
+    const map: Record<string, string> = {
+      '0': 'Error',
+      '1': 'New',
+      '2': 'Accepted',
+      '3': 'Rejected',
+      '4': 'Expired'
+    };
+    const key = String(status);
+    return map[key] ?? key;
   }
 
   acceptProspect(prospectId: string): Observable<any> {

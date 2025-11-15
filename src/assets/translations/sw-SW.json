@@ -1154,6 +1154,7 @@
       "Principal Amount": "Kiasi cha Mkuu"
     },
     "inputs": {
+      "Client Path": "Ndjiya kwa client",
       "Show prospect" : "Onyesha mtazamo",
       "Date of birth": "Tarehe ya kuzaliwa",
       "accounting": {
@@ -1417,6 +1418,7 @@
       "Create Fixed Deposit Product": "Unda Bidhaa ya Amana isiyobadilika",
       "Create Journal Entries": "Unda Maingizo ya Jarida",
       "Created At": "Imeundwa Katika",
+      "Accepted At": "Imekubaliwa Katika",
       "Created By": "Imetengenezwa na",
       "Created On": "Imeundwa Juu",
       "Credit": "Mikopo",
@@ -3473,7 +3475,8 @@
     "loan product will become inactive and unavailable to clients": "Tarehe ambayo bidhaa ya mkopo itaacha kutumika na haitapatikana kwa wateja. Ikiwa tupu, bidhaa ya kupakia haitafanya kazi kamwe.",
     "Refund transactions where interest refund will automatically be calculated": "Shughuli za kurejesha pesa ambapo urejeshaji wa riba utahesabiwa kiotomatiki"
   },
-
+  "Homme":"Ume",
+  "Femme":"Muke",
   "Search by client name, Account No, mobile":"Tafuta kwa jina la mteja, Nambari ya Akaunti, simu",
   "is designed by": "imetengenezwa na",
   "A global community": "Shirika la Dunia",

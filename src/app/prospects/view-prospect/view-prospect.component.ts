@@ -42,6 +42,15 @@ export class ViewProspectComponent implements OnInit  {
   // date of birth formatée
   dateOfBirthLabel: string | null = null;
 
+  // createdAt formatée
+  createdAtLabel: string | null = null;
+
+  // acceptedAt formatée
+  acceptedAtLabel: string | null = null;
+
+  // status label affiché dans le template
+  statusLabel: string | null = null;
+
   constructor(
     private clientsService: ClientsService,
     private _sanitizer: DomSanitizer,
@@ -54,17 +63,19 @@ export class ViewProspectComponent implements OnInit  {
   ) {
     this.translate = this.translateService;
 
+    // Chargement des données via la route (data: { user: any })
     this.route.data.subscribe((data: { user: any }) => {
       this.prospectData = data.user;
       this.clientData = data.user;
-      // formatage immédiatement si dateOfBirth est présente
+      // Autres formatages
       this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth);
-      // Si formatDateNeeded n’existe pas, on utilise formatDateNedeed ou formatDateFailure selon votre service
+      this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt);
+      this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt);
     });
   }
 
   ngOnInit(): void {
-   this.route.paramMap.subscribe(params => {
+    this.route.paramMap.subscribe(params => {
       this.prospectId = params.get('id') || '';
       if (this.prospectId) {
         this.loadProspectProfil();
@@ -95,10 +106,23 @@ export class ViewProspectComponent implements OnInit  {
         this.isImageLoading = false;
         this.loadGenderDescriptionIfNeeded();
 
-        // Mettre à jour la date de naissance formatée après chargement
+        // Mettre à jour les labels formatés après chargement
         this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
           ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
           ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth);
+
+        this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
+          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
+          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt);
+
+        this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
+          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
+          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt);
+
+        // Calcul du statusLabel centralisé via le service
+        const statusRaw = this.prospectData?.statusValue ?? this.prospectData?.status;
+        this.statusLabel = this.prospectsService.mapStatus(statusRaw);
+
       },
       (error: any) => {
         console.error('Erreur chargement image prospect', error);
@@ -110,8 +134,34 @@ export class ViewProspectComponent implements OnInit  {
         this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
           ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
           ?? '';
+        
+        this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
+          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
+          ?? '';
+
+        this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
+          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
+          ?? '';
+
+        // Garder le statusLabel cohérent même en erreur parfois
+        const statusRaw = this.prospectData?.statusValue ?? this.prospectData?.status;
+        this.statusLabel = this.prospectsService.mapStatus(statusRaw);
       }
     );
+  }
+
+  private mapImageResponse(src: string): SafeUrl {
+    if (!src) {
+      return this._sanitizer.bypassSecurityTrustResourceUrl(this.defaultPlaceholder);
+    }
+
+    let url = src;
+    if (src.startsWith('http') || src.startsWith('data:')) {
+      url = src;
+    } else {
+      url = `${window.location.origin}${src}`;
+    }
+    return this._sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   private loadGenderDescriptionIfNeeded() {
@@ -134,23 +184,11 @@ export class ViewProspectComponent implements OnInit  {
     );
   }
 
-  private mapImageResponse(src: string): SafeUrl {
-    if (!src) {
-      return this._sanitizer.bypassSecurityTrustResourceUrl(this.defaultPlaceholder);
-    }
-
-    let url = src;
-    if (src.startsWith('http') || src.startsWith('data:')) {
-      url = src;
-    } else {
-      url = `${window.location.origin}${src}`;
-    }
-    return this._sanitizer.bypassSecurityTrustResourceUrl(url);
-  }
+  // Utilitaire pour transformer l'image brute en SafeUrl
+  // (inchangé par rapport à votre version, inchangé ici)
 
   // ------------- Dialogs --------------
   reject() {
-    // Obtenir la traduction pour le heading
     const translatedHeading = this.translate.instant('labels.buttons.Reject') || 'Reject';
 
     const rejectDialogData: ConfirmationDialogData = {
@@ -172,62 +210,50 @@ export class ViewProspectComponent implements OnInit  {
     });
   }
 
-  /**
-   * Accept the prospect and redirects to clients.
-   */
-  accept() {
-  const translatedHeading = this.translate.instant('labels.buttons.Accept') || 'Accept';
-  const acceptDialogData: ConfirmationDialogData = {
-    heading: translatedHeading,
-    dialogContext: `Êtes-vous sûr de vouloir accepter le prospect "${this.prospectData.displayName ?? ''}"`,
-    type: 'confirm'
-  };
-
-  const acceptProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
-    data: acceptDialogData
-  });
-
-  acceptProspectDialogRef.afterClosed().subscribe((result: any) => {
-    if (result && result.confirm) {
-      this.prospectsService.acceptProspect(this.prospectData?.id).subscribe((resp: any) => {
-        // clientId est un entier selon votre API
-        const clientIdFromResponse = typeof resp?.clientId === 'number' ? resp.clientId : null;
-        if (clientIdFromResponse != null) {
-          const targetId = String(clientIdFromResponse);
-          this.router.navigate(['/clients', targetId]);
-        } else {
-          // Optionnel: gérer le cas où clientId est absent (log ou message)
-          console.warn('clientId manquant dans la réponse de l’API après acceptance');
-        }
-      }, (err) => {
-        console.error('Erreur lors de l’acceptation du prospect', err);
-      });
-    }
-  });
+  get clientPath(): string {
+  const id = this.prospectData?.clientId;
+  return id ? `/clients/${id}` : '/clients';
 }
 
-/**
- * Change Password of the Users.
- */
-change() {
-  // On n'a pas encore de composant de changement de mot de passe dans ce snippet;
-    // vous pouvez adapter si nécessaire. Voici un exemple générique.
-    // Vous pouvez remplacer ceci par l'ouverture de votre ChangePasswordDialogComponent.
+  accept() {
+    const translatedHeading = this.translate.instant('labels.buttons.Accept') || 'Accept';
+    const acceptDialogData: ConfirmationDialogData = {
+      heading: translatedHeading,
+      dialogContext: `Êtes-vous sûr de vouloir accepter le prospect "${this.prospectData.displayName ?? ''}"`,
+      type: 'confirm'
+    };
 
-    // Exemple d'ouverture de dialog (à adapter selon votre implémentation réelle):
-    // const changeUserPasswordDialogRef = this.dialog.open(ChangePasswordDialogComponent, {
-    //   width: '400px',
-    //   height: '300px'
-    // });
+    const acceptProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: acceptDialogData
+    });
 
-    // changeUserPasswordDialogRef.afterClosed().subscribe((response: any) => {
-    //   // logique après fermeture
-    // });
+    acceptProspectDialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.confirm) {
+        this.prospectsService.acceptProspect(this.prospectData?.id).subscribe((resp: any) => {
+          const clientIdFromResponse = typeof resp?.clientId === 'number' ? resp.clientId : null;
+          if (clientIdFromResponse != null) {
+            const targetId = String(clientIdFromResponse);
+            // Optionnel: navigation automatique (à dé-commenter si souhaité)
+            this.router.navigate(['/clients', targetId]);
+            // Mise à jour du statut côté client si disponible dans la réponse
+            if (typeof resp?.statusValue !== 'undefined') {
+              this.prospectData.statusValue = resp.statusValue;
+              // Optionnel: mapper au status standard si nécessaire
+              this.statusLabel = this.prospectsService.mapStatus(resp.statusValue);
+            }
+          } else {
+            console.warn('clientId manquant dans la réponse de l’API après acceptance');
+          }
+        }, (err) => {
+          console.error('Erreur lors duings de l’acceptation du prospect', err);
+        });
+      }
+    });
+  }
 
-    // Pour rester fidèle à votre structure initiale, j’ajoute une imitation minimale:
+  change() {
     const dummy = true;
     if (dummy) {
-      // Pas d’action réelle ici - remplacer par votre dialog exact si nécessaire
       this.snackbar.open('Change password dialog would open here.', 'Fermer', { duration: 3000 });
     }
   }

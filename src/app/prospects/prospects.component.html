@@ -26,6 +26,23 @@
       <div class="loading"></div>
     </div>
 
+    <div class="col filter-col" *ngIf="existsProspectsToFilter" fxLayout="row" fxLayoutAlign="right" fxLayoutGap="8px">
+      <!-- Sub-colonne: Show Accepted -->
+      <div class="col filter-col" fxLayout="row" fxLayoutAlign="right" fxLayoutGap="8px">
+        <mat-checkbox #showAccepted labelPosition="after">
+          {{ 'labels.inputs.Show prospects Accepted' | translate }}
+        </mat-checkbox>
+      </div>
+      <!-- Sub-colonne: Show refused -->
+      <div class="col filter-col" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="8px">
+        <mat-checkbox #showRefused labelPosition="after">
+          {{ 'labels.inputs.Show prospects Refused' | translate }}
+        </mat-checkbox> 
+      </div>
+      
+    </div>
+
+
     <!-- Tableau -->
     <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortChanged($event)">
       <!-- Name Column -->
