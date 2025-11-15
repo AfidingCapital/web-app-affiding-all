@@ -1,14 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-/** Custom Services */
 import { ProspectsService } from '../prospects.service';
 import { ClientsService } from '../../clients/clients.service';
-
-/** Custom Components */
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -39,16 +35,23 @@ export class ViewProspectComponent implements OnInit  {
   // genre description
   genderDescriptionLabel: string | null = null;
 
-  // date of birth formatée
+  // date fields
   dateOfBirthLabel: string | null = null;
 
-  // createdAt formatée
+  // createdAt split parts
+  createdAtDay: number | null = null;
+  createdAtMonthKey: string | null = null; // ex: months.november
+  createdAtYear: number | null = null;
   createdAtLabel: string | null = null;
 
-  // acceptedAt formatée
+  // acceptedAt / status
   acceptedAtLabel: string | null = null;
-
-  // status label affiché dans le template
+  // new: format accepté similaire à createdAt
+  acceptedAtDay: number | null = null;
+  acceptedAtMonthKey: string | null = null;
+  acceptedAtYear: number | null = null;
+  // Optionnel: fallback text
+  // status
   statusLabel: string | null = null;
 
   constructor(
@@ -67,10 +70,34 @@ export class ViewProspectComponent implements OnInit  {
     this.route.data.subscribe((data: { user: any }) => {
       this.prospectData = data.user;
       this.clientData = data.user;
-      // Autres formatages
-      this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth);
-      this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt);
-      this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt);
+      // Date de naissance
+      this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth) ?? null;
+
+      // createdAt: découpage en jour/mois/année si possible
+      const parts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.createdAt);
+      if (parts) {
+        this.createdAtDay = parts.day;
+        this.createdAtMonthKey = parts.monthKey;
+        this.createdAtYear = parts.year;
+        this.createdAtLabel = null;
+      } else {
+        this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt) ?? null;
+      }
+
+      // acceptedAt: idem que createdAt mais optionnel
+      const accParts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.acceptedAt);
+      if (accParts) {
+        this.acceptedAtDay = accParts.day;
+        this.acceptedAtMonthKey = accParts.monthKey;
+        this.acceptedAtYear = accParts.year;
+        this.acceptedAtLabel = null;
+      } else {
+        this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt) ?? null;
+      }
+
+      // Status label
+      const statusRaw = this.prospectData?.statusValue ?? this.prospectData?.status;
+      this.statusLabel = this.prospectsService.mapStatus(statusRaw);
     });
   }
 
@@ -107,19 +134,31 @@ export class ViewProspectComponent implements OnInit  {
         this.loadGenderDescriptionIfNeeded();
 
         // Mettre à jour les labels formatés après chargement
-        this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth);
+        this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth) ?? this.dateOfBirthLabel;
 
-        this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt);
+        // CreatedAt
+        const parts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.createdAt);
+        if (parts) {
+          this.createdAtDay = parts.day;
+          this.createdAtMonthKey = parts.monthKey;
+          this.createdAtYear = parts.year;
+          this.createdAtLabel = null;
+        } else {
+          this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt) ?? this.createdAtLabel;
+        }
 
-        this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt);
+        // AcceptedAt
+        const accParts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.acceptedAt);
+        if (accParts) {
+          this.acceptedAtDay = accParts.day;
+          this.acceptedAtMonthKey = accParts.monthKey;
+          this.acceptedAtYear = accParts.year;
+          this.acceptedAtLabel = null;
+        } else {
+          this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt) ?? this.acceptedAtLabel;
+        }
 
-        // Calcul du statusLabel centralisé via le service
+        // Status
         const statusRaw = this.prospectData?.statusValue ?? this.prospectData?.status;
         this.statusLabel = this.prospectsService.mapStatus(statusRaw);
 
@@ -131,19 +170,11 @@ export class ViewProspectComponent implements OnInit  {
 
         this.loadGenderDescriptionIfNeeded();
 
-        this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth)
-          ?? '';
-        
-        this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt)
-          ?? '';
+        this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth) ?? null;
+        this.createdAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.createdAt) ?? null;
+        this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt) ?? null;
 
-        this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
-          ?? this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt)
-          ?? '';
-
-        // Garder le statusLabel cohérent même en erreur parfois
+        // Status
         const statusRaw = this.prospectData?.statusValue ?? this.prospectData?.status;
         this.statusLabel = this.prospectsService.mapStatus(statusRaw);
       }
@@ -184,22 +215,15 @@ export class ViewProspectComponent implements OnInit  {
     );
   }
 
-  // Utilitaire pour transformer l'image brute en SafeUrl
-  // (inchangé par rapport à votre version, inchangé ici)
-
-  // ------------- Dialogs --------------
   reject() {
     const translatedHeading = this.translate.instant('labels.buttons.Reject') || 'Reject';
-
     const rejectDialogData: ConfirmationDialogData = {
       heading: translatedHeading,
       dialogContext: `Êtes-vous sûr de vouloir rejeter le prospect "${this.prospectData?.displayName ?? ''}"`,
       type: 'delete'
     };
 
-    const rejectProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: rejectDialogData
-    });
+    const rejectProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, { data: rejectDialogData });
 
     rejectProspectDialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.confirm) {
@@ -211,9 +235,9 @@ export class ViewProspectComponent implements OnInit  {
   }
 
   get clientPath(): string {
-  const id = this.prospectData?.clientId;
-  return id ? `/clients/${id}` : '/clients';
-}
+    const id = this.prospectData?.clientId;
+    return id ? `/clients/${id}` : '/clients';
+  }
 
   accept() {
     const translatedHeading = this.translate.instant('labels.buttons.Accept') || 'Accept';
@@ -223,9 +247,7 @@ export class ViewProspectComponent implements OnInit  {
       type: 'confirm'
     };
 
-    const acceptProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: acceptDialogData
-    });
+    const acceptProspectDialogRef = this.dialog.open(ConfirmationDialogComponent, { data: acceptDialogData });
 
     acceptProspectDialogRef.afterClosed().subscribe((result: any) => {
       if (result && result.confirm) {
@@ -233,12 +255,9 @@ export class ViewProspectComponent implements OnInit  {
           const clientIdFromResponse = typeof resp?.clientId === 'number' ? resp.clientId : null;
           if (clientIdFromResponse != null) {
             const targetId = String(clientIdFromResponse);
-            // Optionnel: navigation automatique (à dé-commenter si souhaité)
             this.router.navigate(['/clients', targetId]);
-            // Mise à jour du statut côté client si disponible dans la réponse
             if (typeof resp?.statusValue !== 'undefined') {
               this.prospectData.statusValue = resp.statusValue;
-              // Optionnel: mapper au status standard si nécessaire
               this.statusLabel = this.prospectsService.mapStatus(resp.statusValue);
             }
           } else {

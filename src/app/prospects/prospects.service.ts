@@ -17,6 +17,12 @@ export class ProspectsService {
   // Placeholder public pour usage dans les composants si besoin
   public defaultPlaceholder: string = '/assets/user_placeholder.png';
 
+  // Locale courante de l'application
+  // Initialisée depuis le navigateur, peut être mise à jour à tout moment
+  private _locale: string = (typeof navigator !== 'undefined' && navigator.language) || 'en-US';
+  get locale(): string { return this._locale; }
+  set locale(l: string) { this._locale = l && l.trim() ? l : 'en-US'; }
+
   constructor(private http: HttpClient) {}
 
   // GET /prospects/{prospectId}
@@ -37,20 +43,55 @@ export class ProspectsService {
     return this.http.get(this.base, { params: httpParams });
   }
 
-  // Dans ProspectsService
+  // Petite utilitaire interne pour découper une date si nécessaire (jour / mois / année)
+  private splitDateLabel(iso?: string): { day: string, monthKey: string, year: string } | null {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    const day = String(d.getDate());
+    // Clé simple pour traduction du mois en anglais; peut être adaptée
+    const monthKey = new Intl.DateTimeFormat('en', { month: 'long' }).format(d);
+    const year = String(d.getFullYear());
+    return { day, monthKey, year };
+  }
+
+  // Ajout d'une méthode pour obtenir jour, mois (clé de traduction) et année
+  private getDatePartsForLocale(iso?: string): { day: number; monthKey: string; year: number } | null {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+
+    // Jour
+    const day = d.getDate();
+    // Mois en anglais (clé pour traduction)
+    const monthEn = new Intl.DateTimeFormat('en', { month: 'long' }).format(d).toLowerCase();
+    const monthKey = `months.${monthEn}`; // ex: months.november
+    // Année
+    const year = d.getFullYear();
+
+    return { day, monthKey, year };
+  }
+
+  formatDatePartsForLocale(iso?: string): { day: number; monthKey: string; year: number } | null {
+    return this.getDatePartsForLocale(iso);
+  }
+
+  // Formatage de date en fonction de la locale actuelle
   formatDateNeeded(iso?: string): string {
     if (!iso) return '';
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return new Intl.DateTimeFormat('en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric'
-    }).format(d);
+    // Jour
+    const day = d.getDate();
+    // Mois selon locale courante
+    const moisTexteCourant = new Intl.DateTimeFormat(this.locale, { month: 'long' }).format(d);
+    const year = d.getFullYear();
+
+    // Format attendu: "7 novembre 2025" (fr-FR) ou "7 November 2025" (en-US), etc.
+    return `${day} ${moisTexteCourant} ${year}`;
   }
 
   // Recherche par texte avec pagination et tri optionnel
-  // Version harmonisée: retourne la même structure quelle que soit l’API
   searchByText(
     text: string,
     page: number,
@@ -58,25 +99,18 @@ export class ProspectsService {
     sortAttribute: string = '',
     sortDirection: string = ''
   ): Observable<any> {
-    // Construction des paramètres GET plats
-    // Version sans texte dans l’URL (à adapter si votre API attend texte)
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', pageSize.toString());
 
-    // Texte de recherche (assurez-vous que le nom correspond à l’API)
     if (text != null && text.trim() !== '') {
-      params = params.set('text', text.trim()); // ou 'query' / 'q' selon l’API
+      params = params.set('text', text.trim());
     }
 
-    // Tri optionnel
     if (sortAttribute && sortDirection) {
       const dir = sortDirection.toUpperCase();
       params = params.set('direction', dir).set('property', sortAttribute);
     }
-
-    // Si votre API attend le texte sous un paramètre précis, décommentez et adaptez:
-    // params = params.set('text', text); // ou .set('query', text)
 
     return this.http.get(this.base, { params });
   }
@@ -88,7 +122,6 @@ export class ProspectsService {
   }
 
   // Mapping centralisé du statut
-  // Public pour être réutilisé par tous les composants
   public mapStatus(status: string | number | undefined): string {
     if (status == null) return '—';
     const map: Record<string, string> = {
@@ -113,8 +146,6 @@ export class ProspectsService {
   }
 
   getProspectProfileImage(prospectId: string): Observable<any> {
-    // Option: ajouter des params si nécessaire
-    //const httpParams = new HttpParams().set('maxHeight', '150');
     return this.http.get(`/prospects/${prospectId}/images`, { responseType: 'text' });
   }
 }

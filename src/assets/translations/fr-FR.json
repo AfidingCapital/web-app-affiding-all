@@ -2,6 +2,9 @@
   "APP_NAME": "AfidingCapital",
   "Logged in as": "connecté en tant que",
   "Remember me": "Souviens-toi de moi",
+  "months": {
+"november" : "novembre"
+  },
   "errors": {
     "Email not valid": "E-mail non valide",
     "Filling Details": "Cliquez pour commencer à remplir les détails. * Les champs de marque sont nécessaires. Pour plus de détails, cliquez sur :",
@@ -327,7 +330,7 @@
       "Assign Member": "Attribuer un membre",
       "Attach Meeting": "Joindre une réunion",
       "Attendance": "Présence",
-      "Back": "Précédent",
+      "Back": "Retour",
       "Bar Chart": "Diagramme à bandes",
       "Browse": "Parcourir",
       "Bulk JLG Loan Application": "Demande de prêt JLG en masse",
@@ -3492,7 +3495,6 @@
     "loan product will become inactive and unavailable to clients": "Date à laquelle le produit de prêt deviendra inactif et indisponible pour les clients. S'il est vide, le produit chargé ne deviendra jamais inactif.",
     "Refund transactions where interest refund will automatically be calculated": "Opérations de remboursement pour lesquelles le remboursement des intérêts sera automatiquement calculé"
   },
-
   "Homme":"Homme",
   "Femme":"Femme",
   "Search by client name, Account No, mobile":"Rechercher par nom du client, numéro de compte, mobile",

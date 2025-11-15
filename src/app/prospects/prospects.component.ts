@@ -51,6 +51,8 @@ export class ProspectsComponent implements OnInit {
   constructor(private prospectService: ProspectsService) {}
 
   ngOnInit() {
+    // Si vous avez un LocalisationService, vous pouvez y souscrire pour mettre à jour la locale ici.
+    // Exemple: this.localisationService.currentLang$.subscribe(lang => this.prospectService.locale = lang);
     this.getProspects();
   }
 
@@ -111,6 +113,7 @@ export class ProspectsComponent implements OnInit {
       (data: any) => {
         const content: any[] = data?.content ?? data?.items ?? data ?? [];
 
+        // Map des prospects reçus
         this.apiProspects = content.map((p: any) => {
           const statusRaw = (typeof p.status === 'object' && p.status != null) ? p.status.code : p.status;
           const isAccepted = this.isAcceptedStatus(statusRaw);
@@ -130,12 +133,24 @@ export class ProspectsComponent implements OnInit {
           ];
 
           const statusCode = STATUS_ORDER.find(s => s.cond)?.value;
+          // Nouveaux champs pour jour/mois/année (clé de traduction du mois)
+          const dateParts = this.prospectService.formatDatePartsForLocale(p.createdAt);
+          const createdAtDay = dateParts?.day ?? null;
+          const createdAtMonthKey = dateParts?.monthKey ?? null;
+          const createdAtYear = dateParts?.year ?? null;
+
+          // Libellé formaté alternatif si besoin
+          const createdAtLabel = this.prospectService.formatDateNeeded(p.createdAt); // optionnel
+
           return {
             ...p,
             statusValue: statusRaw,
             statusLabel: statusLabel,
             statusCode: statusCode,
-            createdAtLabel: this.prospectService.formatDateNeeded(p.createdAt)
+            createdAtDay,
+            createdAtMonthKey,
+            createdAtYear,
+            createdAtLabel
           };
         });
 
@@ -161,10 +176,6 @@ export class ProspectsComponent implements OnInit {
         } else {
           this.newStatusEmptyMessage = null;
         }
-
-        // Si tu souhaites activer les filtres immédiatement après chargement même sans interaction utilisateur,
-        // tu peux appeler ceci:
-        // this.applyFilters(true);
       },
       (error: any) => {
         this.isLoading = false;

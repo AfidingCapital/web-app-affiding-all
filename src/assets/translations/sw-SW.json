@@ -2,6 +2,9 @@
   "APP_NAME": "AfidingCapital",
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
+  "months": {
+"november" : "novemba"
+  },
   "errors": {
     "Email not valid": "Barua pepe si halali",
     "Filling Details": "Bofya ili kuanza kujaza maelezo. * maeneo ya alama ni muhimu. Kwa maelezo zaidi bofya:",
