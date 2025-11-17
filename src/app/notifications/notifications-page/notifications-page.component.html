@@ -15,7 +15,7 @@
       <!-- Created At Column -->
       <ng-container matColumnDef="createdAt">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Created At' | translate }}</th>
-        <td mat-cell *matCellDef="let item">{{ item?.createdAt }}</td>
+        <td mat-cell *matCellDef="let item">{{ formatCreatedAtWithTime(item?.createdAt) }}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

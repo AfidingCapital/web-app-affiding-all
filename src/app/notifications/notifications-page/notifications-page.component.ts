@@ -62,6 +62,15 @@ export class NotificationsPageComponent implements OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   /**
+   * New: champs pour le format "jour mois-traduit année HH:mm:ss"
+   * Exposé côté template pour affichage cohérent avec i18n des mois.
+   */
+  createdAtDay: number | null = null;
+  createdAtMonthKey: string | null = null; // ex: 'months.november'
+  createdAtYear: number | null = null;
+  createdAtTime: string | null = null; // ex: '18:30:00'
+
+  /**
    * Retrieves the notifications data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
@@ -101,6 +110,59 @@ export class NotificationsPageComponent implements OnInit {
     if (this.sort) {
       this.dataSource.sort = this.sort;
     }
+
+    // Pré-calcul des champs pour le format "jour mois-traduit année HH:mm:ss" par item
+    // Pour un affichage ligne par ligne, il est préférable d’alimenter les champs par item.
+    // Ici, nous calculons pour le dernier item afin que le template puisse lire les valeurs de manière fiable.
+    // Si vous avez besoin d’un calcul per-row, vous pouvez faire un mapping similaire dans setNotifications.
+    if (mapped.length > 0) {
+      const last = mapped[mapped.length - 1];
+      this.updateCreatedAtParts(last.createdAt);
+    } else {
+      this.clearCreatedAtParts();
+    }
+  }
+
+  private clearCreatedAtParts() {
+    this.createdAtDay = null;
+    this.createdAtMonthKey = null;
+    this.createdAtYear = null;
+    this.createdAtTime = null;
+  }
+
+  /**
+   * Update the per-row date parts (day, monthKey, year, time) from an ISO string.
+   * Adapté pour obtenir passthroughs pour un affichage cohérent dans le template.
+   */
+  private updateCreatedAtParts(iso?: string) {
+    if (!iso) {
+      this.clearCreatedAtParts();
+      return;
+    }
+    const cleaned = iso.split('.')[0];
+    const date = new Date(cleaned);
+    if (Number.isNaN(date.getTime())) {
+      this.clearCreatedAtParts();
+      return;
+    }
+
+    const day = date.getDate();
+    const monthEn = new Intl.DateTimeFormat(undefined, { month: 'long' }).format(date);
+    const year = date.getFullYear();
+
+    // Construire la clé de traduction. Exemple: months.november
+    const monthKey = `months.${monthEn.toLowerCase()}`;
+
+    // Heure au format HH:mm:ss
+    const timePart = new Intl.DateTimeFormat(undefined, {
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false
+    }).format(date);
+
+    this.createdAtDay = day;
+    this.createdAtMonthKey = monthKey;
+    this.createdAtYear = year;
+    this.createdAtTime = timePart;
   }
 
   /**
@@ -128,6 +190,7 @@ export class NotificationsPageComponent implements OnInit {
    * Format createdAt to include date and time according to the current locale.
    * - It trims any trailing information after a dot (.) if present.
    * - Returns an empty string if createdAt is invalid.
+   * Note: This function is kept for backward compatibility if you still need createdAtDisplay in some places.
    */
   formatCreatedAtWithTime(iso?: string): string {
     if (!iso) return '';
@@ -144,7 +207,8 @@ export class NotificationsPageComponent implements OnInit {
 
     const timePart = new Intl.DateTimeFormat(undefined, {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      second: '2-digit'
     }).format(date);
 
     // Combine les parties selon la locale du navigateur
