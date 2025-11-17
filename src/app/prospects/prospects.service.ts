@@ -93,6 +93,7 @@ export class ProspectsService {
 
   // Recherche par texte avec pagination et tri optionnel
   searchByText(
+	statusParam: string,
     text: string,
     page: number,
     pageSize: number,
@@ -101,7 +102,8 @@ export class ProspectsService {
   ): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('limit', pageSize.toString());
+      .set('limit', pageSize.toString())
+	  .set('status', statusParam);
 
     if (text != null && text.trim() !== '') {
       params = params.set('text', text.trim());

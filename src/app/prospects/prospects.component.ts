@@ -37,13 +37,10 @@ export class ProspectsComponent implements OnInit {
 
   sortAttribute = '';
   sortDirection = '';
-
+  
   // Filtres (nouveaux) - pilotage via ngModel
   filterShowAccepted: boolean = false;
   filterShowRejected: boolean = false;
-
-  // Message informatif lorsqu'aucun "new" au chargement
-  newStatusEmptyMessage: string | null = null;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -66,6 +63,12 @@ export class ProspectsComponent implements OnInit {
     // Utilise searchByText pour aligner avec l'API attendue
     this.getProspects();
   }
+  
+  onFilterChange() {
+      this.resetPaginator();
+      // Utilise searchByText pour aligner avec l'API attendue
+      this.getProspects();
+    }
 
   // --------------- Données affichées ---------------
   get displayedData(): any[] {
@@ -100,9 +103,20 @@ export class ProspectsComponent implements OnInit {
 
   private getProspects() {
     this.isLoading = true;
+	
+	let statusParam = '1';
+
+	if(this.filterShowAccepted){
+		statusParam = statusParam + ',2';
+	} 
+
+	if(this.filterShowRejected){
+		statusParam = statusParam + ',3';
+	}
 
     // Appel API adaptée: utilisation de searchByText pour produire l’URL cible
     this.prospectService.searchByText(
+	  statusParam,	
       this.filterText,
       this.currentPage,    // page
       this.pageSize,       // pageSize
@@ -156,26 +170,11 @@ export class ProspectsComponent implements OnInit {
 
         // Total et données affichées initialement
         this.totalRows = data?.totalElements ?? data?.total ?? content.length;
+        this.dataSource.data = this.apiProspects;
 
-        // Filtrage initial: afficher uniquement les "new"
-        const initialNew = this.apiProspects.filter(p => {
-          const s = ((p.statusLabel ?? '')).toString().toLowerCase();
-          return s === 'new';
-        });
-
-        // Mettre à jour dataSource et les compteurs
-        this.dataSource.data = initialNew;
-        this.totalRows = initialNew.length;
-        this.existsProspectsToFilter = initialNew.length > 0;
+        this.existsProspectsToFilter = this.apiProspects.length > 0;
         this.notExistsProspectsToFilter = !this.existsProspectsToFilter;
         this.isLoading = false;
-
-        // Message informatif si aucun "new" au chargement
-        if (initialNew.length === 0) {
-          this.newStatusEmptyMessage = 'Aucun  nouveau prospect trouvé';
-        } else {
-          this.newStatusEmptyMessage = null;
-        }
       },
       (error: any) => {
         this.isLoading = false;
@@ -216,44 +215,5 @@ export class ProspectsComponent implements OnInit {
     this.getProspects(); // recharge les données en fonction du nouvel état (si implémenté)
   }
 
-  // --------------- Filtrage Show Accepted/Refused ---------------
-  onFilterChange(): void {
-    this.applyFilters();
-  }
-
-  private applyFilters(resetToNewOnLoad: boolean = false): void {
-    // Filtrage simple sur les données existantes (après chargement)
-    const accepted = this.filterShowAccepted;
-    const rejected = this.filterShowRejected;
-
-    // Si aucun filtre actif, afficher tout
-    let filtered = this.apiProspects;
-
-    const anyFilterActive = accepted || rejected;
-    if (anyFilterActive) {
-      filtered = this.apiProspects.filter(p => {
-        const s = (p.statusLabel ?? '').toString().toLowerCase();
-        if (resetToNewOnLoad) {
-          // lors du chargement initial, n'afficher que "new"
-          return s === 'new';
-        }
-        if (accepted) {
-          return s === 'accepted';
-        }
-        if (rejected) {
-          return s === 'rejected';
-        }
-        
-        return true;
-      });
-    }
-
-    this.dataSource.data = filtered;
-    this.totalRows = filtered.length;
-    this.notExistsProspectsToFilter = filtered.length === 0;
-    this.existsProspectsToFilter = filtered.length > 0;
-  }
-
-  // --------------- Recherche (inchangé) ---------------
-  // La méthode search est ci-dessus
+  // --------------- Types ---------------
 }
