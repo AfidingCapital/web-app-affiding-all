@@ -40,7 +40,7 @@ export class ProspectsComponent implements OnInit {
 
   // Filtres (nouveaux) - pilotage via ngModel
   filterShowAccepted: boolean = false;
-  filterShowRefused: boolean = false;
+  filterShowRejected: boolean = false;
 
   // Message informatif lorsqu'aucun "new" au chargement
   newStatusEmptyMessage: string | null = null;
@@ -126,8 +126,8 @@ export class ProspectsComponent implements OnInit {
           const statusLabel = this.prospectService.mapStatus(statusRaw);
           const STATUS_ORDER = [
             { cond: isAccepted, value: 'prospectStatusType.accepted' },
-            { cond: isRejected, value: 'loanStatusType.overpaid' },
-            { cond: isExpired, value: 'loanProduct.inActive' },
+            { cond: isRejected, value: 'prospectStatusType.rejected' },
+            { cond: isExpired, value: 'prospectStatusType.expired' },
             { cond: isNew, value: 'prospectStatusType.new' },
             { cond: isError, value: 'prospectStatusType.error' },
           ];
@@ -224,12 +224,12 @@ export class ProspectsComponent implements OnInit {
   private applyFilters(resetToNewOnLoad: boolean = false): void {
     // Filtrage simple sur les données existantes (après chargement)
     const accepted = this.filterShowAccepted;
-    const refused = this.filterShowRefused;
+    const rejected = this.filterShowRejected;
 
     // Si aucun filtre actif, afficher tout
     let filtered = this.apiProspects;
 
-    const anyFilterActive = accepted || refused;
+    const anyFilterActive = accepted || rejected;
     if (anyFilterActive) {
       filtered = this.apiProspects.filter(p => {
         const s = (p.statusLabel ?? '').toString().toLowerCase();
@@ -237,15 +237,13 @@ export class ProspectsComponent implements OnInit {
           // lors du chargement initial, n'afficher que "new"
           return s === 'new';
         }
-        if (accepted && !refused) {
+        if (accepted) {
           return s === 'accepted';
         }
-        if (refused && !accepted) {
-          return s === 'refused';
+        if (rejected) {
+          return s === 'rejected';
         }
-        if (accepted && refused) {
-          return s === 'accepted' || s === 'refused';
-        }
+        
         return true;
       });
     }

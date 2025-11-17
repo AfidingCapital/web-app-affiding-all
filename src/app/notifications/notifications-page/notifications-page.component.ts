@@ -5,6 +5,19 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute } from '@angular/router';
 
+/** Optional: interface pour typer les items de notification */
+interface NotificationItem {
+  id: number;
+  objectType: string;
+  objectId: number;
+  action: string;
+  actorId?: number;
+  content: string;
+  isRead: boolean;
+  isSystemGenerated: boolean;
+  createdAt: string;
+}
+
 /**
  * Notifications Page Component
  */
@@ -15,14 +28,16 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class NotificationsPageComponent implements OnInit {
   /** Notifications data. */
-  notificationsData: any;
+  notificationsData: NotificationItem[] = [];
+
   /** Columns to be displayed in notifications table. */
   displayedColumns: string[] = [
     'notification',
     'createdAt'
   ];
+
   /** Data source for notifications table. */
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<NotificationItem>;
 
   /**
    * Gets router link prefix from notification's objectType attribute
@@ -42,33 +57,97 @@ export class NotificationsPageComponent implements OnInit {
   };
 
   /** Paginator for notifications table. */
-  @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
   /** Sorter for notifications table. */
-  @ViewChild(MatSort, { static: true }) sort: MatSort;
+  @ViewChild(MatSort) sort: MatSort;
 
   /**
    * Retrieves the notifications data from `resolve`.
    * @param {ActivatedRoute} route Activated Route.
    */
   constructor(private route: ActivatedRoute) {
-    this.route.data.subscribe((data: { notifications: any }) => {
-      this.notificationsData = data.notifications.pageItems;
+    // Réception des données résolues
+    this.route.data.subscribe((data: { notifications: { pageItems: NotificationItem[] } }) => {
+      this.notificationsData = data?.notifications?.pageItems ?? [];
+      this.setNotifications();
     });
   }
 
   /**
-   * Sets the notifications table.
+   * Init hook kept for compatibility. La dataSource est déjà initialisée via le resolver.
    */
   ngOnInit() {
-    this.setNotifications();
+    // Pas d'initialisation bloquante ici pour éviter les erreurs si les données arrivent après la construction.
   }
 
   /**
    * Initializes the data source, paginator and sorter for notifications table.
    */
   setNotifications() {
-    this.dataSource = new MatTableDataSource(this.notificationsData);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // Si jamais les données ne sont pas encore disponibles, on crée un tableau vide.
+    const items = Array.isArray(this.notificationsData) ? this.notificationsData : [];
+    // Option 1: mapping avec création d'une propriété displayCreatedAt pour éviter des appels récurrents
+    const mapped = items.map(p => ({
+      ...p,
+      createdAtDisplay: this.formatCreatedAtWithTime(p.createdAt)
+    }));
+
+    this.dataSource = new MatTableDataSource<NotificationItem>(mapped as any);
+
+    // Appliquer paginator et sort une fois que la vue est prête
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
+  }
+
+  /**
+   * Return the entity link for a given notification item.
+   * For loans, the required format is:
+   * /clients/{actorId}/loans-accounts/{objectId}/general
+   */
+  getEntityLink(item: NotificationItem): string {
+    const type = item?.objectType;
+    const base = this.routeMap[type] ?? '';
+
+    if (type === 'loan' && item?.actorId && item?.objectId) {
+      return `/clients/${item.actorId}/loans-accounts/${item.objectId}/general`;
+    }
+
+    // Fallback to generic pattern if available
+    if (base && item?.objectId) {
+      return `${base}${item.objectId}`;
+    }
+
+    return '#';
+  }
+
+  /**
+   * Format createdAt to include date and time according to the current locale.
+   * - It trims any trailing information after a dot (.) if present.
+   * - Returns an empty string if createdAt is invalid.
+   */
+  formatCreatedAtWithTime(iso?: string): string {
+    if (!iso) return '';
+    // Supprime tout ce qui suit le point (ex. millis, TZ, etc.)
+    const cleaned = iso.split('.')[0];
+    const date = new Date(cleaned);
+    if (Number.isNaN(date.getTime())) return '';
+
+    const datePart = new Intl.DateTimeFormat(undefined, {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+
+    const timePart = new Intl.DateTimeFormat(undefined, {
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+
+    // Combine les parties selon la locale du navigateur
+    return `${datePart} ${timePart}`;
   }
 }

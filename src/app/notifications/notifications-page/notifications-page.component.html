@@ -1,14 +1,21 @@
 <div class="container">
   <div class="mat-elevation-z8">
     <table mat-table [dataSource]="dataSource" matSort>
+
+      <!-- Notification Column -->
       <ng-container matColumnDef="notification">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Notification' | translate }}</th>
-        <td mat-cell *matCellDef="let notification">{{ notification.content }}</td>
+        <td mat-cell *matCellDef="let item">
+          <!-- Liens générés côté TS via getEntityLink -->
+          <a *ngIf="item?.content" [routerLink]="getEntityLink(item)">{{ item.content }}</a>
+          <span *ngIf="!item?.content">{{ item?.content }}</span>
+        </td>
       </ng-container>
 
+      <!-- Created At Column -->
       <ng-container matColumnDef="createdAt">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'labels.inputs.Created At' | translate }}</th>
-        <td mat-cell *matCellDef="let notification">{{ notification.createdAt }}</td>
+        <td mat-cell *matCellDef="let item">{{ item?.createdAt }}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -16,8 +23,10 @@
         mat-row
         *matRowDef="let row; columns: displayedColumns"
         class="select-row"
-        [routerLink]="[routeMap[row.objectType], row.objectId]"
-      ></tr>
+        >
+        <!-- Si vous préférez, vous pouvez aussi mettre le routerLink sur la row elle-même,
+             mais ici le lien est déjà dans la cellule "notification" pour éviter des comportements imprévus. -->
+      </tr>
     </table>
 
     <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
