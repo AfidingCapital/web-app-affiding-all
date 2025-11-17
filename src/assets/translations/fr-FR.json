@@ -3,7 +3,18 @@
   "Logged in as": "connecté en tant que",
   "Remember me": "Souviens-toi de moi",
   "months": {
-"november" : "novembre"
+"january" : "janvier",
+  "February" : "février",
+  "march" : "mars",
+  "april" : "avril",
+  "may" : "mai",
+  "june" : "juin",
+  "july" : "juillet",
+  "august" : "août",
+  "september" : "septembre",
+  "october" : "octobre",
+    "november" : "novembre",
+    "december" : "décembre"
   },
   "errors": {
     "Email not valid": "E-mail non valide",

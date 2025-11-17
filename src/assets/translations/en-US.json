@@ -3,7 +3,18 @@
   "Logged in as": "Logged in as",
   "Remember me": "Remember me",
 "months": {
-    "november" : "november"
+  "january" : "january",
+  "February" : "February",
+  "march" : "march",
+  "april" : "april",
+  "may" : "may",
+  "june" : "june",
+  "july" : "july",
+  "august" : "august",
+  "september" : "september",
+  "october" : "october",
+    "november" : "november",
+    "december" : "december"
   },
   "errors": {
     "Email not valid": "Email not valid",

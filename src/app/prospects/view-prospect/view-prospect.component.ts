@@ -35,8 +35,13 @@ export class ViewProspectComponent implements OnInit  {
   // genre description
   genderDescriptionLabel: string | null = null;
 
-  // date fields
+  // dateOfBirth
   dateOfBirthLabel: string | null = null;
+  // new: format accepté similaire à createdAt
+  dateOfBirthDay: number | null = null;
+  dateOfBirthMonthKey: string | null = null;
+  dateOfBirthYear: number | null = null;
+  
 
   // createdAt split parts
   createdAtDay: number | null = null;
@@ -44,7 +49,7 @@ export class ViewProspectComponent implements OnInit  {
   createdAtYear: number | null = null;
   createdAtLabel: string | null = null;
 
-  // acceptedAt / status
+  // acceptedAt 
   acceptedAtLabel: string | null = null;
   // new: format accepté similaire à createdAt
   acceptedAtDay: number | null = null;
@@ -70,8 +75,6 @@ export class ViewProspectComponent implements OnInit  {
     this.route.data.subscribe((data: { user: any }) => {
       this.prospectData = data.user;
       this.clientData = data.user;
-      // Date de naissance
-      this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth) ?? null;
 
       // createdAt: découpage en jour/mois/année si possible
       const parts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.createdAt);
@@ -93,6 +96,17 @@ export class ViewProspectComponent implements OnInit  {
         this.acceptedAtLabel = null;
       } else {
         this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt) ?? null;
+      }
+
+            // dateOfBirth: idem que createdAt mais optionnel
+      const birthParts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.dateOfBirth);
+      if (birthParts) {
+        this.dateOfBirthDay = birthParts.day;
+        this.dateOfBirthMonthKey = birthParts.monthKey;
+        this.dateOfBirthYear = birthParts.year;
+        this.dateOfBirthLabel = null;
+      } else {
+        this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth) ?? null;
       }
 
       // Status label
@@ -157,6 +171,17 @@ export class ViewProspectComponent implements OnInit  {
         } else {
           this.acceptedAtLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.acceptedAt) ?? this.acceptedAtLabel;
         }
+
+         // dateOfBirth: idem que createdAt mais optionnel
+      const birthParts = this.prospectsService.formatDatePartsForLocale?.(this.prospectData?.dateOfBirth);
+      if (birthParts) {
+        this.dateOfBirthDay = birthParts.day;
+        this.dateOfBirthMonthKey = birthParts.monthKey;
+        this.dateOfBirthYear = birthParts.year;
+        this.dateOfBirthLabel = null;
+      } else {
+        this.dateOfBirthLabel = this.prospectsService.formatDateNeeded?.(this.prospectData?.dateOfBirth) ?? null;
+      }
 
         // Status
         const statusRaw = this.prospectData?.statusValue ?? this.prospectData?.status;

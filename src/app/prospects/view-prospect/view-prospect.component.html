@@ -72,10 +72,17 @@
           <span class="value">{{ prospectData.address }}</span>
         </div>
 
-        <!-- Date of birth -->
-        <div class="line" >
-          <span class="label">{{ 'labels.inputs.Date of birth' | translate }}</span>
-          <span class="value">{{ dateOfBirthLabel }}</span>
+        <!-- dateOfBirth (formatting similaire à createdAt) -->
+        <div class="line" *ngIf="dateOfBirthLabel || (dateOfBirthDay != null || dateOfBirthMonthKey || dateOfBirthYear != null)">
+          <span class="label">{{ 'labels.inputs.Date of Birth' | translate }}</span>
+          <span class="value">
+            <ng-container *ngIf="dateOfBirthDay != null && dateOfBirthMonthKey && dateOfBirthYear != null">
+              {{ dateOfBirthDay }} {{ (dateOfBirthMonthKey | translate) }} {{ dateOfBirthYear }}
+            </ng-container>
+            <ng-container *ngIf="dateOfBirthDay == null && dateOfBirthLabel">
+              {{ dateOfBirthLabel }}
+            </ng-container>
+          </span>
         </div>
 
         <!-- Gender -->

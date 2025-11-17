@@ -3,7 +3,18 @@
   "Logged in as": "Imeingia kama",
   "Remember me": "Nikumbuke",
   "months": {
-"november" : "novemba"
+"january" : "january",
+  "February" : "February",
+  "march" : "march",
+  "april" : "april",
+  "may" : "may",
+  "june" : "june",
+  "july" : "july",
+  "august" : "august",
+  "september" : "septemba",
+  "october" : "octoba",
+    "november" : "novemba",
+    "december" : "decemba"
   },
   "errors": {
     "Email not valid": "Barua pepe si halali",
