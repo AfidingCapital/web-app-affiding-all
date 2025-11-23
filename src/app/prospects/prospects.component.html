@@ -21,13 +21,13 @@
     </div>
 
     <!-- Filtres (affichés lorsque nécessaire) avec espacement symétrique -->
-    <div *ngIf="existsProspectsToFilter" fxLayout="row" fxLayoutAlign="right" fxLayoutGap="16px" style="margin: 0">
+    <div  fxLayout="row" fxLayoutAlign="right" fxLayoutGap="16px" style="margin: 0">
 
       <!-- Show Accepted -->
       <div fxLayout="row" fxLayoutAlign="start center" class="filter-item">
         <mat-checkbox 
           [(ngModel)]="filterShowAccepted" 
-          (change)="onFilterChange()"
+          (change)="onFilterSearch()" 
           labelPosition="after">
           {{ 'labels.inputs.Show prospects Accepted' | translate }}
         </mat-checkbox>
@@ -37,7 +37,7 @@
       <div fxLayout="row" fxLayoutAlign="center center" class="filter-item" style="margin-left: 0">
         <mat-checkbox 
           [(ngModel)]="filterShowRejected" 
-          (change)="onFilterChange()" 
+          (change)="onFilterSearch()" 
           labelPosition="after" >
           {{ 'labels.inputs.Show prospects Refused' | translate }}
         </mat-checkbox> 

@@ -2482,7 +2482,13 @@
       "Working with Code": "Kufanya kazi na Kanuni"
     },
     "menus": {
-      "Prospects":"Prospects",
+      "Library" : "Maktaba",
+      "Teller" : "Mtangazaji",
+      "Fund Mapping" : "Ramani ya Fedha",
+      "Enrollment Center " : "Kituo cha Uandikishaji",
+      "Finance" : "Fedha",
+      "Individuals" : "Watu Binafsi",
+      "Prospects":"Wateja Watarajiwa",
       "Accounting": "Uhasibu",
       "Account Overview": "Muhtasari wa akaunti",
       "Activate": "Amilisha",

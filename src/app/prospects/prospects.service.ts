@@ -33,12 +33,24 @@ export class ProspectsService {
 
   // GET uniquement: récupère les prospects avec pagination et tri
   // Version harmonisée: utilise page/limit et optionnel sorting via direction/property
-  getProspects(orderBy: string, sortOrder: string, page: number, limit: number): Observable<any> {
-    const httpParams = new HttpParams()
+  getProspects(
+    orderBy: string,
+    sortOrder: string,
+    page: number,
+    limit: number,
+    statusFilter?: string | number
+  ): Observable<any> {
+    let httpParams = new HttpParams()
       .set('page', page.toString())
-      .set('limit', limit.toString())
-      .set('orderBy', orderBy)
-      .set('sortOrder', sortOrder);
+      .set('limit', limit.toString());
+
+    if (orderBy) httpParams = httpParams.set('orderBy', orderBy);
+    if (sortOrder) httpParams = httpParams.set('sortOrder', sortOrder);
+
+    // Filtre de statut ajouté si fourni
+    if (statusFilter != null && statusFilter !== '') {
+      httpParams = httpParams.set('status', statusFilter.toString());
+    }
 
     return this.http.get(this.base, { params: httpParams });
   }
@@ -93,6 +105,7 @@ export class ProspectsService {
 
   // Recherche par texte avec pagination et tri optionnel
   searchByText(
+    statusParam: string,
     text: string,
     page: number,
     pageSize: number,
@@ -101,7 +114,8 @@ export class ProspectsService {
   ): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
-      .set('limit', pageSize.toString());
+      .set('limit', pageSize.toString())
+      .set('status', statusParam);
 
     if (text != null && text.trim() !== '') {
       params = params.set('text', text.trim());

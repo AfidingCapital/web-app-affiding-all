@@ -2490,6 +2490,12 @@
       "Working with Code": "Travailler avec du code"
     },
     "menus": {
+      "Library" : "Bibliothèque",
+      "Teller" : "Caissier",
+      "Fund Mapping" : "Cartographie des fonds",
+      "Enrollment Center" : "Centre d'enrôlement",
+      "Finance" : "Finance",
+      "Individuals" : "Individus",
       "Prospects":"Prospects",
       "Accounting": "Comptabilité",
       "Account Overview": "Aperçu du compte",

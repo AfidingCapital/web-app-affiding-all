@@ -67,6 +67,12 @@ export class ProspectsComponent implements OnInit {
     this.getProspects();
   }
 
+  onFilterSearch() {
+    this.resetPaginator();
+    // Utilise searchByText pour aligner avec l'API attendue
+    this.getProspects();
+  }
+
   // --------------- Données affichées ---------------
   get displayedData(): any[] {
     return this.apiProspects;
@@ -100,9 +106,19 @@ export class ProspectsComponent implements OnInit {
 
   private getProspects() {
     this.isLoading = true;
+    let statusParam = '1';
+
+    if(this.filterShowAccepted){
+      statusParam = statusParam + ',2';
+    } 
+
+if(this.filterShowRejected){
+      statusParam = statusParam + ',3';
+    }
 
     // Appel API adaptée: utilisation de searchByText pour produire l’URL cible
     this.prospectService.searchByText(
+      statusParam,
       this.filterText,
       this.currentPage,    // page
       this.pageSize,       // pageSize
@@ -210,12 +226,8 @@ export class ProspectsComponent implements OnInit {
     }
   }
 
-  // --------------- Actions UI ---------------
-  onShowDraftChange(_evt?: boolean) {
-    // La valeur this.showDraft n’est pas utilisée ici, garder si besoin d’avenir
-    this.getProspects(); // recharge les données en fonction du nouvel état (si implémenté)
-  }
-
+  
+  
   // --------------- Filtrage Show Accepted/Refused ---------------
   onFilterChange(): void {
     this.applyFilters();

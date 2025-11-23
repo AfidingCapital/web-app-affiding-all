@@ -97,19 +97,31 @@
 </mat-menu>
 
 <mat-menu #institutionMenu="matMenu" [overlapTrigger]="false">
-  <button mat-menu-item routerLink="/prospects">{{ 'labels.menus.Prospects' | translate }}</button>
-  <button mat-menu-item routerLink="/clients">{{ 'labels.menus.Clients' | translate }}</button>
-  <button mat-menu-item routerLink="/groups">{{ 'labels.menus.Groups' | translate }}</button>
-  <button mat-menu-item routerLink="/centers">{{ 'labels.menus.Centers' | translate }}</button>
+  <button mat-menu-item [matMenuTriggerFor]="clientsMenu">{{ 'labels.menus.Clients' | translate }}</button>
   <span fxHide.lt>
-    <button mat-menu-item [routerLink]="['/accounting']">{{ 'labels.menus.Accounting' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="financeMenu">{{ 'labels.menus.Finance' | translate }}</button>
     <button mat-menu-item [matMenuTriggerFor]="reportsMenu">{{ 'labels.menus.Reports' | translate }}</button>
+    <button mat-menu-item routerLink="/clients">{{ 'labels.menus.Library' | translate }}</button>
     <button mat-menu-item [matMenuTriggerFor]="adminMenu">{{ 'labels.menus.Admin' | translate }}</button>
     <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu">{{ 'labels.menus.Self Service' | translate }}</button>
   </span>
 </mat-menu>
 
 <!-- Toolbar Menus -->
+
+<mat-menu #clientsMenu="matMenu" [overlapTrigger]="false">
+  <button mat-menu-item routerLink="/prospects">{{ 'labels.menus.Prospects' | translate }}</button>
+  <button mat-menu-item routerLink="/clients">{{ 'labels.menus.Individuals' | translate }}</button>
+  <button mat-menu-item routerLink="/groups">{{ 'labels.menus.Groups' | translate }}</button>
+  <button mat-menu-item routerLink="/centers">{{ 'labels.menus.Enrollment Center' | translate }}</button>
+</mat-menu>
+
+<mat-menu #financeMenu="matMenu" [overlapTrigger]="false">
+  <button mat-menu-item routerLink="/organization/tellers">{{ 'labels.menus.Teller' | translate }}</button>
+  <button mat-menu-item routerLink="/accounting">{{ 'labels.menus.Accounting' | translate }}</button>
+  <button mat-menu-item routerLink="/organization/fund-mapping">{{ 'labels.menus.Fund Mapping' | translate }}</button>
+</mat-menu>
+
 <mat-menu #reportsMenu="matMenu" [overlapTrigger]="false">
   <button mat-menu-item [routerLink]="['/reports']">{{ 'labels.menus.All' | translate }}</button>
   <button mat-menu-item [routerLink]="['/reports', 'Client']">{{ 'labels.menus.Clients' | translate }}</button>

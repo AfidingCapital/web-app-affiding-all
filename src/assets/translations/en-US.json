@@ -2494,6 +2494,12 @@
       "Working with Code": "Working with Code"
     },
     "menus": {
+      "Library" : "Library",
+      "Teller" : "Teller",
+      "Fund Mapping" :"Fund Mapping",
+      "Enrollment Center" : "Enrollment Center",
+      "Finance" : "Finance",
+      "Individuals" : "Individuals",
       "Prospects":"Prospects",
       "Accounting": "Accounting",
       "Account Overview": "Account Overview",
