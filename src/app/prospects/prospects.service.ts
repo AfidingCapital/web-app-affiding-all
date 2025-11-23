@@ -105,7 +105,7 @@ export class ProspectsService {
 
   // Recherche par texte avec pagination et tri optionnel
   searchByText(
-    statusParam: string,
+	statusParam: string,
     text: string,
     page: number,
     pageSize: number,
@@ -115,7 +115,7 @@ export class ProspectsService {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', pageSize.toString())
-      .set('status', statusParam);
+	  .set('status', statusParam);
 
     if (text != null && text.trim() !== '') {
       params = params.set('text', text.trim());
