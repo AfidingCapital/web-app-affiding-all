@@ -19,7 +19,7 @@
         />
       </mat-form-field>
     </div>
-
+    
     <!-- Filtres (affichés lorsque nécessaire) avec espacement symétrique -->
     <div  fxLayout="row" fxLayoutAlign="right" fxLayoutGap="16px" style="margin: 0">
 
@@ -27,7 +27,7 @@
       <div fxLayout="row" fxLayoutAlign="start center" class="filter-item">
         <mat-checkbox 
           [(ngModel)]="filterShowAccepted" 
-          (change)="onFilterSearch()" 
+          (change)="onFilterChange()"
           labelPosition="after">
           {{ 'labels.inputs.Show prospects Accepted' | translate }}
         </mat-checkbox>
@@ -37,7 +37,7 @@
       <div fxLayout="row" fxLayoutAlign="center center" class="filter-item" style="margin-left: 0">
         <mat-checkbox 
           [(ngModel)]="filterShowRejected" 
-          (change)="onFilterSearch()" 
+           (change)="onFilterChange()"
           labelPosition="after" >
           {{ 'labels.inputs.Show prospects Refused' | translate }}
         </mat-checkbox> 
@@ -115,9 +115,6 @@
     ></mat-paginator>
   </div>
 
-  <div *ngIf="newStatusEmptyMessage" class="info-message" style="padding: 12px; background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 4px; margin: 12px 0;">
-    {{ newStatusEmptyMessage }}
-  </div>
   <div class="alert" [hidden]="!notExistsProspectsToFilter">
     <div class="message">
       <i class="fa fa-exclamation-circle alert-check"></i>
