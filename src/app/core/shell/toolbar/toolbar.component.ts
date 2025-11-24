@@ -28,6 +28,7 @@ import { ConfigurationWizardService } from '../../../configuration-wizard/config
 
 /** Custom Components */
 import { ConfigurationWizardComponent } from '../../../configuration-wizard/configuration-wizard.component';
+import { environment } from 'environments/environment';
 
 /**
  * Toolbar component.
@@ -46,6 +47,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   @ViewChild('appMenu') appMenu: ElementRef<any>;
   /* Template for popover on appMenu */
   @ViewChild('templateAppMenu') templateAppMenu: TemplateRef<any>;
+
+  public libraryUrl: string = environment.baseDocUrl;
+
+  public openLibraryInNewTab(): void {
+    window.open(this.libraryUrl, '_blank');
+  }
 
   /** Subscription to breakpoint observer for handset. */
   isHandset$: Observable<boolean> = this.breakpointObserver
