@@ -101,7 +101,7 @@
   <span fxHide.lt>
     <button mat-menu-item [matMenuTriggerFor]="financeMenu">{{ 'labels.menus.Finance' | translate }}</button>
     <button mat-menu-item [matMenuTriggerFor]="reportsMenu">{{ 'labels.menus.Reports' | translate }}</button>
-    <button mat-menu-item routerLink="/clients">{{ 'labels.menus.Library' | translate }}</button>
+    <button mat-menu-item (click)="libraryLink()">{{ 'labels.menus.Library' | translate }}</button>
     <button mat-menu-item [matMenuTriggerFor]="adminMenu">{{ 'labels.menus.Admin' | translate }}</button>
     <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu">{{ 'labels.menus.Self Service' | translate }}</button>
   </span>

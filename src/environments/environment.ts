@@ -30,6 +30,7 @@ export const environment = {
   //'http://192.168.100.33:8080',
   loadedEnv['baseApiUrl'] || window.location.protocol + '//' + window.location.hostname + ':' + window.location.port,
   customApiApiUrl:'https://cbs-server.afidingcapital.com/custom-provider/api/v1',
+  baseDocUrl:'https://drive.google.com/drive/folders/157tCExmhO2j200MpMMfEG4AczG4HfzlW',
   allowServerSwitch: env.allow_switching_backend_instance,
   apiProvider: loadedEnv['apiProvider'] || '/fineract-provider/api',
   apiVersion: loadedEnv['apiVersion'] || '/v1',

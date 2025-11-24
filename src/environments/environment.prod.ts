@@ -17,6 +17,7 @@ export const environment = {
     'https://cbs-server.afidingcapital.com,https://dev.mifos.io,https://demo.mifos.io,https://qa.mifos.io,https://staging.mifos.io,https://mobile.mifos.io,https://demo.fineract.dev,https://localhost:8443',
   // For connecting to server running elsewhere set the base API URL
   baseApiUrl: loadedEnv['fineractApiUrl'] || window.location.protocol + '//' + window.location.hostname,
+  baseDocUrl:'https://drive.google.com/drive/folders/157tCExmhO2j200MpMMfEG4AczG4HfzlW',
   //baseApiUrl:'http://192.168.100.33:8080',
   oauthServerUrl: loadedEnv['oauthServerUrl'] || loadedEnv['fineractApiUrl'] + loadedEnv['apiProvider'],
   allowServerSwitch: env.allow_switching_backend_instance,
