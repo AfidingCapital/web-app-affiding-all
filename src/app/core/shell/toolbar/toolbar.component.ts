@@ -50,7 +50,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
 
   public libraryUrl: string = environment.baseDocUrl;
 
-  public librayLink(): void {
+  public libraryLink(): void {
     window.open(this.libraryUrl, '_blank');
   }
 
