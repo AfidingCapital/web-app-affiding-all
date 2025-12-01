@@ -1182,11 +1182,11 @@
       "Show prospect" : "Afficher le prospect",
       "Date of birth" : "Date de naissance",
       "accounting": {
-        "ASSET": "ACTIF",
-        "LIABILITY": "RESPONSABILITÉ",
-        "EQUITY": "ÉQUITÉ",
-        "INCOME": "REVENU",
-        "EXPENSE": "FRAIS"
+        "ASSET": "ACTIFS",
+        "LIABILITY": "PASSIFS",
+        "EQUITY": "CAPITAUX",
+        "INCOME": "PRODUITS",
+        "EXPENSE": "CHARGES"
       },
       "ACCOUNTING": "COMPTABILITÉ",
       "ADDRESS": "ADRESSE",

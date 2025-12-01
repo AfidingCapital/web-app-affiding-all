@@ -14,7 +14,7 @@ import { Logger } from '../logger/logger.service';
 import { AlertService } from '../alert/alert.service';
 
 /** Initialize Logger */
-const log = new Logger('ErrorHandlerInterceptor');
+const log = new Logger('ErrorHandler');
 
 /**
  * Http Request interceptor to add a default error handler to requests.
