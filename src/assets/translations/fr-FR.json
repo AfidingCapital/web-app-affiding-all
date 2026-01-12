@@ -1176,6 +1176,12 @@
       "Principal Amount": "Montant principal"
     },
     "inputs": {
+      "Province": "Province",
+      "District/Town" : "Territoire/Ville",
+      "Sector/Cheffery/Municipality" : "Secteur/Chefferie/Commune",
+      "Neighborhood": "Quartier",
+      "Village/Avenue" : "Village/Avenue",
+      "Reference" : "Reference",
       "Show prospects Accepted": "Afficher les prospects acceptés",
       "Show prospects Refused" : "Afficher les prospects refusés",
       "See the client":"Voir le client",

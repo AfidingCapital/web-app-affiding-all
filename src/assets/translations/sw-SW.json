@@ -1168,6 +1168,12 @@
       "Principal Amount": "Kiasi cha Mkuu"
     },
     "inputs": {
+       "Province": "Mkoa",
+      "District/Town" : "Wilaya/Mji",
+      "Sector/Cheffery/Municipality" : "Sekta/Cheffery/Manispaa",
+      "Neighborhood": "Mtaa",
+      "Village/Avenue" : "Kijiji/Avenue",
+      "Reference" : "Rejea",
       "Show prospects Accepted" : "Onyesha mtazamo kubali",
       "Show prospects Refused" : "Onyesha mtazamo kataliya",
       "See the client ": "Onyesha client",

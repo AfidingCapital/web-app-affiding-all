@@ -1,5 +1,5 @@
 /** Angular Imports */
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
@@ -12,6 +12,7 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 /** Custom Services */
 import { TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../clients.service';
+import { forkJoin } from 'rxjs';
 
 /**
  * Clients Address Tab Component
@@ -21,7 +22,7 @@ import { ClientsService } from '../../clients.service';
   templateUrl: './address-tab.component.html',
   styleUrls: ['./address-tab.component.scss']
 })
-export class AddressTabComponent {
+export class AddressTabComponent implements OnInit {
   /** Client Address Data */
   clientAddressData: any;
   /** Client Address Field Config */
@@ -31,24 +32,73 @@ export class AddressTabComponent {
   /** Client Id */
   clientId: string;
 
-  /**
-   * @param {ActivatedRoute} route Activated Route
-   * @param {ClientsService} clientService Clients Service
-   * @param {MatDialog} dialog Mat Dialog
-   * @param {TranslateService} translateService Translate Service.
-   */
+  // Expose les options de codes directement
+  public provinceIdOptions: any[] = []; // Province (27)
+  public districtTownOptions: any[] = []; // District/Town (42)
+  public sectorOptions: any[] = []; // Sector/Cheffery/Municipality (45)
+  public neighborhoodOptions: any[] = []; // Neighborhood (44)
+
   constructor(
     private route: ActivatedRoute,
     private clientService: ClientsService,
     private dialog: MatDialog,
     private translateService: TranslateService
-  ) {
+  ) {}
+
+  ngOnInit() {
+    // Chargement des données via route
     this.route.data.subscribe(
       (data: { clientAddressData: any; clientAddressFieldConfig: any; clientAddressTemplateData: any }) => {
         this.clientAddressData = data.clientAddressData;
         this.clientAddressFieldConfig = data.clientAddressFieldConfig;
         this.clientAddressTemplate = data.clientAddressTemplateData;
-        this.clientId = this.route.parent.snapshot.paramMap.get('clientId');
+        this.clientId = this.route.parent!.snapshot.paramMap.get('clientId')!;
+      }
+    );
+
+    // Chargement en parallèle des codes 27, 42, 45, 44
+    this.loadAllCodeValues();
+  }
+
+  private loadAllCodeValues() {
+    const obs27 = this.clientService.getCodeValues(27);
+    const obs42 = this.clientService.getCodeValues(42);
+    const obs45 = this.clientService.getCodeValues(45);
+    const obs44 = this.clientService.getCodeValues(44);
+
+    forkJoin([obs27, obs42, obs45, obs44]).subscribe(
+      (results: any[]) => {
+        const res27 = results[0] as any[];
+        const res42 = results[1] as any[];
+        const res45 = results[2] as any[];
+        const res44 = results[3] as any[];
+
+        // Mappez directement en { id, name }
+        this.provinceIdOptions = res27.map((it: any) => ({
+          id: it.id,
+          name: it.name
+        }));
+        this.districtTownOptions = res42.map((it: any) => ({
+          id: it.id,
+          name: it.name
+        }));
+        this.sectorOptions = res45.map((it: any) => ({
+          id: it.id,
+          name: it.name
+        }));
+        this.neighborhoodOptions = res44.map((it: any) => ({
+          id: it.id,
+          name: it.name
+        }));
+
+        // Optionnel: trie
+        this.provinceIdOptions.sort((a, b) => a.name.localeCompare(b.name));
+        this.districtTownOptions.sort((a, b) => a.name.localeCompare(b.name));
+        this.sectorOptions.sort((a, b) => a.name.localeCompare(b.name));
+        this.neighborhoodOptions.sort((a, b) => a.name.localeCompare(b.name));
+      },
+      (err) => {
+        console.error('Erreur lors du chargement des codes', err);
       }
     );
   }
@@ -173,6 +223,7 @@ export class AddressTabComponent {
           : null
       );
     }
+
     formfields.push(
       this.isFieldEnabled('street')
         ? new InputBase({
@@ -181,7 +232,7 @@ export class AddressTabComponent {
             value: address ? address.street : '',
             type: 'text',
             required: false,
-            order: 2
+            order: 10
           })
         : null
     );
@@ -189,79 +240,78 @@ export class AddressTabComponent {
       this.isFieldEnabled('addressLine1')
         ? new InputBase({
             controlName: 'addressLine1',
-            label: this.translateService.instant('labels.inputs.Address Line') + ' 1',
+            label: this.translateService.instant('labels.inputs.Village/Avenue'),
             value: address ? address.addressLine1 : '',
-            type: 'text',
-            order: 3
-          })
-        : null
-    );
-    formfields.push(
-      this.isFieldEnabled('addressLine2')
-        ? new InputBase({
-            controlName: 'addressLine2',
-            label: this.translateService.instant('labels.inputs.Address Line') + ' 2',
-            value: address ? address.addressLine2 : '',
-            type: 'text',
-            order: 4
-          })
-        : null
-    );
-    formfields.push(
-      this.isFieldEnabled('addressLine3')
-        ? new InputBase({
-            controlName: 'addressLine3',
-            label: this.translateService.instant('labels.inputs.Address Line') + ' 3',
-            value: address ? address.addressLine3 : '',
-            type: 'text',
-            order: 5
-          })
-        : null
-    );
-    formfields.push(
-      this.isFieldEnabled('townVillage')
-        ? new InputBase({
-            controlName: 'townVillage',
-            label: this.translateService.instant('labels.inputs.Town / Village'),
-            value: address ? address.townVillage : '',
-            type: 'text',
-            order: 6
-          })
-        : null
-    );
-    formfields.push(
-      this.isFieldEnabled('city')
-        ? new InputBase({
-            controlName: 'city',
-            label: this.translateService.instant('labels.inputs.City'),
-            value: address ? address.city : '',
             type: 'text',
             order: 7
           })
         : null
     );
     formfields.push(
-      this.isFieldEnabled('stateProvinceId')
-        ? new SelectBase({
-            controlName: 'stateProvinceId',
-            label: this.translateService.instant('labels.inputs.State / Province'),
-            value: address ? address.stateProvinceId : '',
-            options: { label: 'name', value: 'id', data: this.clientAddressTemplate.stateProvinceIdOptions },
+      this.isFieldEnabled('addressLine1')
+        ? new InputBase({
+            controlName: 'addressLine1',
+            label: this.translateService.instant('labels.inputs.Reference'),
+            value: address ? address.addressLine1 : '',
+            type: 'text',
             order: 8
           })
         : null
     );
+
+    // Province -> 27
     formfields.push(
-      this.isFieldEnabled('countyDistrict')
-        ? new InputBase({
-            controlName: 'countryDistrict',
-            label: this.translateService.instant('labels.inputs.State / Province'),
-            value: address ? address.countyDistrict : '',
-            type: 'text',
-            order: 11
+      this.isFieldEnabled('stateProvinceId')
+        ? new SelectBase({
+            controlName: 'stateProvinceId',
+            label: this.translateService.instant('labels.inputs.Sector/Cheffery/Municipality'),
+            value: address ? address.stateProvinceId : '',
+            options: { label: 'name', value: 'id', data: this.sectorOptions },
+            order: 5
           })
         : null
     );
+
+    // Neighborhood -> 44
+    formfields.push(
+      this.isFieldEnabled('stateProvinceId')
+        ? new SelectBase({
+            controlName: 'stateProvinceId',
+            label: this.translateService.instant('labels.inputs.Neighborhood'),
+            value: address ? address.stateProvinceId : '',
+            options: { label: 'name', value: 'id', data: this.neighborhoodOptions },
+            order: 6
+          })
+        : null
+    );
+
+    // Province -> 27
+    formfields.push(
+      this.isFieldEnabled('stateProvinceId')
+        ? new SelectBase({
+            controlName: 'stateProvinceId',
+            label: this.translateService.instant('labels.inputs.Province'),
+            value: address ? address.stateProvinceId : '',
+            options: { label: 'name', value: 'id', data: this.provinceIdOptions },
+            order: 3
+          })
+        : null
+    );
+
+    // District/Town -> 42
+    formfields.push(
+      this.isFieldEnabled('stateProvinceId')
+        ? new SelectBase({
+            controlName: 'stateProvinceId',
+            label: this.translateService.instant('labels.inputs.District/Town'),
+            value: address ? address.stateProvinceId : '',
+            options: { label: 'name', value: 'id', data: this.districtTownOptions },
+            order: 4
+          })
+        : null
+    );
+
+    // Pays
     formfields.push(
       this.isFieldEnabled('countryId')
         ? new SelectBase({
@@ -269,10 +319,12 @@ export class AddressTabComponent {
             label: this.translateService.instant('labels.inputs.Country'),
             value: address ? address.countryId : '',
             options: { label: 'name', value: 'id', data: this.clientAddressTemplate.countryIdOptions },
-            order: 10
+            order: 2
           })
         : null
     );
+
+    // Code postal
     formfields.push(
       this.isFieldEnabled('postalCode')
         ? new InputBase({
@@ -280,10 +332,11 @@ export class AddressTabComponent {
             label: this.translateService.instant('labels.inputs.Postal Code'),
             value: address ? address.postalCode : '',
             type: 'text',
-            order: 11
+            order: 9
           })
         : null
     );
+
     formfields = formfields.filter((field) => field !== null);
     return formfields;
   }

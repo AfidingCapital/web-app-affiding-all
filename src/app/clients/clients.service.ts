@@ -107,6 +107,10 @@ export class ClientsService {
     return this.http.get(`/clients/${clientId}`);
   }
 
+  getCodeValues(codeId: number) {
+    return this.http.get(`/codes/${codeId}/codevalues`);
+  }
+
   createClient(client: any) {
     return this.http.post(`/clients`, client);
   }

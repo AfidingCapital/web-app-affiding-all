@@ -1177,6 +1177,12 @@
       "Principal Amount": "Principal Amount"
     },
     "inputs": {
+      "Province": "Province",
+      "District/Town" : "District/Town",
+      "Sector/Cheffery/Municipality" : "Sector/Cheffery/Municipality",
+      "Neighborhood": "Neighborhood",
+      "Village/Avenue" : "Village/Avenue",
+      "Reference" : "Reference",
       "Show prospects Accepted": "Show prospects Accepted",
       "Show prospects Refused" : "Show prospects Refused",
       "See the client": "See the client",
