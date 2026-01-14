@@ -32,11 +32,16 @@ export class AddressTabComponent implements OnInit {
   /** Client Id */
   clientId: string;
 
-  // Expose les options de codes directement
+  // Options visibles
   public provinceIdOptions: any[] = []; // Province (27)
-  public districtTownOptions: any[] = []; // District/Town (42)
+  public territoryOptions: any[] = []; // Territoire/District/Town (autonome)
+  public districtTownOptions: any[] = []; // District/Town (anciennement filtré, mais maintenant autonome)
   public sectorOptions: any[] = []; // Sector/Cheffery/Municipality (45)
   public neighborhoodOptions: any[] = []; // Neighborhood (44)
+
+  // Listes brutes en arrière-plan
+  private allDistrictTownOptionsRaw: any[] = [];
+  private allTerritoryOptionsRaw: any[] = []; // Brut pour Territoire (District/Town)
 
   constructor(
     private route: ActivatedRoute,
@@ -61,41 +66,56 @@ export class AddressTabComponent implements OnInit {
   }
 
   private loadAllCodeValues() {
-    const obs27 = this.clientService.getCodeValues(27);
-    const obs42 = this.clientService.getCodeValues(42);
-    const obs45 = this.clientService.getCodeValues(45);
-    const obs44 = this.clientService.getCodeValues(44);
+    const obs27 = this.clientService.getCodeValues(27); // Provinces
+    const obs42 = this.clientService.getCodeValues(42); // District/Town (autonome)
+    const obs45 = this.clientService.getCodeValues(45); // Sector
+    const obs44 = this.clientService.getCodeValues(44); // Neighborhood
 
     forkJoin([obs27, obs42, obs45, obs44]).subscribe(
       (results: any[]) => {
-        const res27 = results[0] as any[];
-        const res42 = results[1] as any[];
-        const res45 = results[2] as any[];
-        const res44 = results[3] as any[];
+        const provinces = results[0] as any[];
+        const districts = results[1] as any[];
+        const sectors = results[2] as any[];
+        const neighborhoods = results[3] as any[];
 
-        // Mappez directement en { id, name }
-        this.provinceIdOptions = res27.map((it: any) => ({
-          id: it.id,
-          name: it.name
-        }));
-        this.districtTownOptions = res42.map((it: any) => ({
-          id: it.id,
-          name: it.name
-        }));
-        this.sectorOptions = res45.map((it: any) => ({
-          id: it.id,
-          name: it.name
-        }));
-        this.neighborhoodOptions = res44.map((it: any) => ({
-          id: it.id,
-          name: it.name
+        // Données brutes
+        this.allDistrictTownOptionsRaw = districts;
+        // Territoire brut, utilisé tel quel comme options autonome
+        this.allTerritoryOptionsRaw = districts;
+
+        // Provinces affichées (avec position)
+        this.provinceIdOptions = provinces.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          position: p.position
         }));
 
-        // Optionnel: trie
-        this.provinceIdOptions.sort((a, b) => a.name.localeCompare(b.name));
-        this.districtTownOptions.sort((a, b) => a.name.localeCompare(b.name));
-        this.sectorOptions.sort((a, b) => a.name.localeCompare(b.name));
-        this.neighborhoodOptions.sort((a, b) => a.name.localeCompare(b.name));
+        // Territoire affiché directement, sans filtrage (autonome)
+        this.territoryOptions = districts.map((d: any) => ({
+          id: d.id,
+          name: d.name
+        })).sort((a, b) => a.name.localeCompare(b.name));
+
+        // District/Town affichage (autonome aussi, identique à Territoire ici)
+        this.districtTownOptions = districts.map((d: any) => ({
+          id: d.id,
+          name: d.name
+        })).sort((a, b) => a.name.localeCompare(b.name));
+
+        // Sectors et Neighborhoods
+        this.sectorOptions = sectors
+          .map((s: any) => ({
+            id: s.id,
+            name: s.name
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        this.neighborhoodOptions = neighborhoods
+          .map((n: any) => ({
+            id: n.id,
+            name: n.name
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name));
       },
       (err) => {
         console.error('Erreur lors du chargement des codes', err);
@@ -127,6 +147,8 @@ export class AddressTabComponent implements OnInit {
             addressData.addressType = this.getSelectedValue('addressTypeIdOptions', addressData.addressType).name;
             addressData.isActive = false;
             this.clientAddressData.push(addressData);
+
+            // Rien à filtrer en fonction de Province ici, version autonome
           });
       }
     });
@@ -225,18 +247,6 @@ export class AddressTabComponent implements OnInit {
     }
 
     formfields.push(
-      this.isFieldEnabled('street')
-        ? new InputBase({
-            controlName: 'street',
-            label: this.translateService.instant('labels.inputs.Street'),
-            value: address ? address.street : '',
-            type: 'text',
-            required: false,
-            order: 10
-          })
-        : null
-    );
-    formfields.push(
       this.isFieldEnabled('addressLine1')
         ? new InputBase({
             controlName: 'addressLine1',
@@ -247,25 +257,13 @@ export class AddressTabComponent implements OnInit {
           })
         : null
     );
-    formfields.push(
-      this.isFieldEnabled('addressLine1')
-        ? new InputBase({
-            controlName: 'addressLine1',
-            label: this.translateService.instant('labels.inputs.Reference'),
-            value: address ? address.addressLine1 : '',
-            type: 'text',
-            order: 8
-          })
-        : null
-    );
 
-    // Province -> 27
     formfields.push(
-      this.isFieldEnabled('stateProvinceId')
+      this.isFieldEnabled('city')
         ? new SelectBase({
-            controlName: 'stateProvinceId',
+            controlName: 'city',
             label: this.translateService.instant('labels.inputs.Sector/Cheffery/Municipality'),
-            value: address ? address.stateProvinceId : '',
+            value: address ? address.city : '',
             options: { label: 'name', value: 'id', data: this.sectorOptions },
             order: 5
           })
@@ -274,11 +272,11 @@ export class AddressTabComponent implements OnInit {
 
     // Neighborhood -> 44
     formfields.push(
-      this.isFieldEnabled('stateProvinceId')
+      this.isFieldEnabled('addressLine3')
         ? new SelectBase({
-            controlName: 'stateProvinceId',
+            controlName: 'addressLine3',
             label: this.translateService.instant('labels.inputs.Neighborhood'),
-            value: address ? address.stateProvinceId : '',
+            value: address ? address.addressLine3 : '',
             options: { label: 'name', value: 'id', data: this.neighborhoodOptions },
             order: 6
           })
@@ -291,20 +289,33 @@ export class AddressTabComponent implements OnInit {
         ? new SelectBase({
             controlName: 'stateProvinceId',
             label: this.translateService.instant('labels.inputs.Province'),
-            value: address ? address.stateProvinceId : '',
+            value: address?.stateProvinceId ?? '',
             options: { label: 'name', value: 'id', data: this.provinceIdOptions },
             order: 3
           })
         : null
     );
 
-    // District/Town -> 42
+    // Territoire (District/Town) autonome — sans filtre
     formfields.push(
-      this.isFieldEnabled('stateProvinceId')
+      this.isFieldEnabled('territoryId')
         ? new SelectBase({
-            controlName: 'stateProvinceId',
+            controlName: 'territoryId',
+            label: this.translateService.instant('labels.inputs.Territory'),
+            value: address ? address.territoryId : '',
+            options: { label: 'name', value: 'id', data: this.territoryOptions },
+            order: 7
+          })
+        : null
+    );
+
+    // District/Town complémentaire (si nécessaire)
+    formfields.push(
+      this.isFieldEnabled('addressLine2')
+        ? new SelectBase({
+            controlName: 'addressLine2',
             label: this.translateService.instant('labels.inputs.District/Town'),
-            value: address ? address.stateProvinceId : '',
+            value: address ? address.addressLine2 : '',
             options: { label: 'name', value: 'id', data: this.districtTownOptions },
             order: 4
           })
@@ -332,7 +343,7 @@ export class AddressTabComponent implements OnInit {
             label: this.translateService.instant('labels.inputs.Postal Code'),
             value: address ? address.postalCode : '',
             type: 'text',
-            order: 9
+            order: 8
           })
         : null
     );
@@ -340,4 +351,5 @@ export class AddressTabComponent implements OnInit {
     formfields = formfields.filter((field) => field !== null);
     return formfields;
   }
+
 }

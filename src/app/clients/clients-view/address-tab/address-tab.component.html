@@ -28,20 +28,14 @@
       </div>
 
       <p>
-        <span *ngIf="isFieldEnabled('street')"
-          >{{ 'labels.inputs.Street' | translate }} : {{ address.street }}<br
+        <span *ngIf="isFieldEnabled('addressLine3')"
+          >{{ 'labels.inputs.Neighborhood' | translate }} : {{ address.addressLine3 }}<br
         /></span>
         <span *ngIf="isFieldEnabled('addressLine1')"
-          >{{ 'labels.inputs.Address Line' | translate }} 1 : {{ address.addressLine1 }}<br
+          >{{ 'labels.inputs.Village/Avenue' | translate }} : {{ address.addressLine1 }}<br
         /></span>
         <span *ngIf="isFieldEnabled('addressLine2')"
-          >{{ 'labels.inputs.Address Line' | translate }} 2 : {{ address.addressLine2 }}<br
-        /></span>
-        <span *ngIf="isFieldEnabled('addressLine3')"
-          >{{ 'labels.inputs.Address Line' | translate }} 3 : {{ address.addressLine3 }}<br
-        /></span>
-        <span *ngIf="isFieldEnabled('townVillage')"
-          >{{ 'labels.inputs.Town / Village' | translate }} : {{ address.townVillage }}<br
+          >{{ 'labels.inputs.District/Town' | translate }} : {{ address.addressLine2 }}<br
         /></span>
         <span *ngIf="isFieldEnabled('city')">{{ 'labels.inputs.City' | translate }} : {{ address.city }}<br /></span>
         <span *ngIf="isFieldEnabled('stateProvinceId')"
