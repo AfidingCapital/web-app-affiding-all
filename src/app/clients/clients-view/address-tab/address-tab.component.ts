@@ -29,15 +29,16 @@ export class AddressTabComponent implements OnInit {
   clientAddressFieldConfig: any;
   /** Client Address Template */
   clientAddressTemplate: any;
+  codeValuesTemplate: any = {}; // Pour les codes 27, 42, 45, 44, 47
   /** Client Id */
   clientId: string;
 
   // Options visibles
   public provinceIdOptions: any[] = []; // Province (27)
-  public territoryOptions: any[] = []; // Territoire/District/Town (autonome)
   public districtTownOptions: any[] = []; // District/Town (anciennement filtré, mais maintenant autonome)
   public sectorOptions: any[] = []; // Sector/Cheffery/Municipality (45)
   public neighborhoodOptions: any[] = []; // Neighborhood (44)
+  public postalCodeOptions: any[] = []; // Postal Code (47)
 
   // Listes brutes en arrière-plan
   private allDistrictTownOptionsRaw: any[] = [];
@@ -57,7 +58,7 @@ export class AddressTabComponent implements OnInit {
         this.clientAddressData = data.clientAddressData;
         this.clientAddressFieldConfig = data.clientAddressFieldConfig;
         this.clientAddressTemplate = data.clientAddressTemplateData;
-        this.clientId = this.route.parent!.snapshot.paramMap.get('clientId')!;
+        this.clientId = this.route.parent!.snapshot.paramMap.get('clientId');
       }
     );
 
@@ -70,13 +71,23 @@ export class AddressTabComponent implements OnInit {
     const obs42 = this.clientService.getCodeValues(42); // District/Town (autonome)
     const obs45 = this.clientService.getCodeValues(45); // Sector
     const obs44 = this.clientService.getCodeValues(44); // Neighborhood
+    const obs47 = this.clientService.getCodeValues(47); // Postal Code 
 
-    forkJoin([obs27, obs42, obs45, obs44]).subscribe(
+    forkJoin([obs27, obs42, obs45, obs44, obs47]).subscribe(
       (results: any[]) => {
         const provinces = results[0] as any[];
         const districts = results[1] as any[];
         const sectors = results[2] as any[];
         const neighborhoods = results[3] as any[];
+        const postalCodes = results[4] as any[];
+
+        this.codeValuesTemplate = {
+          provinceIdOptions: provinces,
+          districtTownOptions: districts,
+          sectorOptions: sectors,
+          neighborhoodOptions: neighborhoods,
+          postalCodeOptions: postalCodes,
+        };
 
         // Données brutes
         this.allDistrictTownOptionsRaw = districts;
@@ -90,32 +101,37 @@ export class AddressTabComponent implements OnInit {
           position: p.position
         }));
 
-        // Territoire affiché directement, sans filtrage (autonome)
-        this.territoryOptions = districts.map((d: any) => ({
-          id: d.id,
-          name: d.name
-        })).sort((a, b) => a.name.localeCompare(b.name));
-
+    
         // District/Town affichage (autonome aussi, identique à Territoire ici)
         this.districtTownOptions = districts.map((d: any) => ({
           id: d.id,
-          name: d.name
-        })).sort((a, b) => a.name.localeCompare(b.name));
+          name: d.name,
+          position: d.position
+        }));
 
-        // Sectors et Neighborhoods
+        // Sectors 
         this.sectorOptions = sectors
           .map((s: any) => ({
             id: s.id,
-            name: s.name
-          }))
-          .sort((a, b) => a.name.localeCompare(b.name));
+            name: s.name,
+            position: s.position
+          }));
 
+          // Neighborhoods
         this.neighborhoodOptions = neighborhoods
           .map((n: any) => ({
             id: n.id,
-            name: n.name
-          }))
-          .sort((a, b) => a.name.localeCompare(b.name));
+            name: n.name,
+            position: n.position
+          }));
+
+          //PostalCode
+          this.postalCodeOptions = postalCodes
+            .map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              position: p.position
+            }));
       },
       (err) => {
         console.error('Erreur lors du chargement des codes', err);
@@ -219,6 +235,19 @@ export class AddressTabComponent implements OnInit {
   }
 
   /**
+   * Find Pipe doesn't work with accordian
+   * @param {any} fieldName Field Name
+   * @param {any} fieldId Field Id
+   */
+
+  getSelectedCodeValue(fieldName: any, fieldId: any) {
+    if(this.codeValuesTemplate[fieldName]) {
+      return this.codeValuesTemplate[fieldName].find((fieldObj: any) => fieldObj.id == fieldId);
+    }
+    return "";
+  }
+
+  /**
    * Returns address form fields for form dialog.
    * @param {string} formType Form Type
    * @param {any} address Address
@@ -232,18 +261,42 @@ export class AddressTabComponent implements OnInit {
       );
     }
 
+    // Utilitaire interne: pushSelectField (factoring)
+    const pushSelectField = (spec: {
+      enabledKey: string;
+      controlName: string;
+      labelKey: string;
+      valueGetter: (addr?: any) => any;
+      options: { label: string; value: string; data: any[] };
+      order: number;
+    }) => {
+      const enabled = this.isFieldEnabled(spec.enabledKey);
+      const value = spec.valueGetter?.(address) ?? '';
+      if (enabled) {
+        formfields.push(
+          new SelectBase({
+            controlName: spec.controlName,
+            label: this.translateService.instant(spec.labelKey),
+            value,
+            options: spec.options,
+            order: spec.order
+          })
+        );
+      } else {
+        formfields.push(null);
+      }
+    };
+
+    // Champs communs et logique d’ajout
     if (formType === 'add') {
-      formfields.push(
-        this.isFieldEnabled('addressType')
-          ? new SelectBase({
-              controlName: 'addressType',
-              label: this.translateService.instant('labels.inputs.Address Type'),
-              value: address ? address.addressType : '',
-              options: { label: 'name', value: 'id', data: this.clientAddressTemplate.addressTypeIdOptions },
-              order: 1
-            })
-          : null
-      );
+      pushSelectField({
+        enabledKey: 'addressType',
+        controlName: 'addressType',
+        labelKey: 'labels.inputs.Address Type',
+        valueGetter: (addr) => (addr ? addr.addressType : ''), // addressType lors d'un ajout
+        options: { label: 'name', value: 'id', data: this.clientAddressTemplate.addressTypeIdOptions },
+        order: 1
+      });
     }
 
     formfields.push(
@@ -258,96 +311,68 @@ export class AddressTabComponent implements OnInit {
         : null
     );
 
-    formfields.push(
-      this.isFieldEnabled('city')
-        ? new SelectBase({
-            controlName: 'city',
-            label: this.translateService.instant('labels.inputs.Sector/Cheffery/Municipality'),
-            value: address ? address.city : '',
-            options: { label: 'name', value: 'id', data: this.sectorOptions },
-            order: 5
-          })
-        : null
-    );
+    // Postal Code 
+    pushSelectField({
+      enabledKey: 'postalCode',
+      controlName: 'postalCode',
+      labelKey: 'labels.inputs.Postal Code',
+      valueGetter: (addr) => addr?.postalCode ?? '',
+      options: { label: 'name', value: 'id', data: this.postalCodeOptions },
+      order: 9
+    });
+           
 
-    // Neighborhood -> 44
-    formfields.push(
-      this.isFieldEnabled('addressLine3')
-        ? new SelectBase({
-            controlName: 'addressLine3',
-            label: this.translateService.instant('labels.inputs.Neighborhood'),
-            value: address ? address.addressLine3 : '',
-            options: { label: 'name', value: 'id', data: this.neighborhoodOptions },
-            order: 6
-          })
-        : null
-    );
+    // City / Sector
+    pushSelectField({
+      enabledKey: 'city',
+      controlName: 'city',
+      labelKey: 'labels.inputs.Sector/Cheffery/Municipality',
+      valueGetter: (addr) => addr?.city ?? '',
+      options: { label: 'name', value: 'id', data: this.sectorOptions },
+      order: 5
+    });
 
-    // Province -> 27
-    formfields.push(
-      this.isFieldEnabled('stateProvinceId')
-        ? new SelectBase({
-            controlName: 'stateProvinceId',
-            label: this.translateService.instant('labels.inputs.Province'),
-            value: address?.stateProvinceId ?? '',
-            options: { label: 'name', value: 'id', data: this.provinceIdOptions },
-            order: 3
-          })
-        : null
-    );
+    // Neighborhood / addressLine3
+    pushSelectField({
+      enabledKey: 'addressLine3',
+      controlName: 'addressLine3',
+      labelKey: 'labels.inputs.Neighborhood',
+      valueGetter: (addr) => addr?.addressLine3 ?? '',
+      options: { label: 'name', value: 'id', data: this.neighborhoodOptions },
+      order: 6
+    });
 
-    // Territoire (District/Town) autonome — sans filtre
-    formfields.push(
-      this.isFieldEnabled('territoryId')
-        ? new SelectBase({
-            controlName: 'territoryId',
-            label: this.translateService.instant('labels.inputs.Territory'),
-            value: address ? address.territoryId : '',
-            options: { label: 'name', value: 'id', data: this.territoryOptions },
-            order: 7
-          })
-        : null
-    );
+    // Province
+    pushSelectField({
+      enabledKey: 'stateProvinceId',
+      controlName: 'stateProvinceId',
+      labelKey: 'labels.inputs.Province',
+      valueGetter: (addr) => addr?.stateProvinceId ?? '',
+      options: { label: 'name', value: 'id', data: this.provinceIdOptions },
+      order: 3
+    });
 
-    // District/Town complémentaire (si nécessaire)
-    formfields.push(
-      this.isFieldEnabled('addressLine2')
-        ? new SelectBase({
-            controlName: 'addressLine2',
-            label: this.translateService.instant('labels.inputs.District/Town'),
-            value: address ? address.addressLine2 : '',
-            options: { label: 'name', value: 'id', data: this.districtTownOptions },
-            order: 4
-          })
-        : null
-    );
+    // District/Town complémentaire
+    pushSelectField({
+      enabledKey: 'addressLine2',
+      controlName: 'addressLine2',
+      labelKey: 'labels.inputs.District/Town',
+      valueGetter: (addr) => addr?.addressLine2 ?? '',
+      options: { label: 'name', value: 'id', data: this.districtTownOptions },
+      order: 4
+    });
 
-    // Pays
-    formfields.push(
-      this.isFieldEnabled('countryId')
-        ? new SelectBase({
-            controlName: 'countryId',
-            label: this.translateService.instant('labels.inputs.Country'),
-            value: address ? address.countryId : '',
-            options: { label: 'name', value: 'id', data: this.clientAddressTemplate.countryIdOptions },
-            order: 2
-          })
-        : null
-    );
+    // Country
+    pushSelectField({
+      enabledKey: 'countryId',
+      controlName: 'countryId',
+      labelKey: 'labels.inputs.Country',
+      valueGetter: (addr) => addr?.countryId ?? '',
+      options: { label: 'name', value: 'id', data: this.clientAddressTemplate.countryIdOptions },
+      order: 2
+    });
 
-    // Code postal
-    formfields.push(
-      this.isFieldEnabled('postalCode')
-        ? new InputBase({
-            controlName: 'postalCode',
-            label: this.translateService.instant('labels.inputs.Postal Code'),
-            value: address ? address.postalCode : '',
-            type: 'text',
-            order: 8
-          })
-        : null
-    );
-
+    // Suppression éventuelle des nulls et retour
     formfields = formfields.filter((field) => field !== null);
     return formfields;
   }
