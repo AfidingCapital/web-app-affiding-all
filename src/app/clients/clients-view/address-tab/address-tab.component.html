@@ -29,7 +29,7 @@
 
       <p>
         <span *ngIf="isFieldEnabled('countryId')"
-          >{{ 'labels.inputs.Country' | translate }} : {{ getSelectedValue('countryIdOptions', address.countryId)?.name
+          >{{ 'labels.inputs.Country' | translate }} : {{ getSelectedCodeValue('countryIdOptions', address.countryId)?.name
           }}<br
         /></span>
         <span *ngIf="isFieldEnabled('stateProvinceId')"

@@ -29,21 +29,9 @@ export class AddressTabComponent implements OnInit {
   clientAddressFieldConfig: any;
   /** Client Address Template */
   clientAddressTemplate: any;
-  codeValuesTemplate: any = {}; // Pour les codes 27, 42, 45, 44, 47
+  codeValuesTemplate: any = {}; // Pour les codes 27, 28, 42, 45, 44, 47
   /** Client Id */
   clientId: string;
-
-  // Options visibles
-  public provinceIdOptions: any[] = []; // Province (27)
-  public territoryOptions: any[] = []; // Territoire/District/Town (autonome)
-  public districtTownOptions: any[] = []; // District/Town (anciennement filtré, mais maintenant autonome)
-  public sectorOptions: any[] = []; // Sector/Cheffery/Municipality (45)
-  public neighborhoodOptions: any[] = []; // Neighborhood (44)
-  public postalCodeOptions: any[] = []; // Postal Code (47)
-
-  // Listes brutes en arrière-plan
-  private allDistrictTownOptionsRaw: any[] = [];
-  private allTerritoryOptionsRaw: any[] = []; // Brut pour Territoire (District/Town)
 
   constructor(
     private route: ActivatedRoute,
@@ -63,69 +51,74 @@ export class AddressTabComponent implements OnInit {
       }
     );
 
-    // Chargement en parallèle des codes 27, 42, 45, 44
+    // Chargement en parallèle des codes 27, 28, 42, 45, 44, 47
     this.loadAllCodeValues();
   }
 
   private loadAllCodeValues() {
     const obs27 = this.clientService.getCodeValues(27); // Provinces
-    const obs42 = this.clientService.getCodeValues(42); // District/Town (autonome)
+    const obs28 = this.clientService.getCodeValues(28); // Country
+    const obs42 = this.clientService.getCodeValues(42); // District/Town 
     const obs45 = this.clientService.getCodeValues(45); // Sector
     const obs44 = this.clientService.getCodeValues(44); // Neighborhood
     const obs47 = this.clientService.getCodeValues(47); // Postal Code 
 
-    forkJoin([obs27, obs42, obs45, obs44, obs47]).subscribe(
+    forkJoin([obs27, obs28, obs42, obs45, obs44, obs47]).subscribe(
       (results: any[]) => {
         const provinces = results[0] as any[];
-        const districts = results[1] as any[];
-        const sectors = results[2] as any[];
-        const neighborhoods = results[3] as any[];
-        const postalCodes = results[4] as any[];
+        const country = results[1] as any[];
+        const districts = results[2] as any[];
+        const sectors = results[3] as any[];
+        const neighborhoods = results[4] as any[];
+        const postalCodes = results[5] as any[];
 
         this.codeValuesTemplate = {
           provinceIdOptions: provinces,
+          countryIdOptions: country,
           districtTownOptions: districts,
           sectorOptions: sectors,
           neighborhoodOptions: neighborhoods,
           postalCodeOptions: postalCodes
         };
-        console.log
 
-        // Données brutes
-        this.allDistrictTownOptionsRaw = districts;
-        // Territoire brut, utilisé tel quel comme options autonome
-        this.allTerritoryOptionsRaw = districts;
-
-        // Provinces affichées (avec position)
-        this.provinceIdOptions = provinces.map((p: any) => ({
+        // Province affichée
+        this.codeValuesTemplate.provinceIdOptions = provinces.map((p: any) => ({
           id: p.id,
           name: p.name,
           position: p.position
         }));
 
-        // Territoire affiché directement, sans filtrage (autonome)
-        this.territoryOptions = districts.map((d: any) => ({
+        //Country
+        this.codeValuesTemplate.countryIdOptions = country.map((c: any) => ({
+          id: c.id,
+          name: c.name,
+          position: c.position
+        }));
+
+        // Territoire affiché 
+        this.codeValuesTemplate.territoryOptions = districts.map((d: any) => ({
           id: d.id,
           name: d.name,
           position: d.position
         }));
 
-        // District/Town affichage (autonome aussi, identique à Territoire ici)
-        this.districtTownOptions = districts.map((d: any) => ({
+        // District/Town affichage 
+        this.codeValuesTemplate.districtTownOptions = districts.map((d: any) => ({
           id: d.id,
           name: d.name,
           position: d.position
         }));
 
-        // Sectors et Neighborhoods
-        this.sectorOptions = sectors
+        // Sectors 
+        this.codeValuesTemplate.sectorOptions = sectors
           .map((s: any) => ({
             id: s.id,
             name: s.name,
             position: s.position
           }));
 
-        this.neighborhoodOptions = neighborhoods
+          //Neighborhoods
+        this.codeValuesTemplate.neighborhoodOptions = neighborhoods
           .map((n: any) => ({
             id: n.id,
             name: n.name,
@@ -133,7 +126,7 @@ export class AddressTabComponent implements OnInit {
           }));
 
           // Codes postaux
-          this.postalCodeOptions = postalCodes
+          this.codeValuesTemplate.postalCodeOptions = postalCodes
             .map((p: any) => ({
               id: p.id,
               name: p.name,
@@ -170,8 +163,6 @@ export class AddressTabComponent implements OnInit {
             addressData.addressType = this.getSelectedValue('addressTypeIdOptions', addressData.addressType).name;
             addressData.isActive = false;
             this.clientAddressData.push(addressData);
-
-            // Rien à filtrer en fonction de Province ici, version autonome
           });
       }
     });
@@ -324,7 +315,7 @@ export class AddressTabComponent implements OnInit {
       controlName: 'postalCode',
       labelKey: 'labels.inputs.Postal Code',
       valueGetter: (addr) => addr?.postalCode ?? '',
-      options: { label: 'name', value: 'id', data: this.postalCodeOptions },
+      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.postalCodeOptions },
       order: 9
     });
 
@@ -334,7 +325,7 @@ export class AddressTabComponent implements OnInit {
       controlName: 'city',
       labelKey: 'labels.inputs.Sector/Cheffery/Municipality',
       valueGetter: (addr) => addr?.city ?? '',
-      options: { label: 'name', value: 'id', data: this.sectorOptions },
+      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.sectorOptions },
       order: 5
     });
 
@@ -344,7 +335,7 @@ export class AddressTabComponent implements OnInit {
       controlName: 'addressLine3',
       labelKey: 'labels.inputs.Neighborhood',
       valueGetter: (addr) => addr?.addressLine3 ?? '',
-      options: { label: 'name', value: 'id', data: this.neighborhoodOptions },
+      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.neighborhoodOptions },
       order: 6
     });
 
@@ -354,18 +345,8 @@ export class AddressTabComponent implements OnInit {
       controlName: 'stateProvinceId',
       labelKey: 'labels.inputs.Province',
       valueGetter: (addr) => addr?.stateProvinceId ?? '',
-      options: { label: 'name', value: 'id', data: this.provinceIdOptions },
+      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.provinceIdOptions },
       order: 3
-    });
-
-    // Territoire
-    pushSelectField({
-      enabledKey: 'territoryId',
-      controlName: 'territoryId',
-      labelKey: 'labels.inputs.Territory',
-      valueGetter: (addr) => addr?.territoryId ?? '',
-      options: { label: 'name', value: 'id', data: this.territoryOptions },
-      order: 7
     });
 
     // District/Town complémentaire
@@ -374,7 +355,7 @@ export class AddressTabComponent implements OnInit {
       controlName: 'addressLine2',
       labelKey: 'labels.inputs.District/Town',
       valueGetter: (addr) => addr?.addressLine2 ?? '',
-      options: { label: 'name', value: 'id', data: this.districtTownOptions },
+      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.districtTownOptions },
       order: 4
     });
 
@@ -384,7 +365,7 @@ export class AddressTabComponent implements OnInit {
       controlName: 'countryId',
       labelKey: 'labels.inputs.Country',
       valueGetter: (addr) => addr?.countryId ?? '',
-      options: { label: 'name', value: 'id', data: this.clientAddressTemplate.countryIdOptions },
+      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.countryIdOptions },
       order: 2
     });
 
