@@ -35,6 +35,7 @@ export class AddressTabComponent implements OnInit {
 
   // Options visibles
   public provinceIdOptions: any[] = []; // Province (27)
+  public territoryOptions: any[] = []; // Territoire/District/Town (autonome)
   public districtTownOptions: any[] = []; // District/Town (anciennement filtré, mais maintenant autonome)
   public sectorOptions: any[] = []; // Sector/Cheffery/Municipality (45)
   public neighborhoodOptions: any[] = []; // Neighborhood (44)
@@ -86,8 +87,9 @@ export class AddressTabComponent implements OnInit {
           districtTownOptions: districts,
           sectorOptions: sectors,
           neighborhoodOptions: neighborhoods,
-          postalCodeOptions: postalCodes,
+          postalCodeOptions: postalCodes
         };
+        console.log
 
         // Données brutes
         this.allDistrictTownOptionsRaw = districts;
@@ -101,7 +103,13 @@ export class AddressTabComponent implements OnInit {
           position: p.position
         }));
 
-    
+        // Territoire affiché directement, sans filtrage (autonome)
+        this.territoryOptions = districts.map((d: any) => ({
+          id: d.id,
+          name: d.name,
+          position: d.position
+        }));
+
         // District/Town affichage (autonome aussi, identique à Territoire ici)
         this.districtTownOptions = districts.map((d: any) => ({
           id: d.id,
@@ -109,7 +117,7 @@ export class AddressTabComponent implements OnInit {
           position: d.position
         }));
 
-        // Sectors 
+        // Sectors et Neighborhoods
         this.sectorOptions = sectors
           .map((s: any) => ({
             id: s.id,
@@ -117,7 +125,6 @@ export class AddressTabComponent implements OnInit {
             position: s.position
           }));
 
-          // Neighborhoods
         this.neighborhoodOptions = neighborhoods
           .map((n: any) => ({
             id: n.id,
@@ -125,7 +132,7 @@ export class AddressTabComponent implements OnInit {
             position: n.position
           }));
 
-          //PostalCode
+          // Codes postaux
           this.postalCodeOptions = postalCodes
             .map((p: any) => ({
               id: p.id,
@@ -311,7 +318,7 @@ export class AddressTabComponent implements OnInit {
         : null
     );
 
-    // Postal Code 
+    // Postal Code (ajouté — order ajusté à 9 pour respecter l’enchaînement logique)
     pushSelectField({
       enabledKey: 'postalCode',
       controlName: 'postalCode',
@@ -320,7 +327,6 @@ export class AddressTabComponent implements OnInit {
       options: { label: 'name', value: 'id', data: this.postalCodeOptions },
       order: 9
     });
-           
 
     // City / Sector
     pushSelectField({
@@ -350,6 +356,16 @@ export class AddressTabComponent implements OnInit {
       valueGetter: (addr) => addr?.stateProvinceId ?? '',
       options: { label: 'name', value: 'id', data: this.provinceIdOptions },
       order: 3
+    });
+
+    // Territoire
+    pushSelectField({
+      enabledKey: 'territoryId',
+      controlName: 'territoryId',
+      labelKey: 'labels.inputs.Territory',
+      valueGetter: (addr) => addr?.territoryId ?? '',
+      options: { label: 'name', value: 'id', data: this.territoryOptions },
+      order: 7
     });
 
     // District/Town complémentaire
