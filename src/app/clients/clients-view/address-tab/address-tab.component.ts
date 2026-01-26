@@ -12,7 +12,8 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 /** Custom Services */
 import { TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../clients.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 /**
  * Clients Address Tab Component
@@ -56,12 +57,12 @@ export class AddressTabComponent implements OnInit {
   }
 
   private loadAllCodeValues() {
-    const obs27 = this.clientService.getCodeValues(27); // Provinces
-    const obs28 = this.clientService.getCodeValues(28); // Country
-    const obs42 = this.clientService.getCodeValues(42); // District/Town 
-    const obs45 = this.clientService.getCodeValues(45); // Sector
-    const obs44 = this.clientService.getCodeValues(44); // Neighborhood
-    const obs47 = this.clientService.getCodeValues(47); // Postal Code 
+    const obs27 = this.clientService.getCodeValues(27).pipe(catchError(() => of([]))); // Provinces
+    const obs28 = this.clientService.getCodeValues(28).pipe(catchError(() => of([]))); // Country
+    const obs42 = this.clientService.getCodeValues(42).pipe(catchError(() => of([]))); // District/Town 
+    const obs45 = this.clientService.getCodeValues(45).pipe(catchError(() => of([]))); // Sector
+    const obs44 = this.clientService.getCodeValues(44).pipe(catchError(() => of([]))); // Neighborhood
+    const obs47 = this.clientService.getCodeValues(47).pipe(catchError(() => of([]))); // Postal Code 
 
     forkJoin([obs27, obs28, obs42, obs45, obs44, obs47]).subscribe(
       (results: any[]) => {
@@ -117,7 +118,7 @@ export class AddressTabComponent implements OnInit {
             position: s.position
           }));
 
-          //Neighborhoods
+        //Neighborhoods
         this.codeValuesTemplate.neighborhoodOptions = neighborhoods
           .map((n: any) => ({
             id: n.id,
@@ -125,13 +126,13 @@ export class AddressTabComponent implements OnInit {
             position: n.position
           }));
 
-          // Codes postaux
-          this.codeValuesTemplate.postalCodeOptions = postalCodes
-            .map((p: any) => ({
-              id: p.id,
-              name: p.name,
-              position: p.position
-            }));
+        // Codes postaux
+        this.codeValuesTemplate.postalCodeOptions = postalCodes
+          .map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            position: p.position
+          }));
       },
       (err) => {
         console.error('Erreur lors du chargement des codes', err);
@@ -150,7 +151,10 @@ export class AddressTabComponent implements OnInit {
         this.translateService.instant('labels.catalogs.Client') +
         ' ' +
         this.translateService.instant('labels.heading.Address'),
-      formfields: this.getAddressFormFields('add')
+      formfields: this.getAddressFormFields('add'),
+      // Passer les données pour le filtrage
+      codeValuesTemplate: this.codeValuesTemplate,
+      enableDistrictFiltering: true
     };
     const addAddressDialogRef = this.dialog.open(FormDialogComponent, { data });
     addAddressDialogRef.afterClosed().subscribe((response: any) => {
@@ -182,7 +186,10 @@ export class AddressTabComponent implements OnInit {
         ' ' +
         this.translateService.instant('labels.heading.Address'),
       formfields: this.getAddressFormFields('edit', address),
-      layout: { addButtonText: 'Edit' }
+      layout: { addButtonText: 'Edit' },
+      // Passer les données pour le filtrage
+      codeValuesTemplate: this.codeValuesTemplate,
+      enableDistrictFiltering: true
     };
     const editAddressDialogRef = this.dialog.open(FormDialogComponent, { data });
     editAddressDialogRef.afterClosed().subscribe((response: any) => {
@@ -237,7 +244,6 @@ export class AddressTabComponent implements OnInit {
    * @param {any} fieldName Field Name
    * @param {any} fieldId Field Id
    */
-
   getSelectedCodeValue(fieldName: any, fieldId: any) {
     if(this.codeValuesTemplate[fieldName]) {
       return this.codeValuesTemplate[fieldName].find((fieldObj: any) => fieldObj.id == fieldId);
@@ -285,7 +291,7 @@ export class AddressTabComponent implements OnInit {
       }
     };
 
-    // Champs communs et logique d’ajout
+    // Champs communs et logique d'ajout
     if (formType === 'add') {
       pushSelectField({
         enabledKey: 'addressType',
@@ -309,7 +315,7 @@ export class AddressTabComponent implements OnInit {
         : null
     );
 
-    // Postal Code (ajouté — order ajusté à 9 pour respecter l’enchaînement logique)
+    // Postal Code (ajouté — order ajusté à 9 pour respecter l'enchaînement logique)
     pushSelectField({
       enabledKey: 'postalCode',
       controlName: 'postalCode',
@@ -349,7 +355,7 @@ export class AddressTabComponent implements OnInit {
       order: 3
     });
 
-    // District/Town complémentaire
+    // District/Town - Utiliser TOUTES les options, le filtrage se fera dans le FormDialog
     pushSelectField({
       enabledKey: 'addressLine2',
       controlName: 'addressLine2',
@@ -373,5 +379,4 @@ export class AddressTabComponent implements OnInit {
     formfields = formfields.filter((field) => field !== null);
     return formfields;
   }
-
 }
