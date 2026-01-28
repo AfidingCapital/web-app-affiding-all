@@ -100,11 +100,11 @@
 <mat-menu #institutionMenu="matMenu" [overlapTrigger]="false">
   <button mat-menu-item [matMenuTriggerFor]="clientsMenu">{{ 'labels.menus.Clients' | translate }}</button>
   <span fxHide.lt>
-    <button mat-menu-item [matMenuTriggerFor]="financeMenu" *mifosxHasPermission="'CREATE_JOURNALENTRY'">{{ 'labels.menus.Finance' | translate }}</button>
-    <button mat-menu-item [matMenuTriggerFor]="reportsMenu" *mifosxHasPermission="'CREATE_REPORT'">{{ 'labels.menus.Reports' | translate }}</button>
-    <button mat-menu-item (click)="libraryLink()" *mifosxHasPermission="'CREATE_ADMIN'">{{ 'labels.menus.Library' | translate }}</button>
-    <button mat-menu-item [matMenuTriggerFor]="adminMenu" *mifosxHasPermission="'CREATE_ADMIN'">{{ 'labels.menus.Admin' | translate }}</button>
-    <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu" *mifosxHasPermission="'CREATE_SELF_SERVICE'">{{ 'labels.menus.Self Service' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="financeMenu" *ngIf="hasPermission('CREATE_JOURNALENTRY')">{{ 'labels.menus.Finance' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="reportsMenu" *ngIf="hasPermission('CREATE_REPORT')">{{ 'labels.menus.Reports' | translate }}</button>
+    <button mat-menu-item (click)="libraryLink()" *ngIf="hasPermission('CREATE_ADMIN')">{{ 'labels.menus.Library' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="adminMenu" *ngIf="hasPermission('CREATE_ADMIN')">{{ 'labels.menus.Admin' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu" *ngIf="hasPermission('CREATE_SELF_SERVICE')">{{ 'labels.menus.Self Service' | translate }}</button>
   </span>
 </mat-menu>
 
