@@ -32,15 +32,15 @@
     </a>
 
     <span fxHide.lt-lg="true">
-      <a #accounting mat-tab-link class="tab-link" [routerLink]="['/accounting']" *mifosxHasPermission="'CREATE_ACCOUNTINGRULE'">
+      <a #accounting mat-tab-link class="tab-link" [routerLink]="['/accounting']" *ngIf="hasPermission('CREATE_ACCOUNTINGRULE')">
         <fa-icon class="mr-05" icon="money-bill-alt" size="lg"></fa-icon>
         {{ 'labels.menus.Accounting' | translate }}
       </a>
-      <a #reports mat-tab-link class="tab-link" [matMenuTriggerFor]="reportsMenu" #reportsMenuTrigger="matMenuTrigger" *mifosxHasPermission="'CREATE_REPORT'">
+      <a #reports mat-tab-link class="tab-link" [matMenuTriggerFor]="reportsMenu" #reportsMenuTrigger="matMenuTrigger" *ngIf="hasPermission('CREATE_REPORT')">
         <fa-icon class="mr-05" icon="chart-bar" size="lg"></fa-icon>
         {{ 'labels.menus.Reports' | translate }}
       </a>
-      <a #admin mat-tab-link class="tab-link" [matMenuTriggerFor]="adminMenu" #adminMenuTrigger="matMenuTrigger" *mifosxHasPermission="'CREATE_ADMIN'">
+      <a #admin mat-tab-link class="tab-link" [matMenuTriggerFor]="adminMenu" #adminMenuTrigger="matMenuTrigger" *ngIf="hasPermission('CREATE_ADMIN')">
         <fa-icon class="mr-05" icon="shield-alt" size="lg"></fa-icon>
         {{ 'labels.menus.Admin' | translate }}
       </a>
@@ -50,13 +50,13 @@
         class="tab-link"
         [matMenuTriggerFor]="selfServiceMenu"
         #selfServiceMenuTrigger="matMenuTrigger"
-        *mifosxHasPermission="'CREATE_SELF_SERVICE'"
+        *ngIf="hasPermission('CREATE_SELF_SERVICE')"
       >
         <fa-icon class="mr-05" icon="users" size="lg"></fa-icon>
         {{ 'labels.menus.Self Service' | translate }}
       </a>
 
-      <a #configWizard mat-tab-link class="tab-link" (click)="openDialog()" *mifosxHasPermission="'CREATE_CONFIG_WIZARD'">
+      <a #configWizard mat-tab-link class="tab-link" (click)="openDialog()" *ngIf="hasPermission('CREATE_ADMIN')">
         <fa-icon class="mr-05" icon="info" size="lg"></fa-icon>
         {{ 'labels.menus.Configuration Wizard' | translate }}
       </a>
