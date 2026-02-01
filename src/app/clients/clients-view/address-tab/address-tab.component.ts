@@ -12,7 +12,8 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 /** Custom Services */
 import { TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../clients.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 /**
  * Clients Address Tab Component

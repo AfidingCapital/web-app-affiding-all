@@ -32,15 +32,15 @@
     </a>
 
     <span fxHide.lt-lg="true">
-      <a #accounting mat-tab-link class="tab-link" [routerLink]="['/accounting']">
+      <a #accounting mat-tab-link class="tab-link" [routerLink]="['/accounting']" *ngIf="hasPermission('CREATE_ACCOUNTINGRULE')">
         <fa-icon class="mr-05" icon="money-bill-alt" size="lg"></fa-icon>
         {{ 'labels.menus.Accounting' | translate }}
       </a>
-      <a #reports mat-tab-link class="tab-link" [matMenuTriggerFor]="reportsMenu" #reportsMenuTrigger="matMenuTrigger">
+      <a #reports mat-tab-link class="tab-link" [matMenuTriggerFor]="reportsMenu" #reportsMenuTrigger="matMenuTrigger" *ngIf="hasPermission('CREATE_REPORT')">
         <fa-icon class="mr-05" icon="chart-bar" size="lg"></fa-icon>
         {{ 'labels.menus.Reports' | translate }}
       </a>
-      <a #admin mat-tab-link class="tab-link" [matMenuTriggerFor]="adminMenu" #adminMenuTrigger="matMenuTrigger">
+      <a #admin mat-tab-link class="tab-link" [matMenuTriggerFor]="adminMenu" #adminMenuTrigger="matMenuTrigger" *ngIf="hasPermission('CREATE_ADMIN')">
         <fa-icon class="mr-05" icon="shield-alt" size="lg"></fa-icon>
         {{ 'labels.menus.Admin' | translate }}
       </a>
@@ -50,12 +50,13 @@
         class="tab-link"
         [matMenuTriggerFor]="selfServiceMenu"
         #selfServiceMenuTrigger="matMenuTrigger"
+        *ngIf="hasPermission('CREATE_SELF_SERVICE')"
       >
         <fa-icon class="mr-05" icon="users" size="lg"></fa-icon>
         {{ 'labels.menus.Self Service' | translate }}
       </a>
 
-      <a #configWizard mat-tab-link class="tab-link" (click)="openDialog()">
+      <a #configWizard mat-tab-link class="tab-link" (click)="openDialog()" *ngIf="hasPermission('CREATE_ADMIN')">
         <fa-icon class="mr-05" icon="info" size="lg"></fa-icon>
         {{ 'labels.menus.Configuration Wizard' | translate }}
       </a>
@@ -99,11 +100,11 @@
 <mat-menu #institutionMenu="matMenu" [overlapTrigger]="false">
   <button mat-menu-item [matMenuTriggerFor]="clientsMenu">{{ 'labels.menus.Clients' | translate }}</button>
   <span fxHide.lt>
-    <button mat-menu-item [matMenuTriggerFor]="financeMenu">{{ 'labels.menus.Finance' | translate }}</button>
-    <button mat-menu-item [matMenuTriggerFor]="reportsMenu">{{ 'labels.menus.Reports' | translate }}</button>
-    <button mat-menu-item (click)="libraryLink()">{{ 'labels.menus.Library' | translate }}</button>
-    <button mat-menu-item [matMenuTriggerFor]="adminMenu">{{ 'labels.menus.Admin' | translate }}</button>
-    <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu">{{ 'labels.menus.Self Service' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="financeMenu" *mifosxHasPermission="'CREATE_JOURNALENTRY'">{{ 'labels.menus.Finance' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="reportsMenu" *mifosxHasPermission="'CREATE_REPORT'">{{ 'labels.menus.Reports' | translate }}</button>
+    <button mat-menu-item (click)="libraryLink()" *mifosxHasPermission="'CREATE_ADMIN'">{{ 'labels.menus.Library' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="adminMenu" *mifosxHasPermission="'CREATE_ADMIN'">{{ 'labels.menus.Admin' | translate }}</button>
+    <button mat-menu-item [matMenuTriggerFor]="selfServiceMenu" *mifosxHasPermission="'CREATE_SELF_SERVICE'">{{ 'labels.menus.Self Service' | translate }}</button>
   </span>
 </mat-menu>
 

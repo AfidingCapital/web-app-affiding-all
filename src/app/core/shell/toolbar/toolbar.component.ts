@@ -67,6 +67,9 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   /** Sidenav collapse event. */
   @Output() collapse = new EventEmitter<boolean>();
 
+  /** User Permissions */
+  private userPermissions: any[];
+
   /**
    * @param {BreakpointObserver} breakpointObserver Breakpoint observer to detect screen size.
    * @param {Router} router Router for navigation.
@@ -83,7 +86,10 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
     private configurationWizardService: ConfigurationWizardService,
     private dialog: MatDialog,
     private changeDetector: ChangeDetectorRef
-  ) {}
+  ) {
+    const savedCredentials = this.authenticationService.getCredentials();
+    this.userPermissions = savedCredentials.permissions;
+  }
 
   /**
    * Subscribes to breakpoint for handset.
@@ -214,5 +220,33 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
 
   navigateMenu(routePath: string): void {
     this.router.navigate([routePath]);
+  }
+
+  /**
+   * Checks if user is permitted.
+   * @param {string} permission Permission
+   * @returns {true}
+   * -`ALL_FUNCTIONS`: user is a Super user.
+   * -`ALL_FUNCTIONS_READ`: user has all read permissions and passed permission is 'read' type.
+   * - User has special permission to access that feature.
+   * @returns {false}
+   * - Passed permission doesn't fall under either of above given permission grants.
+   * - No value was passed to the has permission directive.
+   */
+  hasPermission(permission: string): boolean {
+    permission = permission.trim();
+    if (this.userPermissions.includes('ALL_FUNCTIONS')) {
+      return true;
+    } else if (permission !== '') {
+      if (permission.substring(0, 5) === 'READ_' && this.userPermissions.includes('ALL_FUNCTIONS_READ')) {
+        return true;
+      } else if (this.userPermissions.includes(permission)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
   }
 }

@@ -26,9 +26,16 @@ export class ReportsService {
   /**
    * @returns {Observable<any>} Reports data
    */
-  getReports(): Observable<any> {
+  
+  /* getReports(): Observable<any> {
     return this.http.get('/reports');
-  }
+  } */
+
+  getReports(): Observable<any[]> {
+  return this.http.get<any[]>('/reports').pipe(
+    map(reports => reports.filter(report => report.id === 1 || report.id === 2))
+  );
+}
 
   /**
    * @returns {Observable<any>} Mix Taxonomy data

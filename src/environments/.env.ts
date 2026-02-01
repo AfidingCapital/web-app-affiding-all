@@ -2,8 +2,8 @@
 /* tslint:disable */
 export default {
   'mifos_x': {
-    'version': '260118',
-    'hash': 'b4a22d3c'
+    'version': '260127',
+    'hash': 'a2b8b83c'
   },
   'allow_switching_backend_instance': true
 };
