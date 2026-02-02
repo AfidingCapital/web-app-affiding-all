@@ -545,6 +545,8 @@
       "Yes": "Yes"
     },
     "catalogs": {
+      "Work": "Work",
+      "Home": "Home",
       "Interest payment waiver": "Interest Payment Waiver",
       "Active": "Active",
       "account_transfer": "account_transfer",

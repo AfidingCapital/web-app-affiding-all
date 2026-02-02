@@ -543,6 +543,8 @@
       "Yes": "Ndiyo"
     },
     "catalogs": {
+      "Work": "Kazi",
+      "Home": "Nyumbani",
       "Interest payment waiver": "Msamaha wa Malipo ya Riba",
       "Active": "Inayotumika",
       "account_transfer": "akaunti_uhamisho",

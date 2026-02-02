@@ -258,8 +258,19 @@ export class AddressTabComponent implements OnInit {
       this.displayOptions.neighborhoodOptions.data = [...neighborhoods];
 	  this.displayOptions.postalCodeOptions.data = [...postalcodes];	  
     }
-		
-	this.cdr.detectChanges(); // rafraîchissement explicite
+
+    //4. Neighborhood
+    if (fieldName === 'addressLine3') {
+      const selectedValue = this.displayOptions.neighborhoodOptions.data
+        .find((item: any) => item.id == newValue);
+
+      const postalcodes = this.codeValuesTemplate.postalCodeOptions
+        .filter((item: any) => item.position == selectedValue.position);
+
+      this.displayOptions.postalCodeOptions.data = [...postalcodes];
+    }
+
+    this.cdr.detectChanges(); // rafraîchissement explicite
   };
 
   /**

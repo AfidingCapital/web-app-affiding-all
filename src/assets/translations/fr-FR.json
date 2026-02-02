@@ -545,6 +545,8 @@
       "Yes": "Oui"
     },
     "catalogs": {
+      "Work": "Bureau",
+      "Home": "Domicile",
       "Interest payment waiver": "Renonciation au paiement des intérêts",
       "Active": "Actif",
       "account_transfer": "transfert_de compte",
