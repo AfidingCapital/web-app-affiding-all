@@ -15,6 +15,7 @@
         *ngIf="formfield.controlType === 'select'"
         [formControlName]="formfield.controlName"
         [required]="formfield.required"
+        (selectionChange)="formfield.onValueChange?.($event.value)"
       >
         <mat-option *ngFor="let option of formfield.options.data" [value]="option[formfield.options.value]">
           {{ option[formfield.options.label] }}
