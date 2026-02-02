@@ -67,7 +67,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
   /** Sidenav collapse event. */
   @Output() collapse = new EventEmitter<boolean>();
 
-  /** User Permissions */
+  /** 1.Ajouter la propriété userPermissions */
   private userPermissions: any[];
 
   /**
@@ -78,6 +78,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
    * @param {ConfigurationWizardService} configurationWizardService ConfigurationWizard Service.
    * @param {PopoverService} popoverService PopoverService.
    */
+  //2. Initialiser le tableau userPermissions
   constructor(
     private breakpointObserver: BreakpointObserver,
     private router: Router,
@@ -233,6 +234,8 @@ export class ToolbarComponent implements OnInit, AfterViewInit, AfterContentChec
    * - Passed permission doesn't fall under either of above given permission grants.
    * - No value was passed to the has permission directive.
    */
+
+  //3. Vérifier si l'utilisateur a la permission
   hasPermission(permission: string): boolean {
     permission = permission.trim();
     if (this.userPermissions.includes('ALL_FUNCTIONS')) {
