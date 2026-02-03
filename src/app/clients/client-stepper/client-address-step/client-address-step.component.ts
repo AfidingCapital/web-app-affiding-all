@@ -58,17 +58,17 @@ export class ClientAddressStepComponent implements OnInit {
         this.clientAddressFieldConfig = data.clientAddressFieldConfig;
         this.clientAddressTemplate = data.clientAddressTemplateData;
         this.clientId = this.route.parent!.snapshot.paramMap.get('clientId');
-        
-        // Traduction des options de type d'adresse
+
+        // Traduction des options de type d'adresse si elles existent déjà
         this.translateAddressTypeOptions();
-        
+
         // DEBUG: Afficher les données pour comprendre la structure
         console.log('clientAddressData:', this.clientAddressData);
         console.log('clientAddressTemplate:', this.clientAddressTemplate);
       }
     );
 
-    // Chargement en parallèle des codes 27, 28, 42, 45, 44, 47
+    // Chargement en parallèle des codes 27, 28, 29, 42, 45, 44, 47
     this.loadAllCodeValues();
   }
 
@@ -91,28 +91,40 @@ export class ClientAddressStepComponent implements OnInit {
   private loadAllCodeValues() {
     const obs27 = this.clientService.getCodeValues(27).pipe(catchError(() => of([]))); // Provinces
     const obs28 = this.clientService.getCodeValues(28).pipe(catchError(() => of([]))); // Country
-    const obs42 = this.clientService.getCodeValues(42).pipe(catchError(() => of([]))); // District/Town 
+    const obs29 = this.clientService.getCodeValues(29).pipe(catchError(() => of([]))); // Address Types
+    const obs42 = this.clientService.getCodeValues(42).pipe(catchError(() => of([]))); // District/Town
     const obs45 = this.clientService.getCodeValues(45).pipe(catchError(() => of([]))); // Sector
     const obs44 = this.clientService.getCodeValues(44).pipe(catchError(() => of([]))); // Neighborhood
-    const obs47 = this.clientService.getCodeValues(47).pipe(catchError(() => of([]))); // Postal Code 
+    const obs47 = this.clientService.getCodeValues(47).pipe(catchError(() => of([]))); // Postal Code
 
-    forkJoin([obs27, obs28, obs42, obs45, obs44, obs47]).subscribe(
+    forkJoin([obs27, obs28, obs29, obs42, obs45, obs44, obs47]).subscribe(
       (results: any[]) => {
         const provinces = results[0] as any[];
         const country = results[1] as any[];
-        const districts = results[2] as any[];
-        const sectors = results[3] as any[];
-        const neighborhoods = results[4] as any[];
-        const postalCodes = results[5] as any[];
+        const addressTypes = results[2] as any[];
+        const districts = results[3] as any[];
+        const sectors = results[4] as any[];
+        const neighborhoods = results[5] as any[];
+        const postalCodes = results[6] as any[];
 
         this.codeValuesTemplate = {
           provinceIdOptions: provinces,
           countryIdOptions: country,
+          addressTypeIdOptions: addressTypes,
           districtTownOptions: districts,
           sectorOptions: sectors,
           neighborhoodOptions: neighborhoods,
           postalCodeOptions: postalCodes
         };
+
+        // Set address type options in template if not already present
+        if (!this.clientAddressTemplate.addressTypeIdOptions) {
+          this.clientAddressTemplate.addressTypeIdOptions = addressTypes.map((type: any) => ({
+            id: type.id,
+            name: type.name,
+            position: type.position
+          }));
+        }
 
         // Province affichée
         this.codeValuesTemplate.provinceIdOptions = provinces.map((p: any) => ({
@@ -128,14 +140,14 @@ export class ClientAddressStepComponent implements OnInit {
           position: c.position
         }));
 
-        // District/Town affichage 
+        // District/Town affichage
         this.codeValuesTemplate.districtTownOptions = districts.map((d: any) => ({
           id: d.id,
           name: d.name,
           position: d.position
         }));
 
-        // Sectors 
+        // Sectors
         this.codeValuesTemplate.sectorOptions = sectors
           .map((s: any) => ({
             id: s.id,
@@ -158,6 +170,9 @@ export class ClientAddressStepComponent implements OnInit {
             name: p.name,
             position: p.position
           }));
+
+        // Translate address types after loading
+        this.translateAddressTypeOptions();
       },
       (err) => {
         console.error('Erreur lors du chargement des codes', err);
@@ -170,32 +185,22 @@ export class ClientAddressStepComponent implements OnInit {
    */
   addAddress() {
     const data = {
-      title: this.translateService.instant('labels.buttons.Add') + ' ' + this.translateService.instant('labels.heading.Address'),
-      formfields: this.getAddressFormFields('add'),
-      codeValuesTemplate: this.codeValuesTemplate,
-      enableDistrictFiltering: true
+      title: this.translateService.instant('labels.buttons.Add') +
+       ' ' + 
+      this.translateService.instant('labels.heading.Address'),
+      formfields: this.getAddressFormFields('add')
     };
-    
     const addAddressDialogRef = this.dialog.open(FormDialogComponent, { data, width: '50rem' });
-    
     addAddressDialogRef.afterClosed().subscribe((response: any) => {
-      if (response && response.data) {
-        const payload = response.data.value;
-        // Comme dans le Fichier 2, on appelle le service pour créer l'adresse
-        this.clientService.createClientAddress(this.clientId, payload.addressType, payload).subscribe((res: any) => {
-          const newAddress = { ...payload };
-          newAddress.addressId = res.resourceId;
-          
-          // Conversion ID -> Nom pour l'affichage dans le tableau
-          const typeObj = this.clientAddressTemplate.addressTypeIdOptions.find((o: any) => o.id == payload.addressType);
-          newAddress.addressTypeId =  payload.addressType;
-
-          const options = this.clientAddressTemplate.addressTypeIdOptions;
-        const selectedOption = options.find((o: any) => o.id == payload.addressType);
-        newAddress.addressType = selectedOption ? selectedOption.name : payload.addressType;
-          
-          
-          this.clientAddressData.push(newAddress);
+      if (response.data) {
+        this.clientService
+        .createClientAddress(this.clientId, response.data.value.addressType, response.data.value)
+        .subscribe((res: any) => {
+          const addressData = response.data.value;
+          addressData.addressId = res.resourceId;
+          addressData.addressType = this.getSelectedValue('addressTypeIdOptions', addressData.addressType).name;
+          addressData.isActive = false;
+          this.clientAddressData.push(addressData);
         });
       }
     });
@@ -207,19 +212,6 @@ export class ClientAddressStepComponent implements OnInit {
    * @param {number} index address index
    */
   editAddress(address: any, index: number) {
-    // Pour l'édition, nous devons trouver l'ID correspondant au nom
-    const addressForForm = { ...address };
-    
-    // Si address.addressType est un nom, trouver l'ID correspondant
-    if (addressForForm.addressType && this.clientAddressTemplate?.addressTypeIdOptions) {
-      const addressTypeObj = this.clientAddressTemplate.addressTypeIdOptions.find(
-        (option: any) => option.name === addressForForm.addressType
-      );
-      if (addressTypeObj) {
-        addressForForm.addressTypeId = addressTypeObj.id;
-      }
-    }
-    
     const data = {
       title:
         this.translateService.instant('labels.buttons.Edit') +
@@ -227,32 +219,21 @@ export class ClientAddressStepComponent implements OnInit {
         this.translateService.instant('labels.catalogs.Client') +
         ' ' +
         this.translateService.instant('labels.heading.Address'),
-      formfields: this.getAddressFormFields('edit', addressForForm),
+      formfields: this.getAddressFormFields(address),
       layout: { addButtonText: 'Edit' },
-      // Passer les données pour le filtrage
-      codeValuesTemplate: this.codeValuesTemplate,
-      enableDistrictFiltering: true
     };
     
     const editAddressDialogRef = this.dialog.open(FormDialogComponent, { data, width: '50rem' });
     
     editAddressDialogRef.afterClosed().subscribe((response: any) => {
-      if (response && response.data) {
+      if (response.data) {
         const addressData = response.data.value;
-        addressData.addressId = address.addressId;
         addressData.isActive = address.isActive;
-        
-        // Convertir l'ID en nom pour l'affichage
-        if (addressData.addressType && this.clientAddressTemplate?.addressTypeIdOptions) {
-          const addressTypeObj = this.clientAddressTemplate.addressTypeIdOptions.find(
-            (option: any) => option.id == addressData.addressType
-          );
-          if (addressTypeObj) {
-            addressData.addressType = addressTypeObj.name;
+        for (const key in addressData) {
+          if (addressData[key] === '' || addressData[key] === undefined) {
+            delete addressData[key];
           }
         }
-        
-        // Mettre à jour l'adresse dans la liste
         this.clientAddressData[index] = addressData;
       }
     });
@@ -303,34 +284,18 @@ export class ClientAddressStepComponent implements OnInit {
   getAddressFormFields(formType?: string, address?: any) {
     let formfields: FormfieldBase[] = [];
 
-    // DEBUG: Afficher les données du formulaire
-    console.log('getAddressFormFields appelé avec:', { formType, address });
-
-    // 1. RÉCUPÉRATION SÉCURISÉE DES OPTIONS
-    // On vérifie le nom exact des options dans le template
-    const addressTypeOptions = this.clientAddressTemplate?.addressTypeIdOptions || [];
-
-    // 2. TRADUCTION (comme dans le fichier 2)
-    addressTypeOptions.forEach((option: any) => {
-      // Si le nom n'est pas déjà traduit (ne contient pas d'espace ou est une clé)
-      if (option.name && !option.name.includes(' ')) {
-        option.name = this.translateService.instant(`labels.catalogs.${option.name}`);
-      }
-    });
-    
-
     // Type d'adresse (seulement pour l'ajout)
    if (this.isFieldEnabled('addressType')) {
       formfields.push(
         new SelectBase({
           controlName: 'addressTypeId', // CHANGEMENT : On utilise addressTypeId pour matcher votre JSON
           label: this.translateService.instant('labels.inputs.Address Type'),
-          // On prend l'ID (33) si disponible, sinon on cherche dans addressType
+          // On prend l'ID (29) si disponible, sinon on cherche dans addressType
           value: address ? (address.addressTypeId || address.addressType) : '',
-          options: { 
-            label: 'name', 
-            value: 'id', 
-            data: addressTypeOptions 
+          options: {
+            label: 'name',
+            value: 'id',
+            data: this.codeValuesTemplate?.addressTypeIdOptions || this.clientAddressTemplate?.addressTypeIdOptions || []
           },
           order: 1,
           required: true
