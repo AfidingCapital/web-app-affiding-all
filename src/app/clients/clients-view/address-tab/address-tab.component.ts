@@ -321,7 +321,11 @@ export class AddressTabComponent implements OnInit {
 		    	controlName: 'stateProvinceId',
 		        label: this.translateService.instant('labels.inputs.Province'),
 		        value: address ? address.stateProvinceId : '',
-		        options: { label: 'name', value: 'id', data: this.codeValuesTemplate.provinceIdOptions },
+		        options: { 
+              label: 'name', 
+              value: 'id', 
+              data: this.codeValuesTemplate.provinceIdOptions
+             },
 		        order:3,
 				onValueChange: (value:any) => this.onSelectionChange(value, 'stateProvinceId')
 		      }): null);		  
@@ -372,17 +376,6 @@ export class AddressTabComponent implements OnInit {
             order: 7
           })
         : null);
-	
-    // Postal Code (ajouté — order ajusté à 9 pour respecter l’enchaînement logique)
-/*    pushSelectField({
-      enabledKey: 'postalCode',
-      controlName: 'postalCode',
-      labelKey: 'labels.inputs.Postal Code',
-      valueGetter: (addr) => addr?.postalCode ?? '',
-      options: { label: 'name', value: 'id', data: this.codeValuesTemplate.postalCodeOptions },
-      order: 9,
-	  selectionChange:this.onSelectionChange
-    });*/
 	
 	formfields.push(
 	  this.isFieldEnabled('postalCode')

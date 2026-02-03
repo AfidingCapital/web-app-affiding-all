@@ -1,12 +1,12 @@
 /** Angular Imports */
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 
 /** Custom Models */
 import { FormfieldBase } from 'app/shared/form-dialog/formfield/model/formfield-base';
 import { InputBase } from 'app/shared/form-dialog/formfield/model/input-base';
-import { SelectBase } from 'app/shared/form-dialog/formfield/model/select-base';
+import { ValueChangeSelectBase } from 'app/shared/form-dialog/formfield/model/valuechangeselect-base';
 
 /** Custom Components */
 import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.component';
@@ -37,6 +37,16 @@ export class ClientAddressStepComponent implements OnInit {
   /** Client Id */
   clientId: string;
 
+  displayOptions:any = {
+	districtTownOptions: { label: 'name', value: 'id', data: [] },
+	sectorOptions:  { label: 'name', value: 'id', data: [] },
+	neighborhoodOptions:  { label: 'name', value: 'id', data: [] },
+	postalCodeOptions:  { label: 'name', value: 'id', data: [] }
+  };
+  
+  /** les options à afficher */
+  selectionOptions : any;
+
   /**
    * @param {MatDialog} dialog Mat Dialog
    * @param {TranslateService} translateService Translate Service.
@@ -47,8 +57,11 @@ export class ClientAddressStepComponent implements OnInit {
     private dialog: MatDialog,
     private translateService: TranslateService,
     private route: ActivatedRoute,
-    private clientService: ClientsService
-  ) {}
+    private clientService: ClientsService,
+    private cdr: ChangeDetectorRef
+  ) {
+    this.onSelectionChange = this.onSelectionChange.bind(this);
+  }
 
   ngOnInit() {
     // Chargement des données via route
@@ -58,13 +71,6 @@ export class ClientAddressStepComponent implements OnInit {
         this.clientAddressFieldConfig = data.clientAddressFieldConfig;
         this.clientAddressTemplate = data.clientAddressTemplateData;
         this.clientId = this.route.parent!.snapshot.paramMap.get('clientId');
-
-        // Traduction des options de type d'adresse si elles existent déjà
-        this.translateAddressTypeOptions();
-
-        // DEBUG: Afficher les données pour comprendre la structure
-        console.log('clientAddressData:', this.clientAddressData);
-        console.log('clientAddressTemplate:', this.clientAddressTemplate);
       }
     );
 
@@ -72,23 +78,7 @@ export class ClientAddressStepComponent implements OnInit {
     this.loadAllCodeValues();
   }
 
-  /**
-   * Traduit les options de type d'adresse
-   */
-  private translateAddressTypeOptions() {
-    if (this.clientAddressTemplate?.addressTypeIdOptions) {
-      for (let index = 0; index < this.clientAddressTemplate.addressTypeIdOptions.length; index++) {
-        this.clientAddressTemplate.addressTypeIdOptions[index].name = this.translateService.instant(
-          `labels.catalogs.${this.clientAddressTemplate.addressTypeIdOptions[index].name}`
-        );
-      }
-    }
-  }
-
-  /**
-   * Charge toutes les valeurs de code nécessaires
-   */
-  private loadAllCodeValues() {
+   private loadAllCodeValues() {
     const obs27 = this.clientService.getCodeValues(27).pipe(catchError(() => of([]))); // Provinces
     const obs28 = this.clientService.getCodeValues(28).pipe(catchError(() => of([]))); // Country
     const obs29 = this.clientService.getCodeValues(29).pipe(catchError(() => of([]))); // Address Types
@@ -117,62 +107,6 @@ export class ClientAddressStepComponent implements OnInit {
           postalCodeOptions: postalCodes
         };
 
-        // Set address type options in template if not already present
-        if (!this.clientAddressTemplate.addressTypeIdOptions) {
-          this.clientAddressTemplate.addressTypeIdOptions = addressTypes.map((type: any) => ({
-            id: type.id,
-            name: type.name,
-            position: type.position
-          }));
-        }
-
-        // Province affichée
-        this.codeValuesTemplate.provinceIdOptions = provinces.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          position: p.position
-        }));
-
-        // Country
-        this.codeValuesTemplate.countryIdOptions = country.map((c: any) => ({
-          id: c.id,
-          name: c.name,
-          position: c.position
-        }));
-
-        // District/Town affichage
-        this.codeValuesTemplate.districtTownOptions = districts.map((d: any) => ({
-          id: d.id,
-          name: d.name,
-          position: d.position
-        }));
-
-        // Sectors
-        this.codeValuesTemplate.sectorOptions = sectors
-          .map((s: any) => ({
-            id: s.id,
-            name: s.name,
-            position: s.position
-          }));
-
-        // Neighborhoods
-        this.codeValuesTemplate.neighborhoodOptions = neighborhoods
-          .map((n: any) => ({
-            id: n.id,
-            name: n.name,
-            position: n.position
-          }));
-
-        // Codes postaux
-        this.codeValuesTemplate.postalCodeOptions = postalCodes
-          .map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            position: p.position
-          }));
-
-        // Translate address types after loading
-        this.translateAddressTypeOptions();
       },
       (err) => {
         console.error('Erreur lors du chargement des codes', err);
@@ -276,6 +210,70 @@ export class ClientAddressStepComponent implements OnInit {
     return this.codeValuesTemplate[fieldName].find((fieldObj: any) => fieldObj.id == fieldId);
   }
 
+  onSelectionChange = (newValue: string, fieldName?: string) => {
+
+    // 1. Province → District/Town
+    if (fieldName === 'stateProvinceId') {
+      const selectedVaue = this.codeValuesTemplate.provinceIdOptions
+        .find((item: any) => item.id == newValue);
+
+      const selectedDistricts = this.codeValuesTemplate.districtTownOptions
+        .filter((item: any) => item.position.toString().startsWith(selectedVaue.position));
+			  
+	  this.displayOptions.districtTownOptions.data = [...selectedDistricts];
+	  this.displayOptions.sectorOptions.data = [];
+	  this.displayOptions.neighborhoodOptions.data = [];
+	  this.displayOptions.postalCodeOptions.data = [];
+	  	  
+    }
+
+    // 2. District/Town → Sector
+    if (fieldName === 'addressLine2') {
+      const selectedVaue = this.displayOptions.districtTownOptions.data
+        .find((item: any) => item.id == newValue);
+
+      const sectors = this.codeValuesTemplate.sectorOptions
+        .filter((item: any) => item.position.toString().startsWith(selectedVaue.position));
+
+	  const postalcodes = this.codeValuesTemplate.postalCodeOptions
+		.filter((item: any) => item.position == selectedVaue.position);	
+		
+      this.displayOptions.sectorOptions.data = [...sectors];
+	  this.displayOptions.neighborhoodOptions.data = [];
+	  this.displayOptions.postalCodeOptions.data = [...postalcodes];
+    }
+
+    // 3. Sector → Neighborhood
+    if (fieldName === 'city') {
+	  		
+      const selectedVaue = this.displayOptions.sectorOptions.data
+        .find((item: any) => item.id == newValue);
+		
+      const neighborhoods = this.codeValuesTemplate.neighborhoodOptions
+        .filter((item: any) => item.position.toString().startsWith(selectedVaue.position));
+		
+	  const postalcodes = this.codeValuesTemplate.postalCodeOptions
+		.filter((item: any) => item.position == selectedVaue.position);	
+
+      this.displayOptions.neighborhoodOptions.data = [...neighborhoods];
+	  this.displayOptions.postalCodeOptions.data = [...postalcodes];	  
+    }
+
+    //4. Neighborhood
+    if (fieldName === 'addressLine3') {
+      const selectedValue = this.displayOptions.neighborhoodOptions.data
+        .find((item: any) => item.id == newValue);
+
+      const postalcodes = this.codeValuesTemplate.postalCodeOptions
+        .filter((item: any) => item.position == selectedValue.position);
+
+      this.displayOptions.postalCodeOptions.data = [...postalcodes];
+    }
+
+    this.cdr.detectChanges(); // rafraîchissement explicite
+  };
+
+
   /**
    * Returns address form fields for form dialog.
    * @param {string} formType Form Type
@@ -287,7 +285,7 @@ export class ClientAddressStepComponent implements OnInit {
     // Type d'adresse (seulement pour l'ajout)
    if (this.isFieldEnabled('addressType')) {
       formfields.push(
-        new SelectBase({
+        new ValueChangeSelectBase({
           controlName: 'addressTypeId', // CHANGEMENT : On utilise addressTypeId pour matcher votre JSON
           label: this.translateService.instant('labels.inputs.Address Type'),
           // On prend l'ID (29) si disponible, sinon on cherche dans addressType
@@ -305,7 +303,7 @@ export class ClientAddressStepComponent implements OnInit {
     // Country
     formfields.push(
       this.isFieldEnabled('countryId')
-        ? new SelectBase({
+        ? new ValueChangeSelectBase({
             controlName: 'countryId',
             label: this.translateService.instant('labels.inputs.Country'),
             value: address ? address.countryId : '',
@@ -322,16 +320,17 @@ export class ClientAddressStepComponent implements OnInit {
     // Province
     formfields.push(
       this.isFieldEnabled('stateProvinceId')
-        ? new SelectBase({
+        ? new ValueChangeSelectBase({
             controlName: 'stateProvinceId',
             label: this.translateService.instant('labels.inputs.Province'),
             value: address ? address.stateProvinceId : '',
             options: { 
               label: 'name', 
               value: 'id', 
-              data: this.codeValuesTemplate?.provinceIdOptions || [] 
+              data: this.codeValuesTemplate.provinceIdOptions
             },
-            order: 3
+            order: 3,
+            onValueChange: (value:any) => this.onSelectionChange(value, 'stateProvinceId')
           })
         : null
     );
@@ -339,16 +338,13 @@ export class ClientAddressStepComponent implements OnInit {
     // District/Town
     formfields.push(
       this.isFieldEnabled('addressLine2')
-        ? new SelectBase({
+        ? new ValueChangeSelectBase({
             controlName: 'addressLine2',
             label: this.translateService.instant('labels.inputs.District/Town'),
             value: address ? address.addressLine2 : '',
-            options: { 
-              label: 'name', 
-              value: 'id', 
-              data: this.codeValuesTemplate?.districtTownOptions || [] 
-            },
-            order: 4
+            options: this.displayOptions.districtTownOptions,
+            order: 4,
+            onValueChange: (value:any) => this.onSelectionChange(value, 'addressLine2')
           })
         : null
     );
@@ -356,16 +352,13 @@ export class ClientAddressStepComponent implements OnInit {
     // City / Sector
     formfields.push(
       this.isFieldEnabled('city')
-        ? new SelectBase({
+        ? new ValueChangeSelectBase({
             controlName: 'city',
             label: this.translateService.instant('labels.inputs.Sector/Cheffery/Municipality'),
             value: address ? address.city : '',
-            options: { 
-              label: 'name', 
-              value: 'id', 
-              data: this.codeValuesTemplate?.sectorOptions || [] 
-            },
-            order: 5
+            options: this.displayOptions.sectorOptions,
+            order: 5,
+            onValueChange: (value:any) => this.onSelectionChange(value, 'city')
           })
         : null
     );
@@ -373,16 +366,13 @@ export class ClientAddressStepComponent implements OnInit {
     // Neighborhood / addressLine3
     formfields.push(
       this.isFieldEnabled('addressLine3')
-        ? new SelectBase({
+        ? new ValueChangeSelectBase({
             controlName: 'addressLine3',
             label: this.translateService.instant('labels.inputs.Neighborhood'),
             value: address ? address.addressLine3 : '',
-            options: { 
-              label: 'name', 
-              value: 'id', 
-              data: this.codeValuesTemplate?.neighborhoodOptions || [] 
-            },
-            order: 6
+            options: this.displayOptions.neighborhoodOptions,
+            order: 6,
+            onValueChange: (value:any) => this.onSelectionChange(value, 'addressLine3')
           })
         : null
     );
@@ -403,16 +393,13 @@ export class ClientAddressStepComponent implements OnInit {
     // Postal Code
     formfields.push(
       this.isFieldEnabled('postalCode')
-        ? new SelectBase({
+        ? new ValueChangeSelectBase({
             controlName: 'postalCode',
             label: this.translateService.instant('labels.inputs.Postal Code'),
             value: address ? address.postalCode : '',
-            options: { 
-              label: 'name', 
-              value: 'id', 
-              data: this.codeValuesTemplate?.postalCodeOptions || [] 
-            },
-            order: 8
+            options: this.displayOptions.postalCodeOptions,
+            order: 8,
+            onValueChange: (value:any) => this.onSelectionChange(value, 'postalCode')
           })
         : null
     );
@@ -420,10 +407,7 @@ export class ClientAddressStepComponent implements OnInit {
     // Suppression des nulls
     formfields = formfields.filter((field) => field !== null);
     
-    // DEBUG: Afficher les champs générés
-    console.log('Champs de formulaire générés:', formfields);
-    
-    return formfields.filter(field => field !== null).sort((a, b) => a.order - b.order);
+    return formfields;
   }
 
   /**
