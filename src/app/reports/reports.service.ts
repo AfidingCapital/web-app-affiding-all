@@ -4,12 +4,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 /** rxjs Imports */
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 /** Custom Models */
 import { ReportParameter } from './common-models/report-parameter.model';
 import { SelectOption } from './common-models/select-option.model';
 import { ChartData } from './common-models/chart-data.model';
+import { SystemService } from '../system/system.service';
 
 /**
  * Reports service.
@@ -20,22 +21,27 @@ import { ChartData } from './common-models/chart-data.model';
 export class ReportsService {
   /**
    * @param {HttpClient} http Http Client to send requests.
+   * @param {SystemService} systemService System Service.
    */
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private systemService: SystemService) {}
 
   /**
    * @returns {Observable<any>} Reports data
    */
-  
-  /* getReports(): Observable<any> {
-    return this.http.get('/reports');
-  } */
-
-  getReports(): Observable<any[]> {
-  return this.http.get<any[]>('/reports').pipe(
-    map(reports => reports.filter(report => report.id === 1 || report.id === 2))
-  );
-}
+  getReports(): Observable<any> {
+    return this.systemService.getRoles().pipe(
+      switchMap((roles: any[]) => {
+        const isSuperAgent = roles.some(role => role.name === "Super agent");
+        if (isSuperAgent) {
+          return this.http.get<any[]>('/reports').pipe(
+            map(reports => reports.filter(report => report.id === 1 || report.id === 2))
+          );
+        } else {
+          return this.http.get('/reports');
+        }
+      })
+    );
+  }
 
   /**
    * @returns {Observable<any>} Mix Taxonomy data
