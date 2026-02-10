@@ -27,7 +27,7 @@ export class ClientsService {
   /**
    * @param {HttpClient} http Http Client to send requests.
    */
- 
+
  private base = '/api/v1/clients'
 
   constructor(private http: HttpClient) {}
@@ -107,7 +107,8 @@ export class ClientsService {
     return this.http.get(`/clients/${clientId}`);
   }
 
-  getCodeValues(codeId: string) {
+
+  getCodeValues(codeId: number) {
     return this.http.get(`/codes/${codeId}/codevalues`);
   }
 
