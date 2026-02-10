@@ -11,6 +11,7 @@ import { ReportParameter } from './common-models/report-parameter.model';
 import { SelectOption } from './common-models/select-option.model';
 import { ChartData } from './common-models/chart-data.model';
 import { SystemService } from '../system/system.service';
+import { AuthenticationService } from '../core/authentication/authentication.service';
 
 /**
  * Reports service.
@@ -23,24 +24,22 @@ export class ReportsService {
    * @param {HttpClient} http Http Client to send requests.
    * @param {SystemService} systemService System Service.
    */
-  constructor(private http: HttpClient, private systemService: SystemService) {}
+  constructor(private http: HttpClient, private systemService: SystemService, private authenticationService: AuthenticationService) {}
 
   /**
    * @returns {Observable<any>} Reports data
    */
   getReports(): Observable<any> {
-    return this.systemService.getRoles().pipe(
-      switchMap((roles: any[]) => {
-        const isSuperAgent = roles.some(role => role.name === "Super agent");
-        if (isSuperAgent) {
-          return this.http.get<any[]>('/reports').pipe(
-            map(reports => reports.filter(report => report.id === 1 || report.id === 2))
-          );
-        } else {
-          return this.http.get('/reports');
-        }
-      })
-    );
+    const credentials = this.authenticationService.getCredentials();
+    const userRoles = credentials ? credentials.roles : [];
+    const isSuperAgent = userRoles.some((role: any) => role.name === "Super agent");
+    if (isSuperAgent) {
+      return this.http.get<any[]>('/reports').pipe(
+        map(reports => reports.filter(report => report.id === 1 || report.id === 2))
+      );
+    } else {
+      return this.http.get('/reports');
+    }
   }
 
   /**
