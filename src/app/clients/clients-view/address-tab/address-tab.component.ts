@@ -12,8 +12,7 @@ import { FormDialogComponent } from 'app/shared/form-dialog/form-dialog.componen
 /** Custom Services */
 import { TranslateService } from '@ngx-translate/core';
 import { ClientsService } from '../../clients.service';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 /**
  * Clients Address Tab Component
@@ -71,12 +70,12 @@ export class AddressTabComponent implements OnInit {
   }
 
   private loadAllCodeValues() {
-    const obs27 = this.clientService.getCodeValues(27); // Provinces
-    const obs28 = this.clientService.getCodeValues(28); // Country
-    const obs42 = this.clientService.getCodeValues(42); // District/Town 
-    const obs45 = this.clientService.getCodeValues(45); // Sector
-    const obs44 = this.clientService.getCodeValues(44); // Neighborhood
-    const obs47 = this.clientService.getCodeValues(47); // Postal Code 
+    const obs27 = this.clientService.getCodeValues('STATE'); // Provinces
+    const obs28 = this.clientService.getCodeValues('COUNTRY'); // Country
+    const obs42 = this.clientService.getCodeValues('DISTRICT/TOWN'); // District/Town
+    const obs45 = this.clientService.getCodeValues('SECTOR/CHEFFERY/MUNICIPALITY'); // Sector
+    const obs44 = this.clientService.getCodeValues('NEIGHBORHOOD'); // Neighborhood
+    const obs47 = this.clientService.getCodeValues('CODE_POSTAL'); // Postal Code
 
     forkJoin([obs27, obs28, obs42, obs45, obs44, obs47]).subscribe(
       (results: any[]) => {

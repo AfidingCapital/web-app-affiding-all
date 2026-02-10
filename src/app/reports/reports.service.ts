@@ -35,7 +35,7 @@ export class ReportsService {
     const isSuperAgent = userRoles.some((role: any) => role.name === "Super agent");
     if (isSuperAgent) {
       return this.http.get<any[]>('/reports').pipe(
-        map(reports => reports.filter(report => report.id === 1 || report.id === 2))
+        map(reports => reports.filter(report => report.reportName === "Client Listing" || report.reportName === "Client Loans Listing"))
       );
     } else {
       return this.http.get('/reports');

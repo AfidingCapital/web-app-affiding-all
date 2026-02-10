@@ -79,13 +79,13 @@ export class ClientAddressStepComponent implements OnInit {
   }
 
    private loadAllCodeValues() {
-    const obs27 = this.clientService.getCodeValues(27).pipe(catchError(() => of([]))); // Provinces
-    const obs28 = this.clientService.getCodeValues(28).pipe(catchError(() => of([]))); // Country
-    const obs29 = this.clientService.getCodeValues(29).pipe(catchError(() => of([]))); // Address Types
-    const obs42 = this.clientService.getCodeValues(42).pipe(catchError(() => of([]))); // District/Town
-    const obs45 = this.clientService.getCodeValues(45).pipe(catchError(() => of([]))); // Sector
-    const obs44 = this.clientService.getCodeValues(44).pipe(catchError(() => of([]))); // Neighborhood
-    const obs47 = this.clientService.getCodeValues(47).pipe(catchError(() => of([]))); // Postal Code
+    const obs27 = this.clientService.getCodeValues('STATE').pipe(catchError(() => of([]))); // Provinces
+    const obs28 = this.clientService.getCodeValues('COUNTRY').pipe(catchError(() => of([]))); // Country
+    const obs29 = this.clientService.getCodeValues('ADDRESS_TYPE').pipe(catchError(() => of([]))); // Address Types
+    const obs42 = this.clientService.getCodeValues('DISTRICT/TOWN').pipe(catchError(() => of([]))); // District/Town
+    const obs45 = this.clientService.getCodeValues('SECTOR/CHEFFERY/MUNICIPALITY').pipe(catchError(() => of([]))); // Sector
+    const obs44 = this.clientService.getCodeValues('NEIGHBORHOOD').pipe(catchError(() => of([]))); // Neighborhood
+    const obs47 = this.clientService.getCodeValues('CODE_POSTAL').pipe(catchError(() => of([]))); // Postal Code
 
     forkJoin([obs27, obs28, obs29, obs42, obs45, obs44, obs47]).subscribe(
       (results: any[]) => {

@@ -107,7 +107,7 @@ export class ClientsService {
     return this.http.get(`/clients/${clientId}`);
   }
 
-  getCodeValues(codeId: number) {
+  getCodeValues(codeId: string) {
     return this.http.get(`/codes/${codeId}/codevalues`);
   }
 
