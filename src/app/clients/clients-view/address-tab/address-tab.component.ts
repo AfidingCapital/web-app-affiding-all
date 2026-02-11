@@ -71,14 +71,23 @@ this.loadAllCodeValues();
 }
 
 private loadAllCodeValues() {
-const obs27 = this.clientService.getCodeValues(27); // Provinces
-const obs28 = this.clientService.getCodeValues(28); // Country
-const obs42 = this.clientService.getCodeValues(42); // District/Town 
-const obs45 = this.clientService.getCodeValues(45); // Sector
-const obs44 = this.clientService.getCodeValues(44); // Neighborhood
-const obs47 = this.clientService.getCodeValues(47); // Postal Code 
+this.clientService.getCodes().subscribe(
+(codes: any[]) => {
+const stateCode = codes.find(code => code.name === 'STATE');
+const countryCode = codes.find(code => code.name === 'COUNTRY');
+const districtTownCode = codes.find(code => code.name === 'DISTRICT_TOWN');
+const sectorCode = codes.find(code => code.name === 'SECTOR_CHEFFERY_MUNICIPALITY');
+const neighborhoodCode = codes.find(code => code.name === 'NEIGHBORHOOD');
+const postalCode = codes.find(code => code.name === 'CODE_POSTAL');
 
-forkJoin([obs27, obs28, obs42, obs45, obs44, obs47]).subscribe(
+const obsState = this.clientService.getCodeValues(stateCode.id);
+const obsCountry = this.clientService.getCodeValues(countryCode.id);
+const obsDistrictTown = this.clientService.getCodeValues(districtTownCode.id);
+const obsSector = this.clientService.getCodeValues(sectorCode.id);
+const obsNeighborhood = this.clientService.getCodeValues(neighborhoodCode.id);
+const obsPostalCode = this.clientService.getCodeValues(postalCode.id);
+
+forkJoin([obsState, obsCountry, obsDistrictTown, obsSector, obsNeighborhood, obsPostalCode]).subscribe(
 (results: any[]) => {
 const provinces = results[0] as any[];
 const country = results[1] as any[];
@@ -96,6 +105,11 @@ neighborhoodOptions: neighborhoods,
 postalCodeOptions: postalCodes
 };
 
+},
+(err) => {
+console.error('Erreur lors du chargement des codes', err);
+}
+);
 },
 (err) => {
 console.error('Erreur lors du chargement des codes', err);
