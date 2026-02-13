@@ -170,7 +170,7 @@
 
   <div
     fxFlexFill
-    *ngIf="clientTemplate.isAddressEnabled && client.address && client.address.length"
+    *ngIf="clientTemplate.isAddressEnabled && client.address"
     fxLayout="row wrap"
     fxLayout.lt-md="column"
   >
@@ -179,7 +179,7 @@
     <mat-divider fxFlexFill></mat-divider>
 
     <mat-accordion fxFlexFill class="m-t-5">
-      <mat-expansion-panel *ngFor="let address of client.address" class="address">
+      <mat-expansion-panel *ngFor="let address of client.address.address" class="address">
         <mat-expansion-panel-header>
           <mat-panel-title>
             {{ getSelectedValue('addressTypeIdOptions', address.addressTypeId)?.name }}
