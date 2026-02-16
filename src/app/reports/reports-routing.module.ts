@@ -18,6 +18,7 @@ import { MixTaxonomyResolver } from './common-resolvers/mixtaxonomy.resolver';
 import { MixMappingsResolver } from './common-resolvers/mixmappings.resolver';
 import { GlAccountsResolver } from '../accounting/common-resolvers/gl-accounts.resolver';
 import { GlobalConfigurationsResolver } from 'app/system/configurations/global-configurations-tab/global-configurations.resolver';
+import { ReportAccessGuard } from './common-resolvers/report-access.guard';
 
 /** Reports Routes */
 const routes: Routes = [
@@ -42,6 +43,7 @@ const routes: Routes = [
           path: 'run/:name',
           data: { title: 'Reports', routeParamBreadcrumb: 'name' },
           component: RunReportComponent,
+          canActivate: [ReportAccessGuard],
           resolve: {
             reportParameters: RunReportResolver,
             configurations: GlobalConfigurationsResolver
@@ -86,7 +88,8 @@ const routes: Routes = [
     RunReportResolver,
     MixTaxonomyResolver,
     MixMappingsResolver,
-    GlAccountsResolver
+    GlAccountsResolver,
+    ReportAccessGuard
   ]
 })
 export class ReportsRoutingModule {}

@@ -30,9 +30,9 @@ export class ClientAddressStepComponent {
   clientAddressData: any[] = [];
 
 /**
-  * @param {MatDialog} dialog Mat Dialog
-  * @param {TranslateService} translateService Translate Service.
-  */
+ * @param {MatDialog} dialog Mat Dialog
+ * @param {TranslateService} translateService Translate Service.
+ */
 constructor(
 private dialog: MatDialog,
     private translateService: TranslateService
@@ -42,7 +42,7 @@ private dialog: MatDialog,
 
 /**
    * Adds a client address
-  */
+ */
 addAddress() {
 const data = {
       title:
@@ -72,7 +72,7 @@ addAddressDialogRef.afterClosed().subscribe((response: any) => {
    * Edit Address
    * @param {any} address Address
    * @param {number} index Address index
-  */
+ */
 editAddress(address: any, index: number) {
 const data = {
 title:
@@ -100,9 +100,9 @@ this.clientAddressData[index] = addressData;
 }
 
 /**
-  * @param {any} address Client Address
+ * @param {any} address Client Address
    * @param {number} index Address index
-  */
+ */
   deleteAddress(address: any, index: number) {
     const deleteAddressDialogRef = this.dialog.open(DeleteDialogComponent, {
       data: {
@@ -119,7 +119,7 @@ this.clientAddressData[index] = addressData;
 /**
    * Toggles address activity
    * @param {any} address Address
-  */
+ */
   toggleAddress(address: any) {
     address.isActive = address.isActive ? false : true;
 }
@@ -127,7 +127,7 @@ this.clientAddressData[index] = addressData;
 /**
    * Checks if field is enabled in address configuration
    * @param {any} address Address
-  */
+ */
   isFieldEnabled(fieldName: any) {
     return this.clientAddressFieldConfig.find((fieldObj: any) => fieldObj.field === fieldName)?.isEnabled;
 }
@@ -136,15 +136,15 @@ this.clientAddressData[index] = addressData;
    * Retrieves field Id from name.
    * Find pipe doesn't work with accordian.
    * @param {any} address Address
-  */
+ */
   getSelectedValue(fieldName: any, fieldId: any) {
     return this.clientTemplate.address[0][fieldName].find((fieldObj: any) => fieldObj.id === fieldId);
 }
 
 /**
    * Gets formfields for form dialog.
-  * @param {any} address Address
-  */
+ * @param {any} address Address
+ */
   getAddressFormFields(address?: any) {
 let formfields: FormfieldBase[] = [];
 

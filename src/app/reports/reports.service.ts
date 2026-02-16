@@ -35,11 +35,37 @@ export class ReportsService {
     const isSuperAgent = userRoles.some((role: any) => role.name === "Super agent");
     if (isSuperAgent) {
       return this.http.get<any[]>('/reports').pipe(
-        map(reports => reports.filter(report => report.reportName === "Client Listing" || report.reportName === "Client Loans Listing"))
+        map(reports => reports.filter(report => report.reportName === "Client Listing" || report.reportName === "Client Loans Listing" || report.reportName === "Activite"))
       );
     } else {
       return this.http.get('/reports');
     }
+  }
+
+  /**
+   * Checks if the current user (super agent) has access to a specific report.
+   * @param {string} reportName The name of the report to check
+   * @returns {Observable<boolean>} True if the report is accessible, false otherwise
+   */
+  isReportAccessible(reportName: string): Observable<boolean> {
+    const credentials = this.authenticationService.getCredentials();
+    const userRoles = credentials ? credentials.roles : [];
+    const isSuperAgent = userRoles.some((role: any) => role.name === "Super agent");
+    
+    if (!isSuperAgent) {
+      // Non-super agents have access to all reports
+      return new Observable(observer => {
+        observer.next(true);
+        observer.complete();
+      });
+    }
+
+    // Super agents only have access to specific reports
+    const allowedReports = ["Client Listing", "Client Loans Listing", "Activite"];
+    return new Observable(observer => {
+      observer.next(allowedReports.includes(reportName));
+      observer.complete();
+    });
   }
 
   /**
