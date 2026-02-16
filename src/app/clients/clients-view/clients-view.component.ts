@@ -12,6 +12,7 @@ import { DeleteSignatureDialogComponent } from './custom-dialogs/delete-signatur
 import { DeleteDialogComponent } from 'app/shared/delete-dialog/delete-dialog.component';
 import { UploadImageDialogComponent } from './custom-dialogs/upload-image-dialog/upload-image-dialog.component';
 import { CaptureImageDialogComponent } from './custom-dialogs/capture-image-dialog/capture-image-dialog.component';
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
 
 /** Custom Services */
 import { ClientsService } from '../clients.service';
@@ -27,17 +28,30 @@ export class ClientsViewComponent implements OnInit {
   clientImage: any;
   clientTemplateData: any;
 
+  // Agent mobile check
+  isAgentMobile: boolean = false;
+  isSuperAgent: boolean = false;
+
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private clientsService: ClientsService,
     private _sanitizer: DomSanitizer,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private authenticationService: AuthenticationService
   ) {
     this.route.data.subscribe((data: { clientViewData: any; clientTemplateData: any; clientDatatables: any }) => {
       this.clientViewData = data.clientViewData;
       this.clientDatatables = data.clientDatatables;
       this.clientTemplateData = data.clientTemplateData;
+
+      // Check if user is Agent mobile
+    const credentials = this.authenticationService.getCredentials();
+    const userRoles = credentials ? credentials.roles : [];
+    this.isAgentMobile = userRoles.some((role: any) => role.name === "Agent Mobile");
+    this.isSuperAgent = userRoles.some((role: any) => role.name === "Super agent");
+
     });
   }
 

@@ -1,5 +1,5 @@
 <!-- Barre d’actions en haut -->
-<div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%" *ngIf="prospectData?.status === 1" aria-label="Actions Prospect">
+<div class="container m-b-20" fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="end" fxLayoutGap="2%" *ngIf="prospectData?.status === 1 && !isSuperAgent" aria-label="Actions Prospect">
   <button mat-raised-button color="primary" (click)="accept()" aria-label="Accepter le prospect">
     <fa-icon icon="cog" class="icon" aria-hidden="true"></fa-icon>
     {{ 'labels.buttons.Accept Prospect' | translate }}

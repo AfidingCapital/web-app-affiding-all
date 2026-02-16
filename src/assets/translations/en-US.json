@@ -13,8 +13,8 @@
   "august" : "august",
   "september" : "september",
   "october" : "october",
-    "november" : "november",
-    "december" : "december"
+  "november" : "november",
+  "december" : "december"
   },
   "errors": {
     "Email not valid": "Email not valid",
@@ -3528,7 +3528,17 @@
 
 "Homme":"Man",
 "Femme":"Woman",
-  "Search by client name, Account No, mobile": "Search by client name, Account No, mobile", 
+"Client Listing": "Client Listing",
+"Client Loans Listing" : "Client Loans Listing",
+"Loans Awaiting Disbursal" : "Loans Awaiting Disbursal",
+"Loans Awaiting Disbursal Summary" : "Loans Awaiting Disbursal Summary",
+"Loans Awaiting Disbursal Summary by Month" : "Loans Awaiting Disbursal Summary by Month",
+"Loans Pending Approval" : "Loans Pending Approval",
+"Active Loans-Summary" : "Active Loans-Summary",
+"Active Loans-Details" : "Active Loans-Details",
+"Obligation Met Loans Details" : "Obligation Met Loans Details",
+"Obligation Met Loans Summary" : "Obligation Met Loans Summary",
+  "Search by client name, Account No, mobile": "Search by client name, Account No, mobile",
   "is designed by": "is designed by the",
   "A global community": "A global community",
   "Only savings accounts are allowed" : "Only savings accounts are allowed",

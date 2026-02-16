@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProspectsService } from '../prospects.service';
 import { ClientsService } from '../../clients/clients.service';
+import { AuthenticationService } from 'app/core/authentication/authentication.service';
 import { ConfirmationDialogComponent } from 'app/shared/confirmation-dialog/confirmation-dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -59,6 +60,9 @@ export class ViewProspectComponent implements OnInit  {
   // status
   statusLabel: string | null = null;
 
+  // Super agent check
+  isSuperAgent: boolean = false;
+
   constructor(
     private clientsService: ClientsService,
     private _sanitizer: DomSanitizer,
@@ -67,9 +71,15 @@ export class ViewProspectComponent implements OnInit  {
     private router: Router,
     private dialog: MatDialog,
     private snackbar: MatSnackBar,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private authenticationService: AuthenticationService
   ) {
     this.translate = this.translateService;
+
+    // Check if user is Super agent
+    const credentials = this.authenticationService.getCredentials();
+    const userRoles = credentials ? credentials.roles : [];
+    this.isSuperAgent = userRoles.some((role: any) => role.name === "Super agent");
 
     // Chargement des données via la route (data: { user: any })
     this.route.data.subscribe((data: { user: any }) => {
