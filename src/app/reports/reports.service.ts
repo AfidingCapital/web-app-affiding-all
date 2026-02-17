@@ -69,6 +69,34 @@ export class ReportsService {
   }
 
   /**
+   * Checks if the current user is a super agent.
+   * @returns {boolean} True if the user is a super agent, false otherwise
+   */
+  isSuperAgent(): boolean {
+    const credentials = this.authenticationService.getCredentials();
+    const userRoles = credentials ? credentials.roles : [];
+    return userRoles.some((role: any) => role.name === "Super agent");
+  }
+
+  /**
+   * Gets the office ID of the current user.
+   * @returns {number | null} The office ID of the current user, or null if not available
+   */
+  getUserOfficeId(): number | null {
+    const credentials = this.authenticationService.getCredentials();
+    return credentials ? credentials.officeId : null;
+  }
+
+  /**
+   * Gets the office name of the current user.
+   * @returns {string | null} The office name of the current user, or null if not available
+   */
+  getUserOfficeName(): string | null {
+    const credentials = this.authenticationService.getCredentials();
+    return credentials ? credentials.officeName : null;
+  }
+
+  /**
    * @returns {Observable<any>} Mix Taxonomy data
    */
   getMixTaxonomyArray(): Observable<any> {

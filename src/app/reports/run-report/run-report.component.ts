@@ -206,6 +206,22 @@ export class RunReportComponent implements OnInit {
    */
   fetchSelectOptions(param: ReportParameter, inputstring: string) {
     this.reportsService.getSelectOptions(inputstring).subscribe((options: SelectOption[]) => {
+      // Check if user is super agent and parameter is for office
+      if (this.reportsService.isSuperAgent() && (param.name === 'officeId' || param.name === 'office')) {
+        const userOfficeId = this.reportsService.getUserOfficeId();
+        const userOfficeName = this.reportsService.getUserOfficeName();
+        
+        if (userOfficeId !== null && userOfficeName !== null) {
+          // Filter to only show the user's office
+          options = options.filter((option: SelectOption) => option.id === userOfficeId || option.id.toString() === userOfficeId.toString());
+          
+          // If no matching office found, add it manually
+          if (options.length === 0) {
+            options.push({ id: userOfficeId, name: userOfficeName });
+          }
+        }
+      }
+      
       param.selectOptions = options;
       if (param.selectAll === 'Y') {
         param.selectOptions.push({ id: '-1', name: 'All' });
