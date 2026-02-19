@@ -107,7 +107,19 @@ export class ClientGeneralStepComponent implements OnInit {
    * Sets select dropdown options.
    */
   setOptions() {
-    this.officeOptions = this.clientTemplate.officeOptions;
+    // Sort offices in hierarchical tree order (parent followed by children)
+    // Fetch all offices from /offices API to ensure complete hierarchy
+    this.clientService.getOffices().subscribe((offices: any[]) => {
+      // Build a map of office IDs from clientTemplate for filtering
+      const allowedOfficeIds = new Set(this.clientTemplate.officeOptions.map((o: any) => o.id));
+      
+      // Filter offices to only include those in clientTemplate
+      const filteredOffices = offices.filter((office: any) => allowedOfficeIds.has(office.id));
+      
+      // Sort the filtered offices hierarchically
+      this.officeOptions = this.sortOfficesHierarchically(filteredOffices);
+    });
+    
     this.staffOptions = this.clientTemplate.staffOptions;
     this.legalFormOptions = this.clientTemplate.clientLegalFormOptions;
     this.clientTypeOptions = this.clientTemplate.clientTypeOptions;
@@ -116,6 +128,70 @@ export class ClientGeneralStepComponent implements OnInit {
     this.constitutionOptions = this.clientTemplate.clientNonPersonConstitutionOptions;
     this.genderOptions = this.clientTemplate.genderOptions;
     this.savingProductOptions = this.clientTemplate.savingProductOptions;
+  }
+
+  /**
+   * Sorts offices in hierarchical tree order: parent followed by its children (depth-first).
+   * @param {any[]} offices Array of office objects
+   * @returns {any[]} Sorted array of offices
+   */
+  private sortOfficesHierarchically(offices: any[]): any[] {
+    if (!offices || offices.length === 0) {
+      return offices;
+    }
+
+    // Build a map of parentId -> children
+    const childrenMap = new Map<number, any[]>();
+    const officeMap = new Map<number, any>();
+    let rootOffices: any[] = [];
+
+    // First pass: build office map and identify potential roots
+    offices.forEach((office: any) => {
+      officeMap.set(office.id, office);
+    });
+
+    // Second pass: build parent-child relationships, avoiding circular references
+    offices.forEach((office: any) => {
+      if (!office.parentId) {
+        rootOffices.push(office);
+      } else {
+        // Check if parent exists in the office list
+        const parent = officeMap.get(office.parentId);
+        if (parent) {
+          // Check for circular reference (office's parent is its own child)
+          if (parent.parentId !== office.id) {
+            if (!childrenMap.has(office.parentId)) {
+              childrenMap.set(office.parentId, []);
+            }
+            childrenMap.get(office.parentId).push(office);
+          } else {
+            // Treat as root if circular reference detected
+            rootOffices.push(office);
+          }
+        } else {
+          // Parent not in list - this office should still be included but as a root
+          // This can happen when the API returns a filtered list
+          rootOffices.push(office);
+        }
+      }
+    });
+
+    // Depth-first traversal to build sorted list (with cycle detection)
+    const result: any[] = [];
+    const visited = new Set<number>();
+    
+    const traverse = (office: any) => {
+      if (visited.has(office.id)) {
+        return; // Avoid infinite loops
+      }
+      visited.add(office.id);
+      result.push(office);
+      const children = childrenMap.get(office.id) || [];
+      children.forEach((child: any) => traverse(child));
+    };
+
+    rootOffices.forEach((root: any) => traverse(root));
+    return result;
   }
 
   /**

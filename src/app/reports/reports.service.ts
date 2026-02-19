@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 /** rxjs Imports */
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 
 /** Custom Models */
@@ -115,10 +115,147 @@ export class ReportsService {
    * @returns {Observable<SelectOption[]>}
    */
   getSelectOptions(inputString: string): Observable<SelectOption[]> {
+    const credentials = this.authenticationService.getCredentials();
+    const userOfficeId = credentials ? credentials.officeId : null;
+    
     const httpParams = new HttpParams().set('parameterType', 'true');
     return this.http
       .get(`/runreports/${inputString}`, { params: httpParams })
-      .pipe(map((response: any) => response.data.map((entry: any) => new SelectOption(entry.row))));
+      .pipe(
+        switchMap((response: any) => {
+          let options: SelectOption[] = response.data.map((entry: any) => new SelectOption(entry.row));
+          
+          // For office-related selects, replace nameDecorated with name and use /offices order
+          const isOfficeParam = inputString.toLowerCase().includes('officename') || inputString.toLowerCase().includes('officeid');
+          if (isOfficeParam) {
+            return this.http.get<any[]>('/offices').pipe(
+              map((offices: any[]) => {
+                // Build a map of office id -> office name from /offices API
+                const officeNameMap = new Map<number, string>();
+                offices.forEach((office: any) => {
+                  officeNameMap.set(office.id, office.name);
+                });
+
+                // Replace nameDecorated with actual name from /offices API
+                options.forEach((option: SelectOption) => {
+                  if (officeNameMap.has(option.id)) {
+                    option.name = officeNameMap.get(option.id);
+                  }
+                });
+
+                // Filter by user's office and ALL its descendants if applicable
+                let filteredOffices = offices;
+                const userOfficeIdNum = Number(userOfficeId);
+                if (userOfficeId !== null && userOfficeId !== undefined) {
+                  const allowedOfficeIds = new Set<number>();
+                  allowedOfficeIds.add(userOfficeIdNum);
+                  
+                  // Build parent-child map for recursive descendant finding
+                  const childrenMap = new Map<number, any[]>();
+                  offices.forEach((office: any) => {
+                    if (office.parentId) {
+                      if (!childrenMap.has(office.parentId)) {
+                        childrenMap.set(office.parentId, []);
+                      }
+                      childrenMap.get(office.parentId).push(office);
+                    }
+                  });
+                  
+                  // Recursively add all descendants
+                  const addDescendants = (officeId: number) => {
+                    const children = childrenMap.get(officeId) || [];
+                    children.forEach((child: any) => {
+                      allowedOfficeIds.add(child.id);
+                      addDescendants(child.id); // Recursively add grandchildren
+                    });
+                  };
+                  addDescendants(userOfficeIdNum);
+                  
+                  // Filter both options and offices to show user's office, all descendants, and "All" option
+                  options = options.filter((option: SelectOption) => 
+                    allowedOfficeIds.has(option.id) || option.id === -1
+                  );
+                  filteredOffices = offices.filter((office: any) => allowedOfficeIds.has(office.id));
+                }
+
+                // Sort options in hierarchical tree order: parent followed by children
+                // Build tree-order index from filtered offices
+                const treeOrder = this.buildOfficeTreeOrder(filteredOffices);
+                const officeOrderMap = new Map<number, number>();
+                treeOrder.forEach((id: number, index: number) => {
+                  officeOrderMap.set(id, index);
+                });
+
+                options.sort((a: SelectOption, b: SelectOption) => {
+                  if (a.id === -1) return 1; // "All" option at the end
+                  if (b.id === -1) return -1;
+                  const orderA = officeOrderMap.has(a.id) ? officeOrderMap.get(a.id) : Number.MAX_SAFE_INTEGER;
+                  const orderB = officeOrderMap.has(b.id) ? officeOrderMap.get(b.id) : Number.MAX_SAFE_INTEGER;
+                  return orderA - orderB;
+                });
+                
+                return options;
+              })
+            );
+          }
+          
+          return of(options);
+        })
+      );
+  }
+
+  /**
+   * Builds a flat array of office IDs in hierarchical tree order.
+   * Parent offices are followed immediately by their children (depth-first).
+   * @param {any[]} offices Array of office objects from /offices API
+   * @returns {number[]} Array of office IDs in tree order
+   */
+  private buildOfficeTreeOrder(offices: any[]): number[] {
+    // Build a map of parentId -> children
+    const childrenMap = new Map<number, any[]>();
+    const officeMap = new Map<number, any>();
+    let rootOffices: any[] = [];
+
+    // First pass: build office map and identify potential roots
+    offices.forEach((office: any) => {
+      officeMap.set(office.id, office);
+    });
+
+    // Second pass: build parent-child relationships, avoiding circular references
+    offices.forEach((office: any) => {
+      if (!office.parentId) {
+        rootOffices.push(office);
+      } else {
+        // Check for circular reference (office's parent is its own child)
+        const parent = officeMap.get(office.parentId);
+        if (parent && parent.parentId !== office.id) {
+          if (!childrenMap.has(office.parentId)) {
+            childrenMap.set(office.parentId, []);
+          }
+          childrenMap.get(office.parentId).push(office);
+        } else {
+          // Treat as root if circular reference detected
+          rootOffices.push(office);
+        }
+      }
+    });
+
+    // Depth-first traversal to build tree order (with cycle detection)
+    const result: number[] = [];
+    const visited = new Set<number>();
+    
+    const traverse = (office: any) => {
+      if (visited.has(office.id)) {
+        return; // Avoid infinite loops
+      }
+      visited.add(office.id);
+      result.push(office.id);
+      const children = childrenMap.get(office.id) || [];
+      children.forEach((child: any) => traverse(child));
+    };
+
+    rootOffices.forEach((root: any) => traverse(root));
+    return result;
   }
 
   /**
